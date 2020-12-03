@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.bonitasoft</groupId>
+	<artifactId>bonita-project-store-maven-plugin</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Bonita Project Store Maven Plugin</name>
+	<packaging>maven-plugin</packaging>
+	<url>https://www.bonitasoft.com/</url>
+
+	<properties>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<maven-plugin-api.version>3.6.3</maven-plugin-api.version>
+		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
+		<maven-project.version>2.2.1</maven-project.version>
+		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+		<maven-artifact-transfer.version>0.12.0</maven-artifact-transfer.version>
+		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
+
+		<maven-invoker-plugin.version>3.2.1</maven-invoker-plugin.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<version>${maven-plugin-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.shared</groupId>
+			<artifactId>maven-artifact-transfer</artifactId>
+			<version>${maven-artifact-transfer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<version>${maven-plugin-annotations.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-project</artifactId>
+			<version>${maven-project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>${maven-plugin-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>default-descriptor</id>
+						<phase>process-classes</phase>
+					</execution>
+					<!-- if you want to generate help goal -->
+					<execution>
+						<id>help-goal</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-invoker-plugin</artifactId>
+				<version>${maven-invoker-plugin.version}</version>
+				<configuration>
+					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+					<settingsFile>src/it/settings.xml</settingsFile>
+					<localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+					<postBuildHookScript>verify</postBuildHookScript> <!-- no extension required -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>install</goal>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<scm>
+		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-project-store-maven-plugin.git</developerConnection>
+		<connection>scm:git:git@github.com:bonitasoft/bonita-project-store-maven-plugin.git</connection>
+		<url>https://github.com/bonitasoft/bonita-project-store-maven-plugin</url>
+		<tag>HEAD</tag>
+	</scm>
+</project>
