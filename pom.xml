@@ -153,6 +153,17 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>bintray</name>
+			<url>https://jcenter.bintray.com</url>
+		</repository>
+	</repositories>
+
 	<scm>
 		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-project-store-maven-plugin.git</developerConnection>
 		<connection>scm:git:git@github.com:bonitasoft/bonita-project-store-maven-plugin.git</connection>

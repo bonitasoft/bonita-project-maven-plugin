@@ -29,9 +29,14 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.plugin.version.PluginVersionResolver;
+import org.apache.maven.plugin.version.PluginVersionResult;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -44,6 +49,9 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverExcepti
 
 @Mojo(name = "install", defaultPhase = LifecyclePhase.VALIDATE)
 public class InstallProjectStoreMojo extends AbstractMojo {
+
+    private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
+    private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
@@ -62,6 +70,9 @@ public class InstallProjectStoreMojo extends AbstractMojo {
 
     @Component
     private ArtifactResolver artifactResolver;
+    
+    @Component
+    private PluginVersionResolver pluginVersionResolver;
 
     /**
      * Remote repositories which will be searched for artifacts.
@@ -78,12 +89,18 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Set<Artifact> artifacts = project.getDependencyArtifacts();
+        String installPluginVersion = "2.5.2";
+        try {
+             installPluginVersion = resolveInstallFilePluginVersion();
+        } catch (PluginVersionResolutionException e) {
+            throw new MojoExecutionException(e.getMessage());
+        }
         for (Artifact artifact : artifacts) {
             File artifactFile = findFileInProjectStore(artifact);
             if (artifactFile.exists() && artifact.isSnapshot()) { // Always update SNAPSHOT dependencies
                 try {
-                    installArtifact(artifact, artifactFile);
-                } catch (InstallFileExecutionException e) {
+                    installArtifact(artifact, artifactFile, installPluginVersion);
+                } catch (InstallFileExecutionException  e) {
                     throw new MojoExecutionException(e.getMessage());
                 }
             }
@@ -94,27 +111,27 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                 throw new MojoExecutionException(String.format("Failed to resolve artifact %s", artifact), e);
             } catch (ArtifactResolverException e) {
                 try {
-                    installArtifactFromProjectStore(artifact);
-                } catch (InstallFileExecutionException | ArtifactNotFoundException ex) {
+                    installArtifactFromProjectStore(artifact, installPluginVersion);
+                } catch (InstallFileExecutionException | ArtifactNotFoundException | PluginVersionResolutionException ex) {
                     throw new MojoExecutionException(ex.getMessage());
                 }
             }
         }
     }
 
-    private void installArtifactFromProjectStore(Artifact artifact)
-            throws ArtifactNotFoundException, InstallFileExecutionException {
+    private void installArtifactFromProjectStore(Artifact artifact, String installPluginVersion)
+            throws ArtifactNotFoundException, InstallFileExecutionException, PluginVersionResolutionException {
         File artifactFile = findFileInProjectStore(artifact);
         if (!artifactFile.exists()) {
             throw new ArtifactNotFoundException(
                     String.format("Failed to install artifact %s. Artifact file Not found: %s", artifact, artifactFile),
                     artifact);
         }
-        installArtifact(artifact, artifactFile);
+        installArtifact(artifact, artifactFile, installPluginVersion);
     }
 
-    private void installArtifact(Artifact artifact, File artifactFile) throws InstallFileExecutionException {
-        MavenExecutionResult executionResult = maven.execute(newInstallFileExecutionRequest(artifact, artifactFile));
+    private void installArtifact(Artifact artifact, File artifactFile, String installPluginVersion) throws InstallFileExecutionException {
+        MavenExecutionResult executionResult = maven.execute(newInstallFileExecutionRequest(artifact, artifactFile, installPluginVersion));
         if (executionResult.hasExceptions()) {
             throw new InstallFileExecutionException(executionResult.getExceptions());
         }
@@ -137,9 +154,12 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         return String.format("%s-%s.%s", artifact.getArtifactId(), artifact.getVersion(), artifact.getType());
     }
 
-    private MavenExecutionRequest newInstallFileExecutionRequest(Artifact artifact, File artifactFile) {
+    private MavenExecutionRequest newInstallFileExecutionRequest(Artifact artifact, File artifactFile, String installPluginVersion) {
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
-        executionRequest.setGoals(Arrays.asList("install:install-file"));
+        executionRequest.setGoals(Arrays.asList(String.format("%s:%s:%s:install-file",
+                INSTALL_PLUGIN_GROUP_ID,
+                INSTALL_PLUGIN_ARTIFACT_ID,
+                installPluginVersion)));
         executionRequest.setLocalRepository(localRepository);
         Properties installFileProperties = new Properties();
         installFileProperties.setProperty("groupId", artifact.getGroupId());
@@ -152,6 +172,18 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         installFileProperties.setProperty("packaging", artifact.getType());
         executionRequest.setUserProperties(installFileProperties);
         return executionRequest;
+    }
+
+    private String resolveInstallFilePluginVersion() throws PluginVersionResolutionException {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId(INSTALL_PLUGIN_GROUP_ID);
+        plugin.setArtifactId(INSTALL_PLUGIN_ARTIFACT_ID);
+        DefaultPluginVersionRequest pluginVersionRequest = new DefaultPluginVersionRequest(plugin, session);
+        pluginVersionRequest.setPom(project.getModel());
+        PluginVersionResult pluginVersionResult = pluginVersionResolver.resolve(pluginVersionRequest);
+        
+        String installPluginVersion = pluginVersionResult.getVersion();
+        return installPluginVersion;
     }
 
     /*
