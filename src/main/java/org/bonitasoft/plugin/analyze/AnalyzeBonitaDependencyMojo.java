@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin;
+package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,12 +43,12 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
-import org.bonitasoft.plugin.BonitaArtifact.Definition;
-import org.bonitasoft.plugin.BonitaArtifact.Form;
-import org.bonitasoft.plugin.BonitaArtifact.Implementation;
-import org.bonitasoft.plugin.BonitaArtifact.Page;
-import org.bonitasoft.plugin.BonitaArtifact.RestAPIExtension;
-import org.bonitasoft.plugin.BonitaArtifact.Theme;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Form;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Page;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.RestAPIExtension;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Theme;
 
 @Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {

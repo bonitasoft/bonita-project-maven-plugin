@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin;
+package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
-import org.bonitasoft.plugin.BonitaArtifact.Definition;
-import org.bonitasoft.plugin.BonitaArtifact.Form;
-import org.bonitasoft.plugin.BonitaArtifact.Implementation;
-import org.bonitasoft.plugin.BonitaArtifact.Page;
-import org.bonitasoft.plugin.BonitaArtifact.RestAPIExtension;
-import org.bonitasoft.plugin.BonitaArtifact.Theme;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Form;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Page;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.RestAPIExtension;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Theme;
 
 public class AnalysisResult {
 
@@ -106,30 +106,28 @@ public class AnalysisResult {
     }
 
     public void printResult(Log log) {
-        log.info("==== Bonita artifacts analysis result ===");
-
-        log.info(String.format("%s Connector definitions found", connectorDefinitions.size()));
+        log.info(String.format("=== %s Connector definitions found ===", connectorDefinitions.size()));
         connectorDefinitions.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Connector implementations found", connectorImplmentations.size()));
+        log.info(String.format("=== %s Connector implementations found ===", connectorImplmentations.size()));
         connectorImplmentations.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Actor filter definitions found", filterDefinitions.size()));
+        log.info(String.format("=== %s Actor filter definitions found ===", filterDefinitions.size()));
         filterDefinitions.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Actor filter implementations found", filterImplmentations.size()));
+        log.info(String.format("=== %s Actor filter implementations found ===", filterImplmentations.size()));
         filterImplmentations.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Pages found", pages.size()));
+        log.info(String.format("=== %s Pages found ===", pages.size()));
         pages.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Forms found", forms.size()));
+        log.info(String.format("=== %s Forms found", forms.size()));
         forms.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Rest API Extensions found", restApiExtensions.size()));
+        log.info(String.format("=== %s Rest API Extensions found ===", restApiExtensions.size()));
         restApiExtensions.stream().map(Object::toString).forEach(log::info);
 
-        log.info(String.format("%s Themes found", themes.size()));
+        log.info(String.format("=== %s Themes found ===", themes.size()));
         themes.stream().map(Object::toString).forEach(log::info);
     }
 
@@ -139,31 +137,35 @@ public class AnalysisResult {
         Files.createFile(outputFile.toPath());
         try (FileWriter fileWriter = new FileWriter(outputFile);
              PrintWriter printWriter = new PrintWriter(fileWriter)) {
-            connectorImplmentations.stream().forEach(impl -> printWriter.printf("%s,%s,%s,%s,%s,%s,%s%n",
+            connectorImplmentations.stream().forEach(impl -> printWriter.printf("%s,%s,%s,%s,%s,%s,%s,%s%n",
                     "CONNECTOR_IMPLEMENTATION",
                     impl.getImplementationId(),
                     impl.getImplementationVersion(),
                     impl.getClassName(),
                     impl.getDefinitionId(),
                     impl.getDefinitionVersion(),
+                    impl.getPath(),
                     impl.getArtifact().getFile()));
-            filterImplmentations.stream().forEach(impl -> printWriter.printf("%s,%s,%s,%s,%s,%s,%s%n",
+            filterImplmentations.stream().forEach(impl -> printWriter.printf("%s,%s,%s,%s,%s,%s,%s,%s%n",
                     "FILTER_IMPLEMENTATION",
                     impl.getImplementationId(),
                     impl.getImplementationVersion(),
                     impl.getClassName(),
                     impl.getDefinitionId(),
                     impl.getDefinitionVersion(),
+                    impl.getPath(),
                     impl.getArtifact().getFile()));
-            connectorDefinitions.stream().forEach(def -> printWriter.printf("%s,%s,%s,%s%n",
+            connectorDefinitions.stream().forEach(def -> printWriter.printf("%s,%s,%s,%s,%s%n",
                     "CONNECTOR_DEFINITION",
                     def.getDefinitionId(),
                     def.getDefinitionVersion(),
+                    def.getEntryPath(),
                     def.getArtifact().getFile()));
-            filterDefinitions.stream().forEach(def -> printWriter.printf("%s,%s,%s,%s%n",
+            filterDefinitions.stream().forEach(def -> printWriter.printf("%s,%s,%s,%s,%s%n",
                     "FILTER_DEFINITION",
                     def.getDefinitionId(),
                     def.getDefinitionVersion(),
+                    def.getEntryPath(),
                     def.getArtifact().getFile()));
             pages.stream().forEach(page -> printWriter.printf("%s,%s,%s,%s%n",
                     "PAGE",

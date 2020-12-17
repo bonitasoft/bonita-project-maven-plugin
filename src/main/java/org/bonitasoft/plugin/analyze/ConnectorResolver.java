@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin;
+package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +31,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.artifact.Artifact;
-import org.bonitasoft.plugin.BonitaArtifact.Definition;
-import org.bonitasoft.plugin.BonitaArtifact.Implementation;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
 import org.jd.core.v1.api.loader.Loader;
 import org.jd.core.v1.api.loader.LoaderException;
 import org.jd.core.v1.model.classfile.ClassFile;
@@ -64,7 +64,7 @@ public class ConnectorResolver {
     public List<Implementation> findAllImplementations(Artifact artifact) throws IOException {
         return findImplementationDescriptors(artifact.getFile())
                 .stream()
-                .map(document -> Implementation.create(document, artifact))
+                .map(resource -> Implementation.create(resource.getDocument(),resource.getPath(), artifact))
                 .map(implementation -> detectImplementationType(implementation, artifact.getFile()))
                 .collect(Collectors.toList());
     }
@@ -72,12 +72,12 @@ public class ConnectorResolver {
     public List<Definition> findAllDefinitions(Artifact artifact) throws IOException {
         return findDefinitionDescriptors(artifact.getFile())
                 .stream()
-                .map(document -> Definition.create(document, artifact))
+                .map(resource -> Definition.create(resource.getDocument(),resource.getPath(), artifact))
                 .collect(Collectors.toList());
     }
 
-    private List<Document> findImplementationDescriptors(File artifactFile) throws IOException {
-        List<Document> descriptors = new ArrayList<>();
+    private List<DocumentResource> findImplementationDescriptors(File artifactFile) throws IOException {
+        List<DocumentResource> descriptors = new ArrayList<>();
         try (JarFile jarFile = new JarFile(artifactFile)) {
             Enumeration<JarEntry> enumOfJar = jarFile.entries();
             while (enumOfJar.hasMoreElements()) {
@@ -87,7 +87,7 @@ public class ConnectorResolver {
                     try (InputStream is = jarFile.getInputStream(jarEntry)) {
                         Document document = asXMLDocument(is, IMPLEMENTATION_NS);
                         if (document != null) {
-                            descriptors.add(document);
+                            descriptors.add(new DocumentResource(jarEntry.toString(), document));
                         }
                     }
                 }
@@ -96,8 +96,8 @@ public class ConnectorResolver {
         return descriptors;
     }
 
-    private List<Document> findDefinitionDescriptors(File artifactFile) throws IOException {
-        List<Document> descriptors = new ArrayList<>();
+    private List<DocumentResource> findDefinitionDescriptors(File artifactFile) throws IOException {
+        List<DocumentResource> descriptors = new ArrayList<>();
         try (JarFile jarFile = new JarFile(artifactFile)) {
             Enumeration<JarEntry> enumOfJar = jarFile.entries();
             while (enumOfJar.hasMoreElements()) {
@@ -107,7 +107,7 @@ public class ConnectorResolver {
                     try (InputStream is = jarFile.getInputStream(jarEntry)) {
                         Document document = asXMLDocument(is, DEFINITION_NS);
                         if (document != null) {
-                            descriptors.add(document);
+                            descriptors.add(new DocumentResource(jarEntry.toString(), document));
                         }
                     }
                 }
@@ -200,6 +200,26 @@ public class ConnectorResolver {
             }
             return null;
         }
+    }
+    
+    public class DocumentResource {
+        
+        private final String path;
+        private final Document document;
+        
+        public DocumentResource(String path, Document document) {
+            this.path = path;
+            this.document = document;
+        }
+        
+        public String getPath() {
+            return path;
+        }
+        
+        public Document getDocument() {
+            return document;
+        }
+        
     }
 
 }

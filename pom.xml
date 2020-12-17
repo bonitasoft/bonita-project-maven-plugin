@@ -22,6 +22,8 @@
 		<maven-artifact-transfer.version>0.12.0</maven-artifact-transfer.version>
 		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+		<jd-core.version>1.1.3</jd-core.version>
+		<artifact-lookup-maven-plugin.version>0.6.0</artifact-lookup-maven-plugin.version>
 
 		<!-- Test -->
 		<junit-jupiter-engine.version>5.6.2</junit-jupiter-engine.version>
@@ -56,7 +58,12 @@
 		<dependency>
 			<groupId>org.jd</groupId>
 			<artifactId>jd-core</artifactId>
-			<version>1.1.3</version>
+			<version>${jd-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.codspire.plugins</groupId>
+			<artifactId>artifact-lookup-maven-plugin</artifactId>
+			<version>${artifact-lookup-maven-plugin.version}</version>
 		</dependency>
 
 		<!-- Test -->
@@ -131,6 +138,14 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-invoker-plugin</artifactId>
 				<version>${maven-invoker-plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-all</artifactId>
+						<version>3.0.6</version>
+						<type>pom</type>
+					</dependency>
+				</dependencies>
 				<configuration>
 					<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
 					<settingsFile>src/it/settings.xml</settingsFile>

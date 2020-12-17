@@ -12,10 +12,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin;
+package org.bonitasoft.plugin.analyze;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.List;
@@ -25,8 +25,8 @@ import java.util.Optional;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.bonitasoft.plugin.BonitaArtifact.Definition;
-import org.bonitasoft.plugin.BonitaArtifact.Implementation;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
+import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin;
+package org.bonitasoft.plugin.install;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -181,9 +181,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         DefaultPluginVersionRequest pluginVersionRequest = new DefaultPluginVersionRequest(plugin, session);
         pluginVersionRequest.setPom(project.getModel());
         PluginVersionResult pluginVersionResult = pluginVersionResolver.resolve(pluginVersionRequest);
-        
-        String installPluginVersion = pluginVersionResult.getVersion();
-        return installPluginVersion;
+        return pluginVersionResult.getVersion();
     }
 
     /*
