@@ -1,18 +1,32 @@
-# Bonita Project Store Maven Plugin
+# Bonita Project Maven Plugin
 
-A Maven plug-in used by Bonita projects to synchronize the Project Store (where external projects dependencies can be stored) and the local Maven repository.
+A Maven plug-in used by Bonita projects to: 
+* Install custom dependencies from the project store (where external projects dependencies are stored) to the local Maven repository.
+* Analyze Bonita dependencies and their content (Connector, Actor filters, Rest API Extensions...)
+* Lookup jar dependencies (find the maven artifacts for existing dependencies found in the `lib` folder)
 
 ## Usage
 
+### Install
+
 It is possible to directly invoke the plug-in like this:  
 ```sh
-~/my-bonita-project> mvn org.bonitasoft:bonita-project-store-maven-plugin:install
+~/my-bonita-project> mvn org.bonitasoft:bonita-project-maven-plugin:install
 ```
 
 Or use the `validate` goal:
 ```sh
 ~/my-bonita-project> mvn validate
 ```
+
+### Analyze
+
+It is possible to directly invoke the plug-in like this:  
+```sh
+~/my-bonita-project> mvn org.bonitasoft:bonita-project-maven-plugin:analyze
+```
+The  analysis report is written in the `target` folder
+
 
 ## Philosophy
 
