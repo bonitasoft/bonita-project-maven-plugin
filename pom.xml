@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bonitasoft</groupId>
-	<artifactId>bonita-project-store-maven-plugin</artifactId>
+	<artifactId>bonita-project-maven-plugin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Bonita Project Store Maven Plugin</name>
+	<name>Bonita Project Maven Plugin</name>
 	<packaging>maven-plugin</packaging>
 	<url>https://www.bonitasoft.com/</url>
 
@@ -185,9 +185,9 @@
 	</repositories>
 
 	<scm>
-		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-project-store-maven-plugin.git</developerConnection>
-		<connection>scm:git:git@github.com:bonitasoft/bonita-project-store-maven-plugin.git</connection>
-		<url>https://github.com/bonitasoft/bonita-project-store-maven-plugin</url>
+		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git</developerConnection>
+		<connection>scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git</connection>
+		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
 		<tag>HEAD</tag>
 	</scm>
 </project>

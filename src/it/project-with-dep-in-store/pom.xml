@@ -26,7 +26,7 @@
 		<plugins>
 			<plugin>
 				<groupId>org.bonitasoft</groupId>
-				<artifactId>bonita-project-store-maven-plugin</artifactId>
+				<artifactId>bonita-project-maven-plugin</artifactId>
 				<version>@project.version@</version>
 				<executions>
 					<execution>
