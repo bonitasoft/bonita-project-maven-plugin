@@ -136,7 +136,7 @@ public class AnalysisResult {
         Files.deleteIfExists(outputFile.toPath());
         Files.createFile(outputFile.toPath());
         try (FileWriter fileWriter = new FileWriter(outputFile);
-             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+                PrintWriter printWriter = new PrintWriter(fileWriter)) {
             connectorImplmentations.stream().forEach(impl -> printWriter.printf("%s,%s,%s,%s,%s,%s,%s,%s%n",
                     "CONNECTOR_IMPLEMENTATION",
                     impl.getImplementationId(),

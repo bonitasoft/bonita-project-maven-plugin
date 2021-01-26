@@ -111,7 +111,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         }
     }
 
-    private AnalysisResult analyze(Artifact artifact, AnalysisResult result) throws Exception {
+    private AnalysisResult analyze(Artifact artifact, AnalysisResult result) throws IOException {
         File artifactFile = artifact.getFile();
         String fileName = artifactFile.getName();
         if (fileName.endsWith(".jar") && hasConnectorDescriptor(artifactFile)) {
@@ -123,7 +123,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         return result;
     }
 
-    private void analyseConnectorArtifact(Artifact artifact, AnalysisResult result) throws Exception {
+    private void analyseConnectorArtifact(Artifact artifact, AnalysisResult result) throws IOException  {
         List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact);
         List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact);
         List<Implementation> connectorImplementations = allImplementations.stream()
@@ -148,7 +148,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
                         Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion()));
     }
     
-    private void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws Exception {
+    private void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
         Properties properties = readPageProperties(artifact.getFile());
         String contentType = properties.getProperty("contentType");
         if ("form".equals(contentType)) {

@@ -112,7 +112,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
             } catch (ArtifactResolverException e) {
                 try {
                     installArtifactFromProjectStore(artifact, installPluginVersion);
-                } catch (InstallFileExecutionException | ArtifactNotFoundException | PluginVersionResolutionException ex) {
+                } catch (InstallFileExecutionException | ArtifactNotFoundException ex) {
                     throw new MojoExecutionException(ex.getMessage());
                 }
             }
@@ -120,7 +120,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     }
 
     private void installArtifactFromProjectStore(Artifact artifact, String installPluginVersion)
-            throws ArtifactNotFoundException, InstallFileExecutionException, PluginVersionResolutionException {
+            throws ArtifactNotFoundException, InstallFileExecutionException {
         File artifactFile = findFileInProjectStore(artifact);
         if (!artifactFile.exists()) {
             throw new ArtifactNotFoundException(
