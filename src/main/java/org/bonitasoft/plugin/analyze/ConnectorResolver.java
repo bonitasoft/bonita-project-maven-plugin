@@ -30,6 +30,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.google.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
@@ -43,8 +44,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import com.google.inject.Singleton;
 
 @Named
 @Singleton

@@ -14,9 +14,6 @@
  */
 package org.bonitasoft.plugin.analyze;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +26,9 @@ import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ConnectorResolverTest {
 

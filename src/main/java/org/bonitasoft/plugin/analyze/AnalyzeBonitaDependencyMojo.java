@@ -15,17 +15,9 @@
 package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 
@@ -43,12 +35,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
-import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
-import org.bonitasoft.plugin.analyze.BonitaArtifact.Form;
-import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
-import org.bonitasoft.plugin.analyze.BonitaArtifact.Page;
-import org.bonitasoft.plugin.analyze.BonitaArtifact.RestAPIExtension;
-import org.bonitasoft.plugin.analyze.BonitaArtifact.Theme;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReporter;
 import org.bonitasoft.plugin.analyze.report.CsvAnalysisResultReporter;
