@@ -7,9 +7,9 @@ import org.w3c.dom.Document;
 
 public class BonitaArtifact {
     
-    private static final String DISPLAY_NAME_PROPERTY = "displayName";
-    private static final String DESCRIPTION_PROPERTY = "description";
-    private static final String NAME_PROPERTY = "name";
+    public static final String DISPLAY_NAME_PROPERTY = "displayName";
+	public static final String DESCRIPTION_PROPERTY = "description";
+	public static final String NAME_PROPERTY = "name";
     
     private BonitaArtifact() {
         
@@ -125,7 +125,7 @@ public class BonitaArtifact {
             return new Definition(definitionId, definitionVersion, entryPath, artifact);
         }
 
-        private Definition(String definitionId,
+        protected Definition(String definitionId,
                 String definitionVersion,
                 String entryPath,
                 Artifact artifact) {
@@ -170,7 +170,7 @@ public class BonitaArtifact {
         private String superType;
        
 
-        private Implementation(String className,
+        protected Implementation(String className,
                 String implementationId,
                 String implementationVersion,
                 String definitionId,
@@ -192,8 +192,7 @@ public class BonitaArtifact {
             String implementationVersion = readElement(document, "implementationVersion");
             String definitionId = readElement(document, "definitionId");
             String definitionVersion = readElement(document, "definitionVersion");
-            return new Implementation(className, implementationId, implementationVersion, definitionId,
-                    definitionVersion, path, artifact);
+            return new Implementation(className, implementationId, implementationVersion, definitionId, definitionVersion, path, artifact);
         }
 
         public String getClassName() {

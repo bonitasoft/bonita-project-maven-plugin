@@ -77,44 +77,32 @@ public class ConnectorResolver {
     }
 
     private List<DocumentResource> findImplementationDescriptors(File artifactFile) throws IOException {
-        List<DocumentResource> descriptors = new ArrayList<>();
-        try (JarFile jarFile = new JarFile(artifactFile)) {
-            Enumeration<JarEntry> enumOfJar = jarFile.entries();
-            while (enumOfJar.hasMoreElements()) {
-                JarEntry jarEntry = enumOfJar.nextElement();
-                String name = jarEntry.getName();
-                if (name.endsWith(IMPLEMENTATION_EXTENSION)) {
-                    try (InputStream is = jarFile.getInputStream(jarEntry)) {
-                        Document document = asXMLDocument(is, IMPLEMENTATION_NS);
-                        if (document != null) {
-                            descriptors.add(new DocumentResource(jarEntry.toString(), document));
-                        }
-                    }
-                }
-            }
-        }
-        return descriptors;
-    }
+		return getDocumentResources(artifactFile, IMPLEMENTATION_EXTENSION, IMPLEMENTATION_NS);
+	}
 
-    private List<DocumentResource> findDefinitionDescriptors(File artifactFile) throws IOException {
-        List<DocumentResource> descriptors = new ArrayList<>();
-        try (JarFile jarFile = new JarFile(artifactFile)) {
-            Enumeration<JarEntry> enumOfJar = jarFile.entries();
-            while (enumOfJar.hasMoreElements()) {
-                JarEntry jarEntry = enumOfJar.nextElement();
-                String name = jarEntry.getName();
-                if (name.endsWith(DEFINITION_EXTENSION)) {
-                    try (InputStream is = jarFile.getInputStream(jarEntry)) {
-                        Document document = asXMLDocument(is, DEFINITION_NS);
-                        if (document != null) {
-                            descriptors.add(new DocumentResource(jarEntry.toString(), document));
-                        }
-                    }
-                }
-            }
-        }
-        return descriptors;
-    }
+	private List<DocumentResource> findDefinitionDescriptors(File artifactFile) throws IOException {
+		return getDocumentResources(artifactFile, DEFINITION_EXTENSION, DEFINITION_NS);
+	}
+	private List<DocumentResource> getDocumentResources(File artifactFile, String implementationExtension, String implementationNs) throws IOException {
+		List<DocumentResource> descriptors = new ArrayList<>();
+		try (JarFile jarFile = new JarFile(artifactFile)) {
+			Enumeration<JarEntry> enumOfJar = jarFile.entries();
+			while (enumOfJar.hasMoreElements()) {
+				JarEntry jarEntry = enumOfJar.nextElement();
+				String name = jarEntry.getName();
+				if (name.endsWith(implementationExtension)) {
+					try (InputStream is = jarFile.getInputStream(jarEntry)) {
+						Document document = asXMLDocument(is, implementationNs);
+						if (document != null) {
+							descriptors.add(new DocumentResource(jarEntry.toString(), document));
+						}
+					}
+				}
+			}
+		}
+		return descriptors;
+	}
+
 
     public Implementation detectImplementationType(Implementation implementation, File jarFile) {
         String implementationClassName = implementation.getClassName();
@@ -159,9 +147,9 @@ public class ConnectorResolver {
         return null;
     }
 
-    class DecompilerLoader implements Loader {
+    private static class DecompilerLoader implements Loader {
 
-        private File jarFile;
+        private final File jarFile;
 
         public DecompilerLoader(File jarFile) {
             this.jarFile = jarFile;
@@ -202,7 +190,7 @@ public class ConnectorResolver {
         }
     }
     
-    public class DocumentResource {
+    public static class DocumentResource {
         
         private final String path;
         private final Document document;

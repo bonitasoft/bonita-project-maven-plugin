@@ -1,3 +1,5 @@
+![Build](https://github.com/bonitasoft/bonita-project-maven-plugin/workflows/workflow-build/badge.svg)
+
 # Bonita Project Maven Plugin
 
 A Maven plug-in used by Bonita projects to: 
