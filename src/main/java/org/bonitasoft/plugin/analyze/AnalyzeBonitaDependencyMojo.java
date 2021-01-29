@@ -49,176 +49,180 @@ import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Page;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Theme;
+import org.bonitasoft.plugin.analyze.report.CsvAnalysisResultReporter;
+import org.bonitasoft.plugin.analyze.report.LogAnalysisResultReporter;
+
+import static java.util.Arrays.asList;
 
 @Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    private MavenProject project;
+	private final ArtifactResolver artifactResolver;
 
-    @Parameter(defaultValue = "${session}", readonly = true, required = true)
-    protected MavenSession session;
+	private final ConnectorResolver connectorResolver;
 
-    /**
-     * Remote repositories which will be searched for artifacts.
-     */
-    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
-    private List<ArtifactRepository> remoteRepositories;
+	@Parameter(defaultValue = "${session}", readonly = true, required = true)
+	protected MavenSession session;
 
-    /**
-     * Local Repository.
-     */
-    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
-    protected ArtifactRepository localRepository;
-    
-    /**
-     * Analysis report output file
-     */
-    @Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.csv", required = true)
-    private File outputFile;
+	/**
+	 * Local Repository.
+	 */
+	@Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
+	protected ArtifactRepository localRepository;
 
-    private final ArtifactResolver artifactResolver;
-    private final ConnectorResolver connectorResolver;
-    
-    @Inject
-    public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver, ConnectorResolver connectorResolver) {
-        this.connectorResolver = connectorResolver;
-        this.artifactResolver = artifactResolver;
-    }
+	@Parameter(defaultValue = "${project}", required = true, readonly = true)
+	private MavenProject project;
 
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        Set<Artifact> artifacts = project.getDependencyArtifacts();
-        AnalysisResult analysisResult = new AnalysisResult();
-        for (Artifact artifact : artifacts) {
-            ProjectBuildingRequest buildingRequest = newResolveArtifactProjectBuildingRequest();
-            try {
-                ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
-                File artifactFile = result.getArtifact().getFile();
-                if (artifactFile == null || !artifactFile.exists()) {
-                    throw new MojoExecutionException(String.format("Failed to resolve artifact %s", artifact));
-                }
-                analyze(result.getArtifact(), analysisResult);
-            } catch (Exception e) {
-                throw new MojoExecutionException(String.format("Failed to resolve artifact %s", artifact), e);
-            }
-        }
-        analysisResult.printResult(getLog());
-        try {
-            analysisResult.writeCSVOutput(outputFile);
-        } catch (IOException e) {
-            throw new MojoExecutionException(String.format("Failed to write report file %s", outputFile), e);
-        }
-    }
+	/**
+	 * Remote repositories which will be searched for artifacts.
+	 */
+	@Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
+	private List<ArtifactRepository> remoteRepositories;
 
-    private AnalysisResult analyze(Artifact artifact, AnalysisResult result) throws IOException {
-        File artifactFile = artifact.getFile();
-        String fileName = artifactFile.getName();
-        if (fileName.endsWith(".jar") && hasConnectorDescriptor(artifactFile)) {
-            analyseConnectorArtifact(artifact, result);
-        }
-        if (fileName.endsWith(".zip") && hasCustomPageDescriptor(artifactFile)) {
-            analyseCustomPageArtifact(artifact, result);
-        }
-        return result;
-    }
+	/**
+	 * Analysis report output file
+	 */
+	@Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.csv", required = true)
+	private File outputFile;
 
-    private void analyseConnectorArtifact(Artifact artifact, AnalysisResult result) throws IOException  {
-        List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact);
-        List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact);
-        List<Implementation> connectorImplementations = allImplementations.stream()
-                .filter(impl -> ConnectorResolver.ABSTRACT_CONNECTOR_TYPE.equals(impl.getSuperType()))
-                .collect(Collectors.toList());
-        List<Implementation> filterImplementations = allImplementations.stream()
-                .filter(impl -> ConnectorResolver.ABSTRACT_FILTER_TYPE.equals(impl.getSuperType()))
-                .collect(Collectors.toList());
-        allDefinitions.stream()
-                .filter(def -> hasMatchingImplementation(def, connectorImplementations))
-                .forEach(result::addConnectorDefinition);
-        allDefinitions.stream()
-                .filter(def -> hasMatchingImplementation(def, filterImplementations))
-                .forEach(result::addFilterDefinition);
-        connectorImplementations.stream().forEach(result::addConnectorImplementation);
-        filterImplementations.stream().forEach(result::addFilterImplementation);
-    }
+	@Inject
+	public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver, ConnectorResolver connectorResolver) {
+		this.connectorResolver = connectorResolver;
+		this.artifactResolver = artifactResolver;
+	}
 
-    private boolean hasMatchingImplementation(Definition def, List<Implementation> connectorImplementations) {
-        return connectorImplementations.stream()
-                .anyMatch(implementation -> Objects.equals(def.getDefinitionId(), implementation.getDefinitionId()) &&
-                        Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion()));
-    }
-    
-    private void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
-        Properties properties = readPageProperties(artifact.getFile());
-        String contentType = properties.getProperty("contentType");
-        if ("form".equals(contentType)) {
-            result.addForm(Form.create(properties, artifact));
-        }
-        if ("page".equals(contentType)) {
-            result.addPage(Page.create(properties, artifact));
-        }
-        if ("theme".equals(contentType)) {
-            result.addTheme(Theme.create(properties, artifact));
-        }
-        if ("apiExtension".equals(contentType)) {
-            result.addRestAPIExtension(RestAPIExtension.create(properties, artifact));
-        }
-    }
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		Set<Artifact> artifacts = project.getDependencyArtifacts();
+		AnalysisResult analysisResult = new AnalysisResult();
+		for (Artifact artifact : artifacts) {
+			ProjectBuildingRequest buildingRequest = newResolveArtifactProjectBuildingRequest();
+			try {
+				ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
+				File artifactFile = result.getArtifact().getFile();
+				if (artifactFile == null || !artifactFile.exists()) {
+					throw new MojoExecutionException(String.format("Failed to resolve artifact %s", artifact));
+				}
+				analyze(result.getArtifact(), analysisResult);
+			}
+			catch (Exception e) {
+				throw new MojoExecutionException(String.format("Failed to resolve artifact %s", artifact), e);
+			}
+		}
+		asList(
+				new LogAnalysisResultReporter(getLog()),
+				new CsvAnalysisResultReporter(outputFile)
+		).forEach(reporter -> reporter.report(analysisResult));
+	}
 
-    private boolean hasConnectorDescriptor(File artifactFile) throws IOException {
-        try (JarFile jarFile = new JarFile(artifactFile)) {
-            Enumeration<JarEntry> enumOfJar = jarFile.entries();
-            while (enumOfJar.hasMoreElements()) {
-                JarEntry jarEntry = enumOfJar.nextElement();
-                String name = jarEntry.getName();
-                if (name.endsWith(".impl")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	private AnalysisResult analyze(Artifact artifact, AnalysisResult result) throws IOException {
+		File artifactFile = artifact.getFile();
+		String fileName = artifactFile.getName();
+		if (fileName.endsWith(".jar") && hasConnectorDescriptor(artifactFile)) {
+			analyseConnectorArtifact(artifact, result);
+		}
+		if (fileName.endsWith(".zip") && hasCustomPageDescriptor(artifactFile)) {
+			analyseCustomPageArtifact(artifact, result);
+		}
+		return result;
+	}
 
-    private boolean hasCustomPageDescriptor(File artifactFile) throws IOException {
-        try (ZipFile zipFile = new ZipFile(artifactFile)) {
-            Enumeration<? extends ZipEntry> enumOfZip = zipFile.entries();
-            while (enumOfZip.hasMoreElements()) {
-                ZipEntry zipEntry = enumOfZip.nextElement();
-                String name = zipEntry.getName();
-                if (name.equals("page.properties")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	private void analyseConnectorArtifact(Artifact artifact, AnalysisResult result) throws IOException {
+		List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact);
+		List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact);
+		List<Implementation> connectorImplementations = allImplementations.stream()
+				.filter(impl -> ConnectorResolver.ABSTRACT_CONNECTOR_TYPE.equals(impl.getSuperType()))
+				.collect(Collectors.toList());
+		List<Implementation> filterImplementations = allImplementations.stream()
+				.filter(impl -> ConnectorResolver.ABSTRACT_FILTER_TYPE.equals(impl.getSuperType()))
+				.collect(Collectors.toList());
+		allDefinitions.stream()
+				.filter(def -> hasMatchingImplementation(def, connectorImplementations))
+				.forEach(result::addConnectorDefinition);
+		allDefinitions.stream()
+				.filter(def -> hasMatchingImplementation(def, filterImplementations))
+				.forEach(result::addFilterDefinition);
+		connectorImplementations.forEach(result::addConnectorImplementation);
+		filterImplementations.forEach(result::addFilterImplementation);
+	}
 
-    private Properties readPageProperties(File artifactFile) throws IOException {
-        try (ZipFile zipFile = new ZipFile(artifactFile)) {
-            Enumeration<? extends ZipEntry> enumOfZip = zipFile.entries();
-            while (enumOfZip.hasMoreElements()) {
-                ZipEntry zipEntry = enumOfZip.nextElement();
-                String name = zipEntry.getName();
-                if (name.equals("page.properties")) {
-                    Properties prop = new Properties();
-                    prop.load(zipFile.getInputStream(zipEntry));
-                    return prop;
-                }
-            }
-        }
-        throw new IllegalArgumentException(String.format("No page.properties found in %s", artifactFile));
-    }
+	private boolean hasMatchingImplementation(Definition def, List<Implementation> connectorImplementations) {
+		return connectorImplementations.stream()
+				.anyMatch(implementation -> Objects.equals(def.getDefinitionId(), implementation.getDefinitionId()) &&
+						Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion()));
+	}
 
-    /*
-     * @return Returns a new ProjectBuildingRequest populated from the current session and the current project remote
-     * repositories, used to resolve artifacts.
-     */
-    private ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
-        ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+	private void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
+		Properties properties = readPageProperties(artifact.getFile());
+		String contentType = properties.getProperty("contentType");
+		if ("form".equals(contentType)) {
+			result.addForm(Form.create(properties, artifact));
+		}
+		if ("page".equals(contentType)) {
+			result.addPage(Page.create(properties, artifact));
+		}
+		if ("theme".equals(contentType)) {
+			result.addTheme(Theme.create(properties, artifact));
+		}
+		if ("apiExtension".equals(contentType)) {
+			result.addRestAPIExtension(RestAPIExtension.create(properties, artifact));
+		}
+	}
 
-        buildingRequest.setRemoteRepositories(remoteRepositories);
+	private boolean hasConnectorDescriptor(File artifactFile) throws IOException {
+		try (JarFile jarFile = new JarFile(artifactFile)) {
+			Enumeration<JarEntry> enumOfJar = jarFile.entries();
+			while (enumOfJar.hasMoreElements()) {
+				JarEntry jarEntry = enumOfJar.nextElement();
+				String name = jarEntry.getName();
+				if (name.endsWith(".impl")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-        return buildingRequest;
-    }
+	private boolean hasCustomPageDescriptor(File artifactFile) throws IOException {
+		try (ZipFile zipFile = new ZipFile(artifactFile)) {
+			Enumeration<? extends ZipEntry> enumOfZip = zipFile.entries();
+			while (enumOfZip.hasMoreElements()) {
+				ZipEntry zipEntry = enumOfZip.nextElement();
+				String name = zipEntry.getName();
+				if (name.equals("page.properties")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private Properties readPageProperties(File artifactFile) throws IOException {
+		try (ZipFile zipFile = new ZipFile(artifactFile)) {
+			Enumeration<? extends ZipEntry> enumOfZip = zipFile.entries();
+			while (enumOfZip.hasMoreElements()) {
+				ZipEntry zipEntry = enumOfZip.nextElement();
+				String name = zipEntry.getName();
+				if (name.equals("page.properties")) {
+					Properties prop = new Properties();
+					prop.load(zipFile.getInputStream(zipEntry));
+					return prop;
+				}
+			}
+		}
+		throw new IllegalArgumentException(String.format("No page.properties found in %s", artifactFile));
+	}
+
+	/*
+	 * @return Returns a new ProjectBuildingRequest populated from the current session and the current project remote
+	 * repositories, used to resolve artifacts.
+	 */
+	private ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
+		ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+
+		buildingRequest.setRemoteRepositories(remoteRepositories);
+
+		return buildingRequest;
+	}
 
 }
