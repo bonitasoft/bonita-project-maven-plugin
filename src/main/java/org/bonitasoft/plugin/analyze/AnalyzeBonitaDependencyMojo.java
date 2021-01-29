@@ -75,8 +75,6 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.csv", required = true)
 	protected File outputFile;
 
-	protected List<AnalysisResultReporter> reporters = new ArrayList<>();
-
 	@Inject
 	public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver, ArtifactAnalyser artifactAnalyser) {
 		this.artifactResolver = artifactResolver;
@@ -87,13 +85,14 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		List<Artifact> resolvedArtifacts = resolveArtifacts(project.getDependencyArtifacts());
 		AnalysisResult analysisResult = artifactAnalyser.analyse(resolvedArtifacts);
-		if(reporters.isEmpty()){
-			this.reporters = asList(
-					new LogAnalysisResultReporter(getLog()),
-					new CsvAnalysisResultReporter(outputFile)
-			);
-		}
-		reporters.forEach(reporter -> reporter.report(analysisResult));
+		getReporters().forEach(reporter -> reporter.report(analysisResult));
+	}
+
+	protected List<AnalysisResultReporter> getReporters() {
+		return asList(
+				new LogAnalysisResultReporter(getLog()),
+				new CsvAnalysisResultReporter(outputFile)
+		);
 	}
 
 	protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts) {

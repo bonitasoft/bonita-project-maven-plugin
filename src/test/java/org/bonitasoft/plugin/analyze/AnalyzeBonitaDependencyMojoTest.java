@@ -50,13 +50,14 @@ class AnalyzeBonitaDependencyMojoTest {
 		mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser));
 		mojo.project = project;
 		mojo.setLog(mock(Log.class));
-		mojo.reporters = singletonList(reporter);
 	}
 
 	@Test
 	void sould_run_analysis() throws MojoFailureException, MojoExecutionException {
 		// Given
 		mojo = spy(mojo);
+
+		when(mojo.getReporters()).thenReturn(singletonList(reporter));
 
 		List<Artifact> resolvedArtifacts = new ArrayList<>();
 
