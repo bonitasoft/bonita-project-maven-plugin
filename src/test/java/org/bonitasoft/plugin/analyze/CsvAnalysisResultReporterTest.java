@@ -2,7 +2,6 @@ package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.maven.artifact.DefaultArtifact;
@@ -19,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.plugin.test.TestFiles.getResourceAsFile;
 
 class CsvAnalysisResultReporterTest {
 
@@ -97,7 +97,7 @@ class CsvAnalysisResultReporterTest {
 		reporter.report(analysisResult);
 
 		// Then
-		final File expectedContent = Paths.get(getClass().getResource("/expected-report.csv").toURI()).toFile();
+		final File expectedContent = getResourceAsFile("/expected-report.csv");
 		assertThat(outputFile).exists().isFile().hasSameBinaryContentAs(expectedContent);
 	}
 

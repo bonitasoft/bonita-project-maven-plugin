@@ -31,6 +31,14 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 
+	public static final String CUSTOM_PAGE_TYPE_FORM = "form";
+
+	public static final String CUSTOM_PAGE_TYPE_PAGE = "page";
+
+	public static final String CUSTOM_PAGE_TYPE_THEME = "theme";
+
+	public static final String CUSTOM_PAGE_TYPE_API_EXTENSION = "apiExtension";
+
 	private final ConnectorResolver connectorResolver;
 
 	@Inject
@@ -83,30 +91,32 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 		filterImplementations.forEach(result::addFilterImplementation);
 	}
 
-	private boolean hasMatchingImplementation(Definition def, List<Implementation> connectorImplementations) {
+	protected boolean hasMatchingImplementation(Definition def, List<Implementation> connectorImplementations) {
 		return connectorImplementations.stream()
-				.anyMatch(implementation -> Objects.equals(def.getDefinitionId(), implementation.getDefinitionId()) &&
-						Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion()));
+				.anyMatch(implementation ->
+						Objects.equals(def.getDefinitionId(), implementation.getDefinitionId()) &&
+						Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion())
+				);
 	}
 
-	private void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
+	protected void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
 		Properties properties = readPageProperties(artifact.getFile());
 		String contentType = properties.getProperty("contentType");
-		if ("form".equals(contentType)) {
+		if (CUSTOM_PAGE_TYPE_FORM.equals(contentType)) {
 			result.addForm(Form.create(properties, artifact));
 		}
-		if ("page".equals(contentType)) {
+		if (CUSTOM_PAGE_TYPE_PAGE.equals(contentType)) {
 			result.addPage(Page.create(properties, artifact));
 		}
-		if ("theme".equals(contentType)) {
+		if (CUSTOM_PAGE_TYPE_THEME.equals(contentType)) {
 			result.addTheme(Theme.create(properties, artifact));
 		}
-		if ("apiExtension".equals(contentType)) {
+		if (CUSTOM_PAGE_TYPE_API_EXTENSION.equals(contentType)) {
 			result.addRestAPIExtension(RestAPIExtension.create(properties, artifact));
 		}
 	}
 
-	private boolean hasConnectorDescriptor(File artifactFile) throws IOException {
+	protected boolean hasConnectorDescriptor(File artifactFile) throws IOException {
 		try (JarFile jarFile = new JarFile(artifactFile)) {
 			Enumeration<JarEntry> enumOfJar = jarFile.entries();
 			while (enumOfJar.hasMoreElements()) {
@@ -120,7 +130,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 		return false;
 	}
 
-	private boolean hasCustomPageDescriptor(File artifactFile) throws IOException {
+	protected boolean hasCustomPageDescriptor(File artifactFile) throws IOException {
 		try (ZipFile zipFile = new ZipFile(artifactFile)) {
 			Enumeration<? extends ZipEntry> enumOfZip = zipFile.entries();
 			while (enumOfZip.hasMoreElements()) {
@@ -134,7 +144,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 		return false;
 	}
 
-	private Properties readPageProperties(File artifactFile) throws IOException {
+	protected Properties readPageProperties(File artifactFile) throws IOException {
 		try (ZipFile zipFile = new ZipFile(artifactFile)) {
 			Enumeration<? extends ZipEntry> enumOfZip = zipFile.entries();
 			while (enumOfZip.hasMoreElements()) {
