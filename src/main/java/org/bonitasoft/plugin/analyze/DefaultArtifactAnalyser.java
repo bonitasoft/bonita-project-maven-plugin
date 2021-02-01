@@ -2,6 +2,7 @@ package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 				analyze(artifact, analysisResult);
 			}
 			catch (IOException e) {
-				throw new AnalysisResultReportException("Failed to analyse artifacts: "+artifact.getId(), e);
+				throw new AnalysisResultReportException("Failed to analyse artifacts: " + artifact.getId(), e);
 			}
 		});
 		return analysisResult;
@@ -95,24 +96,29 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 		return connectorImplementations.stream()
 				.anyMatch(implementation ->
 						Objects.equals(def.getDefinitionId(), implementation.getDefinitionId()) &&
-						Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion())
+								Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion())
 				);
 	}
 
 	protected void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
 		Properties properties = readPageProperties(artifact.getFile());
 		String contentType = properties.getProperty("contentType");
-		if (CUSTOM_PAGE_TYPE_FORM.equals(contentType)) {
-			result.addForm(Form.create(properties, artifact));
-		}
-		if (CUSTOM_PAGE_TYPE_PAGE.equals(contentType)) {
-			result.addPage(Page.create(properties, artifact));
-		}
-		if (CUSTOM_PAGE_TYPE_THEME.equals(contentType)) {
-			result.addTheme(Theme.create(properties, artifact));
-		}
-		if (CUSTOM_PAGE_TYPE_API_EXTENSION.equals(contentType)) {
-			result.addRestAPIExtension(RestAPIExtension.create(properties, artifact));
+		CustomPageType customPageType = CustomPageType.fromValue(contentType);
+		switch (customPageType) {
+			case FORM:
+				result.addForm(Form.create(properties, artifact));
+				break;
+			case PAGE:
+				result.addPage(Page.create(properties, artifact));
+				break;
+			case THEME:
+				result.addTheme(Theme.create(properties, artifact));
+				break;
+			case API_EXTENSION:
+				result.addRestAPIExtension(RestAPIExtension.create(properties, artifact));
+				break;
+			default:
+				throw new AnalysisResultReportException("Unsupported Custom Page type: " + contentType);
 		}
 	}
 
@@ -158,5 +164,30 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 			}
 		}
 		throw new IllegalArgumentException(format("No page.properties found in %s", artifactFile));
+	}
+
+	public enum CustomPageType {
+		FORM("form"), PAGE("page"), THEME("theme"), API_EXTENSION("apiExtension");
+
+		private String value;
+
+		CustomPageType(String value) {
+			this.value = value;
+		}
+
+		/**
+		 * Create enum instance from string representation in property files
+		 * @param customPageTypeValue
+		 * @return
+		 */
+		public static CustomPageType fromValue(final String customPageTypeValue) {
+			return Arrays.stream(CustomPageType.values())
+					.filter(customPageType -> customPageType.getValue().equals(customPageTypeValue)).findFirst()
+					.orElseThrow(()-> new AnalysisResultReportException("Unsupported CustomPage type:" + customPageTypeValue));
+		}
+
+		public String getValue() {
+			return value;
+		}
 	}
 }

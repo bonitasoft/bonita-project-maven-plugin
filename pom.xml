@@ -118,6 +118,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-runner</artifactId>
 			<scope>test</scope>
@@ -320,11 +325,8 @@
 	</distributionManagement>
 
 	<scm>
-		<developerConnection>
-			scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git
-		</developerConnection>
-		<connection>scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git
-		</connection>
+		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git</developerConnection>
+		<connection>scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git</connection>
 		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
 		<tag>HEAD</tag>
 	</scm>

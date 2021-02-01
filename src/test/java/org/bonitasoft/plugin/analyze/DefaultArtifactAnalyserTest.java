@@ -11,14 +11,18 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Definition;
 import org.bonitasoft.plugin.analyze.BonitaArtifact.Implementation;
+import org.bonitasoft.plugin.analyze.DefaultArtifactAnalyser.CustomPageType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.plugin.test.TestFiles.getResourceAsFile;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -135,12 +139,13 @@ class DefaultArtifactAnalyserTest {
 		assertThat(match).isFalse();
 	}
 
-	@Test
-	void should_detect_cutom_page_form_type() throws IOException {
+	@ParameterizedTest
+	@EnumSource(CustomPageType.class)
+	void should_detect_custom_page_type(CustomPageType customPageType) throws IOException {
 		// Given
 		DefaultArtifactAnalyser spy = spy(analyser);
 		Properties properties = new Properties();
-		properties.setProperty("contentType", analyser.CUSTOM_PAGE_TYPE_FORM);
+		properties.setProperty("contentType", customPageType.getValue());
 		doReturn(properties).when(spy).readPageProperties(any());
 		final Artifact artifact = mock(Artifact.class);
 		final AnalysisResult analysisResult = mock(AnalysisResult.class);
@@ -149,60 +154,23 @@ class DefaultArtifactAnalyserTest {
 		spy.analyseCustomPageArtifact(artifact, analysisResult);
 
 		// Then
-		verify(analysisResult).addForm(any());
+		switch (customPageType) {
+			case PAGE:
+				verify(analysisResult).addPage(any());
+				break;
+			case FORM:
+				verify(analysisResult).addForm(any());
+				break;
+			case THEME:
+				verify(analysisResult).addTheme(any());
+				break;
+			case API_EXTENSION:
+				verify(analysisResult).addRestAPIExtension(any());
+				break;
+			default:
+				fail("Custom page type no supported:" + customPageType);
+		}
 	}
-
-	@Test
-	void should_detect_cutom_page_page_type() throws IOException {
-		// Given
-		DefaultArtifactAnalyser spy = spy(analyser);
-		Properties properties = new Properties();
-		properties.setProperty("contentType", analyser.CUSTOM_PAGE_TYPE_PAGE);
-		doReturn(properties).when(spy).readPageProperties(any());
-		final Artifact artifact = mock(Artifact.class);
-		final AnalysisResult analysisResult = mock(AnalysisResult.class);
-
-		// When
-		spy.analyseCustomPageArtifact(artifact, analysisResult);
-
-		// Then
-		verify(analysisResult).addPage(any());
-	}
-
-	@Test
-	void should_detect_cutom_page_theme_type() throws IOException {
-		// Given
-		DefaultArtifactAnalyser spy = spy(analyser);
-		Properties properties = new Properties();
-		properties.setProperty("contentType", analyser.CUSTOM_PAGE_TYPE_THEME);
-		doReturn(properties).when(spy).readPageProperties(any());
-		final Artifact artifact = mock(Artifact.class);
-		final AnalysisResult analysisResult = mock(AnalysisResult.class);
-
-		// When
-		spy.analyseCustomPageArtifact(artifact, analysisResult);
-
-		// Then
-		verify(analysisResult).addTheme(any());
-	}
-
-	@Test
-	void should_detect_cutom_page_api_ext_type() throws IOException {
-		// Given
-		DefaultArtifactAnalyser spy = spy(analyser);
-		Properties properties = new Properties();
-		properties.setProperty("contentType", analyser.CUSTOM_PAGE_TYPE_API_EXTENSION);
-		doReturn(properties).when(spy).readPageProperties(any());
-		final Artifact artifact = mock(Artifact.class);
-		final AnalysisResult analysisResult = mock(AnalysisResult.class);
-
-		// When
-		spy.analyseCustomPageArtifact(artifact, analysisResult);
-
-		// Then
-		verify(analysisResult).addRestAPIExtension(any());
-	}
-
 
 	@Test
 	void should_read_customPage_properties() throws Exception {
