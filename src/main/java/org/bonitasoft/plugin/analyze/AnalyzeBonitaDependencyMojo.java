@@ -15,7 +15,6 @@
 package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
