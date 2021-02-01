@@ -32,14 +32,6 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 
-	public static final String CUSTOM_PAGE_TYPE_FORM = "form";
-
-	public static final String CUSTOM_PAGE_TYPE_PAGE = "page";
-
-	public static final String CUSTOM_PAGE_TYPE_THEME = "theme";
-
-	public static final String CUSTOM_PAGE_TYPE_API_EXTENSION = "apiExtension";
-
 	private final ConnectorResolver connectorResolver;
 
 	@Inject
