@@ -2,7 +2,6 @@ package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -18,9 +17,10 @@ import javax.inject.Named;
 import com.google.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
-import org.bonitasoft.plugin.analyze.report.model.AnalysisResult;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage;
+import org.bonitasoft.plugin.analyze.report.model.CustomPage.CustomPageType;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
+import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Form;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.bonitasoft.plugin.analyze.report.model.Page;
@@ -42,20 +42,20 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 	}
 
 	@Override
-	public AnalysisResult analyse(List<Artifact> artifacts) {
-		AnalysisResult analysisResult = new AnalysisResult();
+	public DependencyReport analyse(List<Artifact> artifacts) {
+		DependencyReport dependencyReport = new DependencyReport();
 		artifacts.forEach(artifact -> {
 			try {
-				analyze(artifact, analysisResult);
+				analyze(artifact, dependencyReport);
 			}
 			catch (IOException e) {
 				throw new AnalysisResultReportException("Failed to analyse artifacts: " + artifact.getId(), e);
 			}
 		});
-		return analysisResult;
+		return dependencyReport;
 	}
 
-	private AnalysisResult analyze(Artifact artifact, AnalysisResult result) throws IOException {
+	private DependencyReport analyze(Artifact artifact, DependencyReport result) throws IOException {
 		File artifactFile = artifact.getFile();
 		String fileName = artifactFile.getName();
 		if (fileName.endsWith(".jar") && hasConnectorDescriptor(artifactFile)) {
@@ -67,7 +67,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 		return result;
 	}
 
-	private void analyseConnectorArtifact(Artifact artifact, AnalysisResult result) throws IOException {
+	private void analyseConnectorArtifact(Artifact artifact, DependencyReport result) throws IOException {
 		List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact);
 		List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact);
 		List<Implementation> connectorImplementations = allImplementations.stream()
@@ -94,34 +94,26 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 				);
 	}
 
-	protected void analyseCustomPageArtifact(Artifact artifact, AnalysisResult result) throws IOException {
+	protected void analyseCustomPageArtifact(Artifact artifact, DependencyReport result) throws IOException {
 		Properties properties = readPageProperties(artifact.getFile());
 		String contentType = properties.getProperty("contentType");
-		CustomPageType customPageType = CustomPageType.fromValue(contentType);
+		CustomPageType customPageType = CustomPageType.valueOf(contentType.toUpperCase());
+		String name = properties.getProperty(CustomPage.NAME_PROPERTY);
+		String displayName = properties.getProperty(CustomPage.DISPLAY_NAME_PROPERTY);
+		String description = properties.getProperty(CustomPage.DESCRIPTION_PROPERTY);
+		final String artifactPath = artifact.getFile().getAbsolutePath();
 		switch (customPageType) {
 			case FORM:
-				String name = properties.getProperty(CustomPage.NAME_PROPERTY);
-				String displayName = properties.getProperty(CustomPage.DISPLAY_NAME_PROPERTY);
-				String description = properties.getProperty(CustomPage.DESCRIPTION_PROPERTY);
-				result.addForm(new Form(name, displayName, description, artifact.getFile().getAbsolutePath()));
+				result.addForm(Form.create(name, displayName, description, artifactPath));
 				break;
 			case PAGE:
-				String name1 = properties.getProperty(CustomPage.NAME_PROPERTY);
-				String displayName1 = properties.getProperty(CustomPage.DISPLAY_NAME_PROPERTY);
-				String description1 = properties.getProperty(CustomPage.DESCRIPTION_PROPERTY);
-				result.addPage(new Page(name1, displayName1, description1, artifact.getFile().getAbsolutePath()));
+				result.addPage(Page.create(name, displayName, description, artifactPath));
 				break;
 			case THEME:
-				String name3 = properties.getProperty(CustomPage.NAME_PROPERTY);
-				String displayName3 = properties.getProperty(CustomPage.DISPLAY_NAME_PROPERTY);
-				String description3 = properties.getProperty(CustomPage.DESCRIPTION_PROPERTY);
-				result.addTheme(new Theme(name3, displayName3, description3, artifact.getFile().getAbsolutePath()));
+				result.addTheme(Theme.create(name, displayName, description, artifactPath));
 				break;
-			case API_EXTENSION:
-				String name2 = properties.getProperty(CustomPage.NAME_PROPERTY);
-				String displayName2 = properties.getProperty(CustomPage.DISPLAY_NAME_PROPERTY);
-				String description2 = properties.getProperty(CustomPage.DESCRIPTION_PROPERTY);
-				result.addRestAPIExtension(new RestAPIExtension(name2, displayName2, description2, artifact.getFile().getAbsolutePath()));
+			case APIEXTENSION:
+				result.addRestAPIExtension(RestAPIExtension.create(name, displayName, description, artifactPath));
 				break;
 			default:
 				throw new AnalysisResultReportException("Unsupported Custom Page type: " + contentType);
@@ -172,28 +164,4 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 		throw new IllegalArgumentException(format("No page.properties found in %s", artifactFile));
 	}
 
-	public enum CustomPageType {
-		FORM("form"), PAGE("page"), THEME("theme"), API_EXTENSION("apiExtension");
-
-		private String value;
-
-		CustomPageType(String value) {
-			this.value = value;
-		}
-
-		/**
-		 * Create enum instance from string representation in property files
-		 * @param customPageTypeValue
-		 * @return
-		 */
-		public static CustomPageType fromValue(final String customPageTypeValue) {
-			return Arrays.stream(CustomPageType.values())
-					.filter(customPageType -> customPageType.getValue().equals(customPageTypeValue)).findFirst()
-					.orElseThrow(()-> new AnalysisResultReportException("Unsupported CustomPage type:" + customPageTypeValue));
-		}
-
-		public String getValue() {
-			return value;
-		}
-	}
 }

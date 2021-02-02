@@ -1,41 +1,24 @@
 package org.bonitasoft.plugin.analyze.report.model;
 
+import lombok.Data;
+
+@Data
 public class Definition {
 
-	private final String definitionId;
-	private final String definitionVersion;
-	private final String filePath;
+	private String definitionId;
+
+	private String definitionVersion;
+
+	private String filePath;
+
 	private String entryPath;
 
-	public Definition(String definitionId,
-			String definitionVersion,
-			String entryPath,
-			String filePath) {
-		this.definitionId = definitionId;
-		this.definitionVersion = definitionVersion;
-		this.entryPath = entryPath;
-		this.filePath = filePath;
+	public static Definition create(String definitionId, String definitionVersion, String entryPath, String filePath) {
+		final Definition definition = new Definition();
+		definition.setDefinitionId(definitionId);
+		definition.setDefinitionVersion(definitionVersion);
+		definition.setEntryPath(entryPath);
+		definition.setFilePath(filePath);
+		return definition;
 	}
-
-	public String getDefinitionId() {
-		return definitionId;
-	}
-
-	public String getDefinitionVersion() {
-		return definitionVersion;
-	}
-
-	public String getEntryPath() {
-		return entryPath;
-	}
-
-	public String getFilePath() {
-		return filePath;
-	}
-
-	@Override
-	public String toString() {
-		return definitionId + " (" + definitionVersion + ") in " + filePath;
-	}
-
 }

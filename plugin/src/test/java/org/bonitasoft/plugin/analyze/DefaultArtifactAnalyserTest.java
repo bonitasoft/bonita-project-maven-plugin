@@ -9,14 +9,14 @@ import java.util.Properties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.bonitasoft.plugin.analyze.DefaultArtifactAnalyser.CustomPageType;
-import org.bonitasoft.plugin.analyze.report.model.AnalysisResult;
+import org.bonitasoft.plugin.analyze.report.model.CustomPage.CustomPageType;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
+import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -52,10 +52,10 @@ class DefaultArtifactAnalyserTest {
 		List<Artifact> artifacts = singletonList(artifact);
 
 		// When
-		final AnalysisResult analysisResult = analyser.analyse(artifacts);
+		final DependencyReport dependencyReport = analyser.analyse(artifacts);
 
 		// Then
-		assertThat(analysisResult).isNotNull();
+		assertThat(dependencyReport).isNotNull();
 	}
 
 	@Test
@@ -142,33 +142,33 @@ class DefaultArtifactAnalyserTest {
 	}
 
 	@ParameterizedTest
-	@EnumSource(CustomPageType.class)
-	void should_detect_custom_page_type(CustomPageType customPageType) throws IOException {
+	@ValueSource(strings = {"page","form","theme","apiExtension"})
+	void should_detect_custom_page_type(String customPageType) throws IOException {
 		// Given
 		DefaultArtifactAnalyser spy = spy(analyser);
 		Properties properties = new Properties();
-		properties.setProperty("contentType", customPageType.getValue());
+		properties.setProperty("contentType", customPageType);
 		doReturn(properties).when(spy).readPageProperties(any());
 		final Artifact artifact = mock(Artifact.class);
 		when(artifact.getFile()).thenReturn(new File("/somewhere-over-the-rain.bow"));
-		final AnalysisResult analysisResult = mock(AnalysisResult.class);
+		final DependencyReport dependencyReport = mock(DependencyReport.class);
 
 		// When
-		spy.analyseCustomPageArtifact(artifact, analysisResult);
+		spy.analyseCustomPageArtifact(artifact, dependencyReport);
 
 		// Then
-		switch (customPageType) {
+		switch (CustomPageType.valueOf(customPageType.toUpperCase())) {
 			case PAGE:
-				verify(analysisResult).addPage(any());
+				verify(dependencyReport).addPage(any());
 				break;
 			case FORM:
-				verify(analysisResult).addForm(any());
+				verify(dependencyReport).addForm(any());
 				break;
 			case THEME:
-				verify(analysisResult).addTheme(any());
+				verify(dependencyReport).addTheme(any());
 				break;
-			case API_EXTENSION:
-				verify(analysisResult).addRestAPIExtension(any());
+			case APIEXTENSION:
+				verify(dependencyReport).addRestAPIExtension(any());
 				break;
 			default:
 				fail("Custom page type no supported:" + customPageType);

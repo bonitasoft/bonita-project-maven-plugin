@@ -3,8 +3,8 @@ package org.bonitasoft.plugin.analyze;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.bonitasoft.plugin.analyze.report.model.AnalysisResult;
+import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
 public interface ArtifactAnalyser {
-	AnalysisResult analyse(List<Artifact> artifacts);
+	DependencyReport analyse(List<Artifact> artifacts);
 }

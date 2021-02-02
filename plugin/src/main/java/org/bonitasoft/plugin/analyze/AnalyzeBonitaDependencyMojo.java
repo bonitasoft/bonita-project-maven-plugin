@@ -15,6 +15,7 @@
 package org.bonitasoft.plugin.analyze;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +36,12 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
-import org.bonitasoft.plugin.analyze.report.AnalysisResultReporter;
-import org.bonitasoft.plugin.analyze.report.CsvAnalysisResultReporter;
-import org.bonitasoft.plugin.analyze.report.LogAnalysisResultReporter;
-import org.bonitasoft.plugin.analyze.report.model.AnalysisResult;
+import org.bonitasoft.plugin.analyze.report.DependencyReporter;
+import org.bonitasoft.plugin.analyze.report.JsonDependencyReporter;
+import org.bonitasoft.plugin.analyze.report.LogDependencyReporter;
+import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 @Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
@@ -72,7 +72,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 	/**
 	 * Analysis report output file
 	 */
-	@Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.csv", required = true)
+	@Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.json")
 	protected File outputFile;
 
 	@Inject
@@ -84,15 +84,17 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		List<Artifact> resolvedArtifacts = resolveArtifacts(project.getDependencyArtifacts());
-		AnalysisResult analysisResult = artifactAnalyser.analyse(resolvedArtifacts);
-		getReporters().forEach(reporter -> reporter.report(analysisResult));
+		DependencyReport dependencyReport = artifactAnalyser.analyse(resolvedArtifacts);
+		getReporters().forEach(reporter -> reporter.report(dependencyReport));
 	}
 
-	protected List<AnalysisResultReporter> getReporters() {
-		return asList(
-				new LogAnalysisResultReporter(getLog()),
-				new CsvAnalysisResultReporter(outputFile)
-		);
+	protected List<DependencyReporter> getReporters() {
+		List<DependencyReporter> reporters = new ArrayList<>();
+		reporters.add(new LogDependencyReporter(getLog()));
+		if (outputFile != null) {
+			reporters.add(new JsonDependencyReporter(outputFile));
+		}
+		return reporters;
 	}
 
 	protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts) {

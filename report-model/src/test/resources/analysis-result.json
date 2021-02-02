@@ -1,0 +1,47 @@
+{
+  "connectorImplementations" : [ {
+    "className" : "aClassName",
+    "implementationId" : "anImplId",
+    "implementationVersion" : "anImplVersion",
+    "definitionId" : "aDefId",
+    "definitionVersion" : "aDefVersion",
+    "filePath" : "/a/file.jar",
+    "superType" : "aSuperType"
+  } ],
+  "filterImplementations" : [ ],
+  "connectorDefinitions" : [ {
+    "definitionId" : "anId",
+    "definitionVersion" : "aVersion",
+    "filePath" : "/a/file.jar",
+    "entryPath" : "anEntryPath"
+  } ],
+  "filterDefinitions" : [ ],
+  "restApiExtensions" : [ {
+    "type" : "APIEXTENSION",
+    "name" : "aName",
+    "displayName" : "aDisplayName",
+    "description" : "aDesc",
+    "filePath" : "/a/file.jar"
+  } ],
+  "pages" : [ {
+    "type" : "PAGE",
+    "name" : "aName",
+    "displayName" : "aDisplayName",
+    "description" : "aDesc",
+    "filePath" : "/a/file.jar"
+  } ],
+  "forms" : [ {
+    "type" : "FORM",
+    "name" : "aName",
+    "displayName" : "aDisplayName",
+    "description" : "aDesc",
+    "filePath" : "/a/file.jar"
+  } ],
+  "themes" : [ {
+    "type" : "THEME",
+    "name" : "aName",
+    "displayName" : "aDisplayName",
+    "description" : "aDesc",
+    "filePath" : "/a/file.jar"
+  } ]
+}

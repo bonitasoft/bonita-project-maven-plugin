@@ -13,8 +13,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
-import org.bonitasoft.plugin.analyze.report.AnalysisResultReporter;
-import org.bonitasoft.plugin.analyze.report.model.AnalysisResult;
+import org.bonitasoft.plugin.analyze.report.DependencyReporter;
+import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,7 @@ class AnalyzeBonitaDependencyMojoTest {
 	ArtifactAnalyser artifactAnalyser;
 
 	@Mock
-	AnalysisResultReporter reporter;
+	DependencyReporter reporter;
 
 	@BeforeEach
 	void setUp() {
@@ -68,7 +68,7 @@ class AnalyzeBonitaDependencyMojoTest {
 
 		when(project.getDependencyArtifacts()).thenReturn(new HashSet<>());
 		doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any());
-		when(artifactAnalyser.analyse(any())).thenReturn(new AnalysisResult());
+		when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
 
 		// When
 		mojo.execute();

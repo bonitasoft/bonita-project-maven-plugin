@@ -79,7 +79,7 @@ public class ConnectorResolver {
 					String implementationVersion = readElement(document, "implementationVersion");
 					String definitionId = readElement(document, "definitionId");
 					String definitionVersion = readElement(document, "definitionVersion");
-					return new Implementation(className, implementationId, implementationVersion, definitionId, definitionVersion, resource.getPath(), artifact.getFile().getAbsolutePath());
+					return Implementation.create(className ,definitionId, definitionVersion, implementationId, implementationVersion, resource.getPath(), artifact.getFile().getAbsolutePath(),null);
 				})
 				.map(implementation -> detectImplementationType(implementation, artifact.getFile()))
 				.collect(Collectors.toList());
@@ -92,7 +92,7 @@ public class ConnectorResolver {
 					Document document = resource.getDocument();
 					String definitionId = readElement(document, "id");
 					String definitionVersion = readElement(document, "version");
-					return new Definition(definitionId, definitionVersion, resource.getPath(), artifact.getFile().getAbsolutePath());
+					return Definition.create(definitionId, definitionVersion, resource.getPath(), artifact.getFile().getAbsolutePath());
 				})
 				.collect(Collectors.toList());
 	}

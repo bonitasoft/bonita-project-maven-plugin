@@ -17,31 +17,33 @@ package org.bonitasoft.plugin.analyze.report.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
 
-public class AnalysisResult {
+@Data
+public class DependencyReport {
 
-	private final List<Implementation> connectorImplmentations = new ArrayList<>();
+	private List<Implementation> connectorImplementations = new ArrayList<>();
 
-	private final List<Implementation> filterImplmentations = new ArrayList<>();
+	private List<Implementation> filterImplementations = new ArrayList<>();
 
-	private final List<Definition> connectorDefinitions = new ArrayList<>();
+	private List<Definition> connectorDefinitions = new ArrayList<>();
 
-	private final List<Definition> filterDefinitions = new ArrayList<>();
+	private List<Definition> filterDefinitions = new ArrayList<>();
 
-	private final List<RestAPIExtension> restApiExtensions = new ArrayList<>();
+	private List<RestAPIExtension> restApiExtensions = new ArrayList<>();
 
-	private final List<Page> pages = new ArrayList<>();
+	private List<Page> pages = new ArrayList<>();
 
-	private final List<Form> forms = new ArrayList<>();
+	private List<Form> forms = new ArrayList<>();
 
-	private final List<Theme> themes = new ArrayList<>();
+	private List<Theme> themes = new ArrayList<>();
 
 	public void addConnectorImplementation(Implementation connectorImplementation) {
-		connectorImplmentations.add(connectorImplementation);
+		connectorImplementations.add(connectorImplementation);
 	}
 
 	public void addFilterImplementation(Implementation filterImplementation) {
-		filterImplmentations.add(filterImplementation);
+		filterImplementations.add(filterImplementation);
 	}
 
 	public void addConnectorDefinition(Definition connectorDefinition) {
@@ -68,36 +70,5 @@ public class AnalysisResult {
 		themes.add(theme);
 	}
 
-	public List<Implementation> getConnectorImplmentations() {
-		return connectorImplmentations;
-	}
-
-	public List<Implementation> getFilterImplmentations() {
-		return filterImplmentations;
-	}
-
-	public List<Definition> getConnectorDefinitions() {
-		return connectorDefinitions;
-	}
-
-	public List<Definition> getFilterDefinitions() {
-		return filterDefinitions;
-	}
-
-	public List<RestAPIExtension> getRestApiExtensions() {
-		return restApiExtensions;
-	}
-
-	public List<Page> getPages() {
-		return pages;
-	}
-
-	public List<Form> getForms() {
-		return forms;
-	}
-
-	public List<Theme> getThemes() {
-		return themes;
-	}
 
 }

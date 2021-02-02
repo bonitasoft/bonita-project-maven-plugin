@@ -1,0 +1,16 @@
+[INFO] === 1 Connector definitions found ===
+[INFO] aDdefinitionId-aDefinitionVersion in file /tmp/a-connector-1.0.0.jar
+[INFO] === 1 Connector implementations found ===
+[INFO] aDefinitionId-aDefinitionVersion for anIimplementationId-anImplementationVersion in file /tmp/a-connector-1.0.0.jar
+[INFO] === 1 Actor filter definitions found ===
+[INFO] aDdefinitionId-aDefinitionVersion in file /tmp/a-filter-1.0.0.jar
+[INFO] === 1 Actor filter implementations found ===
+[INFO] aDefinitionId-aDefinitionVersion for anIimplementationId-anImplementationVersion in file /tmp/a-filter-1.0.0.jar
+[INFO] === 1 Pages found ===
+[INFO] page_name in file /tmp/a-page-1.0.0.jar
+[INFO] === 1 Forms found
+[INFO] form_name in file /tmp/a-form-1.0.0.jar
+[INFO] === 1 Rest API Extensions found ===
+[INFO] rest_name in file /tmp/a-rest-1.0.0.jar
+[INFO] === 1 Themes found ===
+[INFO] theme_name in file /tmp/a-theme-1.0.0.jar

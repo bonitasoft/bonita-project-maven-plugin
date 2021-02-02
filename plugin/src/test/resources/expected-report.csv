@@ -1,8 +1,0 @@
-CONNECTOR_IMPLEMENTATION,anIimplementationId,anImplementationVersion,aClassName,aDefinitionId,aDefinitionVersion,aPath,a-connector-1.0.0.jar
-FILTER_IMPLEMENTATION,anIimplementationId,anImplementationVersion,aClassName,aDefinitionId,aDefinitionVersion,aPath,a-filter-1.0.0.jar
-CONNECTOR_DEFINITION,aDdefinitionId,aDefinitionVersion,anEntryPath,a-connector-1.0.0.jar
-FILTER_DEFINITION,aDdefinitionId,aDefinitionVersion,anEntryPath,a-filter-1.0.0.jar
-PAGE,page_name,page_display_name,a-page-1.0.0.jar
-FORM,form_name,form_display_name,a-form-1.0.0.jar
-REST_API_EXTENSION,rest_name,rest_display_name,a-rest-1.0.0.jar
-THEME,theme_name,theme_display_name,a-theme-1.0.0.jar
