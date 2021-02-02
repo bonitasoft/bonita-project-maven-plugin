@@ -37,9 +37,8 @@ public abstract class CustomPage {
 			o.setDescription(description);
 			o.setFilePath(filePath);
 			return o;
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to create a new instance of class: " + type.getName(), e);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Failed to create a new instance of class: " + type.getName(), e);
 		}
 	}
 

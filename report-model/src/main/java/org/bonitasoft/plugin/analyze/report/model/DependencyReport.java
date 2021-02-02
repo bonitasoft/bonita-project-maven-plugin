@@ -22,27 +22,27 @@ import lombok.Data;
 @Data
 public class DependencyReport {
 
-	private List<Implementation> connectorImplementations = new ArrayList<>();
+	private final List<ConnectorImplementation> connectorImplementations = new ArrayList<>();
 
-	private List<Implementation> filterImplementations = new ArrayList<>();
+	private final List<ActorFilterImplementation> filterImplementations = new ArrayList<>();
 
-	private List<Definition> connectorDefinitions = new ArrayList<>();
+	private final List<Definition> connectorDefinitions = new ArrayList<>();
 
-	private List<Definition> filterDefinitions = new ArrayList<>();
+	private final List<Definition> filterDefinitions = new ArrayList<>();
 
-	private List<RestAPIExtension> restApiExtensions = new ArrayList<>();
+	private final List<RestAPIExtension> restApiExtensions = new ArrayList<>();
 
-	private List<Page> pages = new ArrayList<>();
+	private final List<Page> pages = new ArrayList<>();
 
-	private List<Form> forms = new ArrayList<>();
+	private final List<Form> forms = new ArrayList<>();
 
-	private List<Theme> themes = new ArrayList<>();
+	private final List<Theme> themes = new ArrayList<>();
 
-	public void addConnectorImplementation(Implementation connectorImplementation) {
+	public void addConnectorImplementation(ConnectorImplementation connectorImplementation) {
 		connectorImplementations.add(connectorImplementation);
 	}
 
-	public void addFilterImplementation(Implementation filterImplementation) {
+	public void addFilterImplementation(ActorFilterImplementation filterImplementation) {
 		filterImplementations.add(filterImplementation);
 	}
 

@@ -21,11 +21,6 @@
 			<version>1.3.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.connectors</groupId>
-			<artifactId>bonita-connector-rest</artifactId>
-			<version>1.0.10</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.actorfilter</groupId>
 			<artifactId>bonita-actorfilter-single-user</artifactId>
 			<version>1.0.0</version>

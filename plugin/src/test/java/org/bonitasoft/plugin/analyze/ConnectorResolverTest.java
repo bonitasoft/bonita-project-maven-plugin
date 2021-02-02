@@ -14,6 +14,10 @@
  */
 package org.bonitasoft.plugin.analyze;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -22,13 +26,12 @@ import java.util.Optional;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
+import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ConnectorResolverTest {
 
@@ -60,7 +63,7 @@ class ConnectorResolverTest {
 
 		assertEquals(1, implementations.size());
 		Implementation emailImplementation = implementations.get(0);
-		assertEquals(ConnectorResolver.ABSTRACT_CONNECTOR_TYPE, emailImplementation.getSuperType());
+		assertTrue(emailImplementation instanceof ConnectorImplementation);
 		assertEquals("email-impl", emailImplementation.getImplementationId());
 		assertEquals("1.3.0", emailImplementation.getImplementationVersion());
 		assertEquals("email", emailImplementation.getDefinitionId());
@@ -105,32 +108,28 @@ class ConnectorResolverTest {
 		assertThat(postImplementationSearchResult)
 				.isPresent()
 				.get()
-				.extracting("superType")
-				.isEqualTo(ConnectorResolver.ABSTRACT_CONNECTOR_TYPE);
+				.isInstanceOf(ConnectorImplementation.class);
 
 		Optional<Implementation> getImplementationSearchResult = findImplemetationById("rest-get-impl",
 				implementations);
 		assertThat(getImplementationSearchResult)
 				.isPresent()
 				.get()
-				.extracting("superType")
-				.isEqualTo(ConnectorResolver.ABSTRACT_CONNECTOR_TYPE);
+				.isInstanceOf(ConnectorImplementation.class);
 
 		Optional<Implementation> putImplementationSearchResult = findImplemetationById("rest-put-impl",
 				implementations);
 		assertThat(putImplementationSearchResult)
 				.isPresent()
 				.get()
-				.extracting("superType")
-				.isEqualTo(ConnectorResolver.ABSTRACT_CONNECTOR_TYPE);
+				.isInstanceOf(ConnectorImplementation.class);
 
 		Optional<Implementation> deleteImplementationSearchResult = findImplemetationById("rest-delete-impl",
 				implementations);
 		assertThat(deleteImplementationSearchResult)
 				.isPresent()
 				.get()
-				.extracting("superType")
-				.isEqualTo(ConnectorResolver.ABSTRACT_CONNECTOR_TYPE);
+				.isInstanceOf(ConnectorImplementation.class);
 	}
 
 	@Test
@@ -142,7 +141,7 @@ class ConnectorResolverTest {
 
 		assertEquals(1, implementations.size());
 		Implementation singleUserImplementation = implementations.get(0);
-		assertEquals(ConnectorResolver.ABSTRACT_FILTER_TYPE, singleUserImplementation.getSuperType());
+		assertTrue(singleUserImplementation instanceof ActorFilterImplementation);
 		assertEquals("bonita-actorfilter-single-user-impl", singleUserImplementation.getImplementationId());
 		assertEquals("1.0.0", singleUserImplementation.getImplementationVersion());
 		assertEquals("bonita-actorfilter-single-user", singleUserImplementation.getDefinitionId());

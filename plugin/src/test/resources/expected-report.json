@@ -1,31 +1,35 @@
 {
   "connectorImplementations" : [ {
+    "type" : "CONNECTOR",
     "className" : "aClassName",
-    "implementationId" : "aDefinitionId",
-    "implementationVersion" : "aDefinitionVersion",
-    "definitionId" : "anIimplementationId",
-    "definitionVersion" : "anImplementationVersion",
-    "filePath" : "/tmp/a-connector-1.0.0.jar"
-  } ],
-  "filterImplementations" : [ {
-    "className" : "aClassName",
-    "implementationId" : "aDefinitionId",
-    "implementationVersion" : "aDefinitionVersion",
-    "definitionId" : "anIimplementationId",
-    "definitionVersion" : "anImplementationVersion",
-    "filePath" : "/tmp/a-filter-1.0.0.jar"
-  } ],
-  "connectorDefinitions" : [ {
-    "definitionId" : "aDdefinitionId",
+    "implementationId" : "anImplementationId",
+    "implementationVersion" : "anImplementationVersion",
+    "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-connector-1.0.0.jar",
-    "entryPath" : "anEntryPath"
+    "jarEntry" : "connector.impl"
   } ],
-  "filterDefinitions" : [ {
-    "definitionId" : "aDdefinitionId",
+  "filterImplementations" : [ {
+    "type" : "ACTOR_FILTER",
+    "className" : "aClassName",
+    "implementationId" : "anImplementationId",
+    "implementationVersion" : "anImplementationVersion",
+    "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-filter-1.0.0.jar",
-    "entryPath" : "anEntryPath"
+    "jarEntry" : "filter.impl"
+  } ],
+  "connectorDefinitions" : [ {
+    "definitionId" : "aDefinitionId",
+    "definitionVersion" : "aDefinitionVersion",
+    "filePath" : "/tmp/a-connector-1.0.0.jar",
+    "jarEntry" : "connector.def"
+  } ],
+  "filterDefinitions" : [ {
+    "definitionId" : "aDefinitionId",
+    "definitionVersion" : "aDefinitionVersion",
+    "filePath" : "/tmp/a-filter-1.0.0.jar",
+    "jarEntry" : "filter.def"
   } ],
   "restApiExtensions" : [ {
     "type" : "APIEXTENSION",

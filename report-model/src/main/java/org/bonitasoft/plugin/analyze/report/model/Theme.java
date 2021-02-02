@@ -1,9 +1,7 @@
 package org.bonitasoft.plugin.analyze.report.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.Data;
 
-@Data
 @JsonTypeName("THEME")
 public class Theme extends CustomPage {
 

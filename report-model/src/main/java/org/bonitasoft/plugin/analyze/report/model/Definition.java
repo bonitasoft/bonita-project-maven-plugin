@@ -5,20 +5,28 @@ import lombok.Data;
 @Data
 public class Definition {
 
-	private String definitionId;
+    private String definitionId;
 
-	private String definitionVersion;
+    private String definitionVersion;
 
-	private String filePath;
+    /**
+     * Jar file containing the definition descriptor file
+     */
+    private String filePath;
 
-	private String entryPath;
+    /**
+     * Definition descriptor file entry path in the jar file
+     */
+    private String jarEntry;
 
-	public static Definition create(String definitionId, String definitionVersion, String entryPath, String filePath) {
-		final Definition definition = new Definition();
-		definition.setDefinitionId(definitionId);
-		definition.setDefinitionVersion(definitionVersion);
-		definition.setEntryPath(entryPath);
-		definition.setFilePath(filePath);
-		return definition;
-	}
+    public static Definition create(DescriptorIdentifier definitionIdentifier,
+            String filePath,
+            String jarEntry) {
+        final Definition definition = new Definition();
+        definition.setDefinitionId(definitionIdentifier.getId());
+        definition.setDefinitionVersion(definitionIdentifier.getVersion());
+        definition.setFilePath(filePath);
+        definition.setJarEntry(jarEntry);
+        return definition;
+    }
 }

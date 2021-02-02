@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.bonitasoft.maven</groupId>
@@ -25,7 +25,7 @@
 
 		<!-- Test -->
 		<maven-invoker-plugin.version>3.2.1</maven-invoker-plugin.version>
-
+		<groovy.version>3.0.7</groovy.version>
 	</properties>
 
 	<dependencies>
@@ -41,12 +41,6 @@
 			<version>2.12.1</version>
 			<scope>compile</scope>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.codehaus.woodstox</groupId>-->
-<!--			<artifactId>woodstox-core-asl</artifactId>-->
-<!--			<version>4.1.4</version>-->
-<!--		</dependency>-->
-
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
@@ -132,17 +126,10 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<executions>
-					<execution>
-						<id>prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
 					<execution>
 						<id>prepare-agent-integration</id>
 						<goals>
@@ -152,27 +139,7 @@
 							<propertyName>invoker.mavenOpts</propertyName>
 						</configuration>
 					</execution>
-					<execution>
-						<id>jacoco-test-report</id>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>jacoco-it-report</id>
-						<goals>
-							<goal>report-integration</goal>
-						</goals>
-					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -182,7 +149,12 @@
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy</artifactId>
-						<version>3.0.7</version>
+						<version>${groovy.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-json</artifactId>
+						<version>${groovy.version}</version>
 					</dependency>
 				</dependencies>
 				<configuration>

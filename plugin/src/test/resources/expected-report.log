@@ -1,11 +1,11 @@
 [INFO] === 1 Connector definitions found ===
-[INFO] aDdefinitionId-aDefinitionVersion in file /tmp/a-connector-1.0.0.jar
+[INFO] aDefinitionId-aDefinitionVersion in file /tmp/a-connector-1.0.0.jar
 [INFO] === 1 Connector implementations found ===
-[INFO] aDefinitionId-aDefinitionVersion for anIimplementationId-anImplementationVersion in file /tmp/a-connector-1.0.0.jar
+[INFO] anImplementationId-anImplementationVersion for aDefinitionId-aDefinitionVersion in file /tmp/a-connector-1.0.0.jar
 [INFO] === 1 Actor filter definitions found ===
-[INFO] aDdefinitionId-aDefinitionVersion in file /tmp/a-filter-1.0.0.jar
+[INFO] aDefinitionId-aDefinitionVersion in file /tmp/a-filter-1.0.0.jar
 [INFO] === 1 Actor filter implementations found ===
-[INFO] aDefinitionId-aDefinitionVersion for anIimplementationId-anImplementationVersion in file /tmp/a-filter-1.0.0.jar
+[INFO] anImplementationId-anImplementationVersion for aDefinitionId-aDefinitionVersion in file /tmp/a-filter-1.0.0.jar
 [INFO] === 1 Pages found ===
 [INFO] page_name in file /tmp/a-page-1.0.0.jar
 [INFO] === 1 Forms found

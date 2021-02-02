@@ -1,15 +1,17 @@
 package org.bonitasoft.plugin.analyze.report;
 
+import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
+import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
+import org.bonitasoft.plugin.analyze.report.model.DescriptorIdentifier;
 import org.bonitasoft.plugin.analyze.report.model.Form;
-import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.bonitasoft.plugin.analyze.report.model.Page;
 import org.bonitasoft.plugin.analyze.report.model.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.report.model.Theme;
 import org.junit.jupiter.api.Test;
 
-public abstract class AbstractDependencyReportReporterTest {
+abstract class AbstractDependencyReportReporterTest {
 
 	protected abstract DependencyReporter getReporter();
 
@@ -18,39 +20,31 @@ public abstract class AbstractDependencyReportReporterTest {
 		// Given
 		final DependencyReport dependencyReport = new DependencyReport();
 		final String connectorArtifactFile = "/tmp/a-connector-1.0.0.jar";
-		dependencyReport.addConnectorImplementation(Implementation.create(
+		dependencyReport.addConnectorImplementation(ConnectorImplementation.create(
 				"aClassName",
-				"anIimplementationId",
-				"anImplementationVersion",
-				"aDefinitionId",
-				"aDefinitionVersion",
-				"aPath",
+				new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
+				new DescriptorIdentifier("anImplementationId", "anImplementationVersion"),
 				connectorArtifactFile,
-				null
+				"connector.impl"
 		));
 		dependencyReport.addConnectorDefinition(Definition.create(
-				"aDdefinitionId",
-				"aDefinitionVersion",
-				"anEntryPath",
-				connectorArtifactFile
+				new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
+				connectorArtifactFile,
+				"connector.def"
 		));
 
 		final String filterArtifactFile = "/tmp/a-filter-1.0.0.jar";
-		dependencyReport.addFilterImplementation(Implementation.create(
+		dependencyReport.addFilterImplementation(ActorFilterImplementation.create(
 				"aClassName",
-				"anIimplementationId",
-				"anImplementationVersion",
-				"aDefinitionId",
-				"aDefinitionVersion",
-				"aPath",
+				new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
+                new DescriptorIdentifier("anImplementationId", "anImplementationVersion"),
 				filterArtifactFile,
-				null
+				"filter.impl"
 		));
 		dependencyReport.addFilterDefinition(Definition.create(
-				"aDdefinitionId",
-				"aDefinitionVersion",
-				"anEntryPath",
-				filterArtifactFile
+		        new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
+				filterArtifactFile,
+				"filter.def"
 		));
 
 		dependencyReport.addRestAPIExtension(RestAPIExtension.create("rest_name", "rest_displayName", "rest_description", "/tmp/a-rest-1.0.0.jar"));
