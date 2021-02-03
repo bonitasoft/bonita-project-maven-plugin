@@ -21,7 +21,7 @@ import lombok.Value;
 @AllArgsConstructor
 public class DescriptorIdentifier {
 
-    private String id;
-    private String version;
+    String id;
+    String version;
     
 }
