@@ -1,0 +1,62 @@
+{
+  "connectorImplementations" : [ {
+    "type" : "CONNECTOR",
+    "className" : "aClassName",
+    "implementationId" : "anImplementationId",
+    "implementationVersion" : "anImplementationVersion",
+    "definitionId" : "aDefinitionId",
+    "definitionVersion" : "aDefinitionVersion",
+    "filePath" : "/tmp/a-connector-1.0.0.jar",
+    "jarEntry" : "connector.impl"
+  } ],
+  "filterImplementations" : [ {
+    "type" : "ACTOR_FILTER",
+    "className" : "aClassName",
+    "implementationId" : "anImplementationId",
+    "implementationVersion" : "anImplementationVersion",
+    "definitionId" : "aDefinitionId",
+    "definitionVersion" : "aDefinitionVersion",
+    "filePath" : "/tmp/a-filter-1.0.0.jar",
+    "jarEntry" : "filter.impl"
+  } ],
+  "connectorDefinitions" : [ {
+    "definitionId" : "aDefinitionId",
+    "definitionVersion" : "aDefinitionVersion",
+    "filePath" : "/tmp/a-connector-1.0.0.jar",
+    "jarEntry" : "connector.def"
+  } ],
+  "filterDefinitions" : [ {
+    "definitionId" : "aDefinitionId",
+    "definitionVersion" : "aDefinitionVersion",
+    "filePath" : "/tmp/a-filter-1.0.0.jar",
+    "jarEntry" : "filter.def"
+  } ],
+  "restApiExtensions" : [ {
+    "type" : "APIEXTENSION",
+    "name" : "rest_name",
+    "displayName" : "rest_displayName",
+    "description" : "rest_description",
+    "filePath" : "/tmp/a-rest-1.0.0.jar"
+  } ],
+  "pages" : [ {
+    "type" : "PAGE",
+    "name" : "page_name",
+    "displayName" : "page_displayName",
+    "description" : "page_description",
+    "filePath" : "/tmp/a-page-1.0.0.jar"
+  } ],
+  "forms" : [ {
+    "type" : "FORM",
+    "name" : "form_name",
+    "displayName" : "form_displayName",
+    "description" : "form_description",
+    "filePath" : "/tmp/a-form-1.0.0.jar"
+  } ],
+  "themes" : [ {
+    "type" : "THEME",
+    "name" : "theme_name",
+    "displayName" : "theme_displayName",
+    "description" : "theme_description",
+    "filePath" : "/tmp/a-theme-1.0.0.jar"
+  } ]
+}

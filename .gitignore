@@ -1,8 +1,9 @@
-/target/
-/.settings/
-/.classpath
-/.project
-/.mvn/wrapper/*.jar
+target
+.settings/
+.classpath
+.project
+.mvn/wrapper/*.jar
 
 .idea
 *.iml
+/bin/
