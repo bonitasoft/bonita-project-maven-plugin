@@ -71,7 +71,11 @@ public class ConnectorResolver {
     private DeserializeClassFileProcessor decompiler = new DeserializeClassFileProcessor();
 
     public static String readElement(Document document, String elementName) {
-        return document.getElementsByTagName(elementName).item(0).getTextContent();
+        String textContent = document.getElementsByTagName(elementName).item(0).getTextContent();
+        if(textContent != null) {
+            textContent = textContent.trim();
+        }
+        return textContent;
     }
 
     public List<Implementation> findAllImplementations(Artifact artifact) throws IOException {
