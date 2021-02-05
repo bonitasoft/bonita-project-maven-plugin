@@ -6,6 +6,9 @@ import static org.bonitasoft.plugin.analyze.ConnectorResolver.findJarEntry;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -145,14 +148,15 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
     protected Properties readPageProperties(File artifactFile) throws IOException {
         return findZipEntry(artifactFile, entry -> entry.getName().equals("page.properties"))
                 .map(entry -> {
-                    try (ZipFile zipFile = new ZipFile(artifactFile)) {
+                    try (ZipFile zipFile = new ZipFile(artifactFile);
+                            Reader reader = new InputStreamReader(zipFile.getInputStream(entry),
+                                    StandardCharsets.UTF_8)) {
                         Properties prop = new Properties();
-                        prop.load(zipFile.getInputStream(entry));
+                        prop.load(reader);
                         return prop;
                     } catch (IOException e) {
                         return null;
                     }
-
                 })
                 .filter(Objects::nonNull)
                 .orElseThrow(
