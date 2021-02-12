@@ -10,14 +10,14 @@ public class ConnectorImplementation extends Implementation {
             DescriptorIdentifier implementationIdentifier,
             String filePath,
             String jarEntry,
-            GAV gav) {
+            MavenArtifact mavenArtifact) {
         return Implementation.create(className,
                 definitionIdentifier,
                 implementationIdentifier,
                 filePath,
                 jarEntry,
                 ConnectorImplementation.class,
-                gav);
+                mavenArtifact);
     }
 
 }

@@ -36,8 +36,8 @@ import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DescriptorIdentifier;
-import org.bonitasoft.plugin.analyze.report.model.GAV;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.MavenArtifact;
 import org.jd.core.v1.api.loader.Loader;
 import org.jd.core.v1.api.loader.LoaderException;
 import org.jd.core.v1.model.classfile.ClassFile;
@@ -80,7 +80,9 @@ public class ConnectorResolver {
     }
 
     public List<Implementation> findAllImplementations(Artifact artifact) throws IOException {
-        GAV gav = GAV.create(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+        MavenArtifact mavenArtifact = MavenArtifact.create(artifact.getGroupId(), artifact.getArtifactId(),
+                artifact.getVersion(),
+                artifact.getClassifier(), artifact.getType());
         return findImplementationDescriptors(artifact.getFile())
                 .stream()
                 .map(resource -> {
@@ -97,14 +99,14 @@ public class ConnectorResolver {
                                 new DescriptorIdentifier(implementationId, implementationVersion),
                                 artifact.getFile().getAbsolutePath(),
                                 resource.getPath(),
-                                gav);
+                                mavenArtifact);
                     } else if (ABSTRACT_FILTER_TYPE.equals(superType)) {
                         return ActorFilterImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
                                 artifact.getFile().getAbsolutePath(),
                                 resource.getPath(),
-                                gav);
+                                mavenArtifact);
                     } else {
                         return null;
                     }
@@ -114,7 +116,9 @@ public class ConnectorResolver {
     }
 
     public List<Definition> findAllDefinitions(Artifact artifact) throws IOException {
-        GAV gav = GAV.create(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+        MavenArtifact mavenArtifact = MavenArtifact.create(artifact.getGroupId(), artifact.getArtifactId(),
+                artifact.getVersion(),
+                artifact.getClassifier(), artifact.getType());
         return findDefinitionDescriptors(artifact.getFile())
                 .stream()
                 .map(resource -> {
@@ -124,7 +128,7 @@ public class ConnectorResolver {
                     return Definition.create(new DescriptorIdentifier(definitionId, definitionVersion),
                             artifact.getFile().getAbsolutePath(),
                             resource.getPath(),
-                            gav);
+                            mavenArtifact);
                 })
                 .collect(Collectors.toList());
     }

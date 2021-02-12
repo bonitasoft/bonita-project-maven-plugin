@@ -26,31 +26,29 @@ class DependencyReportTest {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final DependencyReport sourceResult = new DependencyReport();
+        MavenArtifact mavenArtifact = MavenArtifact.create("groupId", "artifactID", "1.0.0", "classifier", "type");
         sourceResult.getConnectorDefinitions().add(Definition.create(new DescriptorIdentifier("anId", "aVersion"),
-                "/a/file.jar", "connector.def", GAV.create("groupId", "artifactID", "1.0.0")));
+                "/a/file.jar", "connector.def", mavenArtifact));
         sourceResult.getConnectorImplementations().add(
                 ConnectorImplementation.create("aClassName",
                         new DescriptorIdentifier("aDefId", "aDefVersion"),
                         new DescriptorIdentifier("anImplId", "anImplVersion"),
                         "/a/file.jar",
                         "connector.impl",
-                        GAV.create("groupId", "artifactID", "1.0.0")));
+                        mavenArtifact));
         sourceResult.getFilterDefinitions().add(Definition.create(new DescriptorIdentifier("anId", "aVersion"),
-                "/a/file.jar", "filter.def", GAV.create("groupId", "artifactID", "1.0.0")));
+                "/a/file.jar", "filter.def", mavenArtifact));
         sourceResult.getFilterImplementations().add(ActorFilterImplementation.create("aClassName",
                 new DescriptorIdentifier("aDefId", "aDefVersion"),
                 new DescriptorIdentifier("anImplId", "anImplVersion"),
                 "/a/file.jar",
                 "filter.impl",
-                GAV.create("groupId", "artifactID", "1.0.0")));
-        sourceResult.getRestApiExtensions().add(RestAPIExtension.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                GAV.create("groupId", "artifactID", "1.0.0")));
-        sourceResult.getForms().add(Form.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                GAV.create("groupId", "artifactID", "1.0.0")));
-        sourceResult.getPages().add(Page.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                GAV.create("groupId", "artifactID", "1.0.0")));
-        sourceResult.getThemes().add(Theme.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                GAV.create("groupId", "artifactID", "1.0.0")));
+                mavenArtifact));
+        sourceResult.getRestApiExtensions()
+                .add(RestAPIExtension.create("aName", "aDisplayName", "aDesc", "/a/file.jar", mavenArtifact));
+        sourceResult.getForms().add(Form.create("aName", "aDisplayName", "aDesc", "/a/file.jar", mavenArtifact));
+        sourceResult.getPages().add(Page.create("aName", "aDisplayName", "aDesc", "/a/file.jar", mavenArtifact));
+        sourceResult.getThemes().add(Theme.create("aName", "aDisplayName", "aDesc", "/a/file.jar", mavenArtifact));
 
         // When
         final String json = mapper.writeValueAsString(sourceResult);

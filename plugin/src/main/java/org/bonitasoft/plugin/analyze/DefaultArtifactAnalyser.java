@@ -29,8 +29,8 @@ import org.bonitasoft.plugin.analyze.report.model.CustomPage.CustomPageType;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Form;
-import org.bonitasoft.plugin.analyze.report.model.GAV;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.MavenArtifact;
 import org.bonitasoft.plugin.analyze.report.model.Page;
 import org.bonitasoft.plugin.analyze.report.model.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.report.model.Theme;
@@ -108,21 +108,22 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
         String name = properties.getProperty(CustomPage.NAME_PROPERTY);
         String displayName = properties.getProperty(CustomPage.DISPLAY_NAME_PROPERTY);
         String description = properties.getProperty(CustomPage.DESCRIPTION_PROPERTY);
-        GAV gav = GAV.create(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+        MavenArtifact mavenArtifact = MavenArtifact.create(artifact.getGroupId(), artifact.getArtifactId(),
+                artifact.getVersion(), artifact.getClassifier(), artifact.getType());
         final String artifactPath = artifact.getFile().getAbsolutePath();
         switch (customPageType) {
             case FORM:
-                result.addForm(Form.create(name, displayName, description, artifactPath, gav));
+                result.addForm(Form.create(name, displayName, description, artifactPath, mavenArtifact));
                 break;
             case PAGE:
-                result.addPage(Page.create(name, displayName, description, artifactPath, gav));
+                result.addPage(Page.create(name, displayName, description, artifactPath, mavenArtifact));
                 break;
             case THEME:
-                result.addTheme(Theme.create(name, displayName, description, artifactPath, gav));
+                result.addTheme(Theme.create(name, displayName, description, artifactPath, mavenArtifact));
                 break;
             case APIEXTENSION:
                 result.addRestAPIExtension(
-                        RestAPIExtension.create(name, displayName, description, artifactPath, gav));
+                        RestAPIExtension.create(name, displayName, description, artifactPath, mavenArtifact));
                 break;
             default:
                 throw new AnalysisResultReportException("Unsupported Custom Page type: " + contentType);

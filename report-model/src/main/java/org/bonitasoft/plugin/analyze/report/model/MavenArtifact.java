@@ -17,7 +17,7 @@ package org.bonitasoft.plugin.analyze.report.model;
 import lombok.Data;
 
 @Data
-public class GAV {
+public class MavenArtifact {
 
     private String groupId;
 
@@ -25,12 +25,18 @@ public class GAV {
 
     private String version;
 
-    public static GAV create(String groupId, String artifactId, String version) {
-        GAV gav = new GAV();
-        gav.setGroupId(groupId);
-        gav.setArtifactId(artifactId);
-        gav.setVersion(version);
-        return gav;
+    private String classifier;
+
+    private String type;
+
+    public static MavenArtifact create(String groupId, String artifactId, String version, String classifier, String type) {
+        MavenArtifact artifact = new MavenArtifact();
+        artifact.setGroupId(groupId);
+        artifact.setArtifactId(artifactId);
+        artifact.setVersion(version);
+        artifact.setClassifier(classifier);
+        artifact.setType(type);
+        return artifact;
     }
 
 }

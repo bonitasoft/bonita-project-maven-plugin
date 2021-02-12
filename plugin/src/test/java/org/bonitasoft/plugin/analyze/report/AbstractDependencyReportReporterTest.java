@@ -6,7 +6,7 @@ import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.DescriptorIdentifier;
 import org.bonitasoft.plugin.analyze.report.model.Form;
-import org.bonitasoft.plugin.analyze.report.model.GAV;
+import org.bonitasoft.plugin.analyze.report.model.MavenArtifact;
 import org.bonitasoft.plugin.analyze.report.model.Page;
 import org.bonitasoft.plugin.analyze.report.model.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.report.model.Theme;
@@ -21,19 +21,19 @@ abstract class AbstractDependencyReportReporterTest {
         // Given
         final DependencyReport dependencyReport = new DependencyReport();
         final String connectorArtifactFile = "/tmp/a-connector-1.0.0.jar";
-        GAV gav = GAV.create("groupId", "artifactID", "1.0.0");
+        MavenArtifact mavenArtifact = MavenArtifact.create("groupId", "artifactID", "1.0.0", "classifier", "type");
         dependencyReport.addConnectorImplementation(ConnectorImplementation.create(
                 "aClassName",
                 new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
                 new DescriptorIdentifier("anImplementationId", "anImplementationVersion"),
                 connectorArtifactFile,
                 "connector.impl",
-                gav));
+                mavenArtifact));
         dependencyReport.addConnectorDefinition(Definition.create(
                 new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
                 connectorArtifactFile,
                 "connector.def",
-                gav));
+                mavenArtifact));
 
         final String filterArtifactFile = "/tmp/a-filter-1.0.0.jar";
         dependencyReport.addFilterImplementation(ActorFilterImplementation.create(
@@ -42,22 +42,25 @@ abstract class AbstractDependencyReportReporterTest {
                 new DescriptorIdentifier("anImplementationId", "anImplementationVersion"),
                 filterArtifactFile,
                 "filter.impl",
-                gav));
+                mavenArtifact));
         dependencyReport.addFilterDefinition(Definition.create(
                 new DescriptorIdentifier("aDefinitionId", "aDefinitionVersion"),
                 filterArtifactFile,
                 "filter.def",
-                gav));
+                mavenArtifact));
 
         dependencyReport.addRestAPIExtension(
-                RestAPIExtension.create("rest_name", "rest_displayName", "rest_description", "/tmp/a-rest-1.0.0.jar", gav));
+                RestAPIExtension.create("rest_name", "rest_displayName", "rest_description", "/tmp/a-rest-1.0.0.jar",
+                        mavenArtifact));
         dependencyReport
-                .addPage(Page.create("page_name", "page_displayName", "page_description", "/tmp/a-page-1.0.0.jar", gav));
+                .addPage(Page.create("page_name", "page_displayName", "page_description", "/tmp/a-page-1.0.0.jar",
+                        mavenArtifact));
         dependencyReport
-                .addForm(Form.create("form_name", "form_displayName", "form_description", "/tmp/a-form-1.0.0.jar", gav));
+                .addForm(Form.create("form_name", "form_displayName", "form_description", "/tmp/a-form-1.0.0.jar",
+                        mavenArtifact));
         dependencyReport
-                .addTheme(
-                        Theme.create("theme_name", "theme_displayName", "theme_description", "/tmp/a-theme-1.0.0.jar", gav));
+                .addTheme(Theme.create("theme_name", "theme_displayName", "theme_description", "/tmp/a-theme-1.0.0.jar",
+                        mavenArtifact));
 
         // When
         getReporter().report(dependencyReport);

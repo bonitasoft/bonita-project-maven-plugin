@@ -23,7 +23,7 @@ class CustomPageTest {
     @Test
     void should_throw_illegal_argument_exception() throws Exception {
         assertThrows(IllegalArgumentException.class,
-                () -> CustomPage.create("", "", "", "", InvalidPageType.class, GAV.create("", "", "")));
+                () -> CustomPage.create("", "", "", "", InvalidPageType.class, null));
     }
 
     class InvalidPageType extends CustomPage {

@@ -30,21 +30,21 @@ public abstract class CustomPage {
 
     private String filePath;
 
-    private GAV gav;
+    private MavenArtifact mavenArtifact;
 
     protected static <T extends CustomPage> T create(String name,
             String displayName,
             String description,
             String filePath,
             Class<T> type,
-            GAV gav) {
+            MavenArtifact mavenArtifact) {
         try {
             T o = type.getDeclaredConstructor().newInstance();
             o.setName(name);
             o.setDisplayName(displayName);
             o.setDescription(description);
             o.setFilePath(filePath);
-            o.setGav(gav);
+            o.setMavenArtifact(mavenArtifact);
             return o;
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create a new instance of class: " + type.getName(), e);

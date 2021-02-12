@@ -34,7 +34,7 @@ public abstract class Implementation {
      */
     private String jarEntry;
 
-    private GAV gav;
+    private MavenArtifact mavenArtifact;
 
     public static <T extends Implementation> T create(String className,
             DescriptorIdentifier definitionIdentifier,
@@ -42,7 +42,7 @@ public abstract class Implementation {
             String filePath,
             String jarEntry,
             Class<T> type,
-            GAV gav) {
+            MavenArtifact mavenArtifact) {
         try {
             T implementation = type.getDeclaredConstructor().newInstance();
             implementation.setClassName(className);
@@ -52,7 +52,7 @@ public abstract class Implementation {
             implementation.setImplementationVersion(implementationIdentifier.getVersion());
             implementation.setFilePath(filePath);
             implementation.setJarEntry(jarEntry);
-            implementation.setGav(gav);
+            implementation.setMavenArtifact(mavenArtifact);
             return implementation;
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create a new instance of class: " + type.getName(), e);

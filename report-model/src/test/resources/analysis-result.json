@@ -8,10 +8,12 @@
     "definitionVersion" : "aDefVersion",
     "filePath" : "/a/file.jar",
     "jarEntry" : "connector.impl",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "filterImplementations" : [ {
@@ -23,10 +25,12 @@
     "definitionVersion" : "aDefVersion",
     "filePath" : "/a/file.jar",
     "jarEntry" : "filter.impl",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "connectorDefinitions" : [ {
@@ -34,10 +38,12 @@
     "definitionVersion" : "aVersion",
     "filePath" : "/a/file.jar",
     "jarEntry" : "connector.def",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "filterDefinitions" : [ {
@@ -45,10 +51,12 @@
     "definitionVersion" : "aVersion",
     "filePath" : "/a/file.jar",
     "jarEntry" : "filter.def",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "restApiExtensions" : [ {
@@ -57,10 +65,12 @@
     "displayName" : "aDisplayName",
     "description" : "aDesc",
     "filePath" : "/a/file.jar",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "pages" : [ {
@@ -69,10 +79,12 @@
     "displayName" : "aDisplayName",
     "description" : "aDesc",
     "filePath" : "/a/file.jar",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "forms" : [ {
@@ -81,10 +93,12 @@
     "displayName" : "aDisplayName",
     "description" : "aDesc",
     "filePath" : "/a/file.jar",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ],
   "themes" : [ {
@@ -93,10 +107,12 @@
     "displayName" : "aDisplayName",
     "description" : "aDesc",
     "filePath" : "/a/file.jar",
-    "gav" : {
+    "mavenArtifact" : {
       "groupId" : "groupId",
       "artifactId" : "artifactID",
-      "version" : "1.0.0"
+      "version" : "1.0.0",
+      "classifier" : "classifier",
+      "type" : "type"
     }
   } ]
 }

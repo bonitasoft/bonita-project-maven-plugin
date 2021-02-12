@@ -19,18 +19,18 @@ public class Definition {
      */
     private String jarEntry;
 
-    private GAV gav;
+    private MavenArtifact mavenArtifact;
 
     public static Definition create(DescriptorIdentifier definitionIdentifier,
             String filePath,
             String jarEntry,
-            GAV gav) {
+            MavenArtifact mavenArtifact) {
         final Definition definition = new Definition();
         definition.setDefinitionId(definitionIdentifier.getId());
         definition.setDefinitionVersion(definitionIdentifier.getVersion());
         definition.setFilePath(filePath);
         definition.setJarEntry(jarEntry);
-        definition.setGav(gav);
+        definition.setMavenArtifact(mavenArtifact);
         return definition;
     }
 }
