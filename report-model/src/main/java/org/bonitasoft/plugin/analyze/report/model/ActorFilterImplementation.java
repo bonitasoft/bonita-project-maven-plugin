@@ -9,13 +9,19 @@ public class ActorFilterImplementation extends Implementation {
             DescriptorIdentifier definitionIdentifier,
             DescriptorIdentifier implementationIdentifier,
             String filePath,
-            String jarEntry) {
+            String jarEntry,
+            String groupId,
+            String artifactID,
+            String version) {
         return Implementation.create(className,
                 definitionIdentifier,
                 implementationIdentifier,
                 filePath,
                 jarEntry,
-                ActorFilterImplementation.class);
+                ActorFilterImplementation.class,
+                groupId,
+                artifactID,
+                version);
     }
 
 }

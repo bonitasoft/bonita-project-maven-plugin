@@ -72,7 +72,7 @@ public class ConnectorResolver {
 
     public static String readElement(Document document, String elementName) {
         String textContent = document.getElementsByTagName(elementName).item(0).getTextContent();
-        if(textContent != null) {
+        if (textContent != null) {
             textContent = textContent.trim();
         }
         return textContent;
@@ -94,13 +94,19 @@ public class ConnectorResolver {
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
                                 artifact.getFile().getAbsolutePath(),
-                                resource.getPath());
+                                resource.getPath(),
+                                artifact.getGroupId(),
+                                artifact.getArtifactId(),
+                                artifact.getVersion());
                     } else if (ABSTRACT_FILTER_TYPE.equals(superType)) {
                         return ActorFilterImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
                                 artifact.getFile().getAbsolutePath(),
-                                resource.getPath());
+                                resource.getPath(),
+                                artifact.getGroupId(),
+                                artifact.getArtifactId(),
+                                artifact.getVersion());
                     } else {
                         return null;
                     }
@@ -118,7 +124,10 @@ public class ConnectorResolver {
                     String definitionVersion = readElement(document, "version");
                     return Definition.create(new DescriptorIdentifier(definitionId, definitionVersion),
                             artifact.getFile().getAbsolutePath(),
-                            resource.getPath());
+                            resource.getPath(),
+                            artifact.getGroupId(),
+                            artifact.getArtifactId(),
+                            artifact.getVersion());
                 })
                 .collect(Collectors.toList());
     }

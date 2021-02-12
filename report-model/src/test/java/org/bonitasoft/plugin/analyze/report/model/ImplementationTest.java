@@ -18,19 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-
 class ImplementationTest {
 
     @Test
     void should_throw_illegal_argument_exception() throws Exception {
-        assertThrows(IllegalArgumentException.class, () -> Implementation.create("",null, null, "", "", InvalidImplementationType.class));
+        assertThrows(IllegalArgumentException.class,
+                () -> Implementation.create("", null, null, "", "", InvalidImplementationType.class, "", "", ""));
     }
 
     class InvalidImplementationType extends Implementation {
 
-        public InvalidImplementationType(String noEmptyConstructor) { }
+        public InvalidImplementationType(String noEmptyConstructor) {
+        }
 
     }
 
-    
 }

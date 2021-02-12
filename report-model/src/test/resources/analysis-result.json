@@ -1,6 +1,9 @@
 {
   "connectorImplementations" : [ {
     "type" : "CONNECTOR",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplId",
     "implementationVersion" : "anImplVersion",
@@ -11,6 +14,9 @@
   } ],
   "filterImplementations" : [ {
     "type" : "ACTOR_FILTER",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplId",
     "implementationVersion" : "anImplVersion",
@@ -20,12 +26,18 @@
     "jarEntry" : "filter.impl"
   } ],
   "connectorDefinitions" : [ {
+  	"groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "definitionId" : "anId",
     "definitionVersion" : "aVersion",
     "filePath" : "/a/file.jar",
     "jarEntry" : "connector.def"
   } ],
   "filterDefinitions" : [ {
+  	"groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "definitionId" : "anId",
     "definitionVersion" : "aVersion",
     "filePath" : "/a/file.jar",
@@ -33,6 +45,9 @@
   } ],
   "restApiExtensions" : [ {
     "type" : "APIEXTENSION",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
@@ -40,6 +55,9 @@
   } ],
   "pages" : [ {
     "type" : "PAGE",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
@@ -47,6 +65,9 @@
   } ],
   "forms" : [ {
     "type" : "FORM",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
@@ -54,6 +75,9 @@
   } ],
   "themes" : [ {
     "type" : "THEME",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",

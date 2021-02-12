@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2021 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2021 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
@@ -14,23 +14,15 @@
  */
 package org.bonitasoft.plugin.analyze.report.model;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import lombok.Data;
 
-import org.junit.jupiter.api.Test;
+@Data
+public abstract class GAV {
 
-class CustomPageTest {
+    private String groupId;
 
-    @Test
-    void should_throw_illegal_argument_exception() throws Exception {
-        assertThrows(IllegalArgumentException.class,
-                () -> CustomPage.create("", "", "", "", InvalidPageType.class, "", "", ""));
-    }
+    private String artifactId;
 
-    class InvalidPageType extends CustomPage {
-
-        public InvalidPageType(String noEmptyConstructor) {
-        }
-
-    }
+    private String version;
 
 }

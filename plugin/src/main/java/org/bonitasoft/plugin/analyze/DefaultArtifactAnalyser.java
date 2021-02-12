@@ -110,16 +110,21 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
         final String artifactPath = artifact.getFile().getAbsolutePath();
         switch (customPageType) {
             case FORM:
-                result.addForm(Form.create(name, displayName, description, artifactPath));
+                result.addForm(Form.create(name, displayName, description, artifactPath, artifact.getGroupId(),
+                        artifact.getArtifactId(), artifact.getVersion()));
                 break;
             case PAGE:
-                result.addPage(Page.create(name, displayName, description, artifactPath));
+                result.addPage(Page.create(name, displayName, description, artifactPath, artifact.getGroupId(),
+                        artifact.getArtifactId(), artifact.getVersion()));
                 break;
             case THEME:
-                result.addTheme(Theme.create(name, displayName, description, artifactPath));
+                result.addTheme(Theme.create(name, displayName, description, artifactPath, artifact.getGroupId(),
+                        artifact.getArtifactId(), artifact.getVersion()));
                 break;
             case APIEXTENSION:
-                result.addRestAPIExtension(RestAPIExtension.create(name, displayName, description, artifactPath));
+                result.addRestAPIExtension(
+                        RestAPIExtension.create(name, displayName, description, artifactPath, artifact.getGroupId(),
+                                artifact.getArtifactId(), artifact.getVersion()));
                 break;
             default:
                 throw new AnalysisResultReportException("Unsupported Custom Page type: " + contentType);

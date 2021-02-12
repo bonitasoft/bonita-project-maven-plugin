@@ -1,6 +1,9 @@
 {
   "connectorImplementations" : [ {
     "type" : "CONNECTOR",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplementationId",
     "implementationVersion" : "anImplementationVersion",
@@ -11,6 +14,9 @@
   } ],
   "filterImplementations" : [ {
     "type" : "ACTOR_FILTER",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplementationId",
     "implementationVersion" : "anImplementationVersion",
@@ -20,12 +26,18 @@
     "jarEntry" : "filter.impl"
   } ],
   "connectorDefinitions" : [ {
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-connector-1.0.0.jar",
     "jarEntry" : "connector.def"
   } ],
   "filterDefinitions" : [ {
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-filter-1.0.0.jar",
@@ -33,6 +45,9 @@
   } ],
   "restApiExtensions" : [ {
     "type" : "APIEXTENSION",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "rest_name",
     "displayName" : "rest_displayName",
     "description" : "rest_description",
@@ -40,6 +55,9 @@
   } ],
   "pages" : [ {
     "type" : "PAGE",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "page_name",
     "displayName" : "page_displayName",
     "description" : "page_description",
@@ -47,6 +65,9 @@
   } ],
   "forms" : [ {
     "type" : "FORM",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "form_name",
     "displayName" : "form_displayName",
     "description" : "form_description",
@@ -54,6 +75,9 @@
   } ],
   "themes" : [ {
     "type" : "THEME",
+    "groupId" : "groupId",
+    "artifactId" : "artifactID",
+    "version" : "1.0.0",
     "name" : "theme_name",
     "displayName" : "theme_displayName",
     "description" : "theme_description",
