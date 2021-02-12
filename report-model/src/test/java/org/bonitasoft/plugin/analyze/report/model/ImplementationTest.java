@@ -23,7 +23,8 @@ class ImplementationTest {
     @Test
     void should_throw_illegal_argument_exception() throws Exception {
         assertThrows(IllegalArgumentException.class,
-                () -> Implementation.create("", null, null, "", "", InvalidImplementationType.class, "", "", ""));
+                () -> Implementation.create("", null, null, "", "", InvalidImplementationType.class,
+                        GAV.create("", "", "")));
     }
 
     class InvalidImplementationType extends Implementation {

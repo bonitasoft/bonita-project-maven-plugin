@@ -1,11 +1,9 @@
 package org.bonitasoft.plugin.analyze.report.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class Definition extends GAV {
+public class Definition {
 
     private String definitionId;
 
@@ -21,20 +19,18 @@ public class Definition extends GAV {
      */
     private String jarEntry;
 
+    private GAV gav;
+
     public static Definition create(DescriptorIdentifier definitionIdentifier,
             String filePath,
             String jarEntry,
-            String groupId,
-            String artifactID,
-            String version) {
+            GAV gav) {
         final Definition definition = new Definition();
         definition.setDefinitionId(definitionIdentifier.getId());
         definition.setDefinitionVersion(definitionIdentifier.getVersion());
         definition.setFilePath(filePath);
         definition.setJarEntry(jarEntry);
-        definition.setGroupId(groupId);
-        definition.setArtifactId(artifactID);
-        definition.setVersion(version);
+        definition.setGav(gav);
         return definition;
     }
 }

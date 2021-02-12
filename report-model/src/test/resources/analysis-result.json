@@ -1,86 +1,102 @@
 {
   "connectorImplementations" : [ {
     "type" : "CONNECTOR",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplId",
     "implementationVersion" : "anImplVersion",
     "definitionId" : "aDefId",
     "definitionVersion" : "aDefVersion",
     "filePath" : "/a/file.jar",
-    "jarEntry" : "connector.impl"
+    "jarEntry" : "connector.impl",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "filterImplementations" : [ {
     "type" : "ACTOR_FILTER",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplId",
     "implementationVersion" : "anImplVersion",
     "definitionId" : "aDefId",
     "definitionVersion" : "aDefVersion",
     "filePath" : "/a/file.jar",
-    "jarEntry" : "filter.impl"
+    "jarEntry" : "filter.impl",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "connectorDefinitions" : [ {
-  	"groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "definitionId" : "anId",
     "definitionVersion" : "aVersion",
     "filePath" : "/a/file.jar",
-    "jarEntry" : "connector.def"
+    "jarEntry" : "connector.def",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "filterDefinitions" : [ {
-  	"groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "definitionId" : "anId",
     "definitionVersion" : "aVersion",
     "filePath" : "/a/file.jar",
-    "jarEntry" : "filter.def"
+    "jarEntry" : "filter.def",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "restApiExtensions" : [ {
     "type" : "APIEXTENSION",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
-    "filePath" : "/a/file.jar"
+    "filePath" : "/a/file.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "pages" : [ {
     "type" : "PAGE",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
-    "filePath" : "/a/file.jar"
+    "filePath" : "/a/file.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "forms" : [ {
     "type" : "FORM",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
-    "filePath" : "/a/file.jar"
+    "filePath" : "/a/file.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "themes" : [ {
     "type" : "THEME",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "aName",
     "displayName" : "aDisplayName",
     "description" : "aDesc",
-    "filePath" : "/a/file.jar"
+    "filePath" : "/a/file.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ]
 }

@@ -17,12 +17,20 @@ package org.bonitasoft.plugin.analyze.report.model;
 import lombok.Data;
 
 @Data
-public abstract class GAV {
+public class GAV {
 
     private String groupId;
 
     private String artifactId;
 
     private String version;
+
+    public static GAV create(String groupId, String artifactId, String version) {
+        GAV gav = new GAV();
+        gav.setGroupId(groupId);
+        gav.setArtifactId(artifactId);
+        gav.setVersion(version);
+        return gav;
+    }
 
 }

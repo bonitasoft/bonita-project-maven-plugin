@@ -1,86 +1,102 @@
 {
   "connectorImplementations" : [ {
     "type" : "CONNECTOR",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplementationId",
     "implementationVersion" : "anImplementationVersion",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-connector-1.0.0.jar",
-    "jarEntry" : "connector.impl"
+    "jarEntry" : "connector.impl",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "filterImplementations" : [ {
     "type" : "ACTOR_FILTER",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "className" : "aClassName",
     "implementationId" : "anImplementationId",
     "implementationVersion" : "anImplementationVersion",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-filter-1.0.0.jar",
-    "jarEntry" : "filter.impl"
+    "jarEntry" : "filter.impl",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "connectorDefinitions" : [ {
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-connector-1.0.0.jar",
-    "jarEntry" : "connector.def"
+    "jarEntry" : "connector.def",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "filterDefinitions" : [ {
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
     "filePath" : "/tmp/a-filter-1.0.0.jar",
-    "jarEntry" : "filter.def"
+    "jarEntry" : "filter.def",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "restApiExtensions" : [ {
     "type" : "APIEXTENSION",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "rest_name",
     "displayName" : "rest_displayName",
     "description" : "rest_description",
-    "filePath" : "/tmp/a-rest-1.0.0.jar"
+    "filePath" : "/tmp/a-rest-1.0.0.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "pages" : [ {
     "type" : "PAGE",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "page_name",
     "displayName" : "page_displayName",
     "description" : "page_description",
-    "filePath" : "/tmp/a-page-1.0.0.jar"
+    "filePath" : "/tmp/a-page-1.0.0.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "forms" : [ {
     "type" : "FORM",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "form_name",
     "displayName" : "form_displayName",
     "description" : "form_description",
-    "filePath" : "/tmp/a-form-1.0.0.jar"
+    "filePath" : "/tmp/a-form-1.0.0.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ],
   "themes" : [ {
     "type" : "THEME",
-    "groupId" : "groupId",
-    "artifactId" : "artifactID",
-    "version" : "1.0.0",
     "name" : "theme_name",
     "displayName" : "theme_displayName",
     "description" : "theme_description",
-    "filePath" : "/tmp/a-theme-1.0.0.jar"
+    "filePath" : "/tmp/a-theme-1.0.0.jar",
+    "gav" : {
+      "groupId" : "groupId",
+      "artifactId" : "artifactID",
+      "version" : "1.0.0"
+    }
   } ]
 }

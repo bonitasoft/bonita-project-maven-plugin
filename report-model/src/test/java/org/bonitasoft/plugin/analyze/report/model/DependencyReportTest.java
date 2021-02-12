@@ -27,30 +27,30 @@ class DependencyReportTest {
 
         final DependencyReport sourceResult = new DependencyReport();
         sourceResult.getConnectorDefinitions().add(Definition.create(new DescriptorIdentifier("anId", "aVersion"),
-                "/a/file.jar", "connector.def", "groupId", "artifactID", "1.0.0"));
+                "/a/file.jar", "connector.def", GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getConnectorImplementations().add(
                 ConnectorImplementation.create("aClassName",
                         new DescriptorIdentifier("aDefId", "aDefVersion"),
                         new DescriptorIdentifier("anImplId", "anImplVersion"),
                         "/a/file.jar",
                         "connector.impl",
-                        "groupId", "artifactID", "1.0.0"));
+                        GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getFilterDefinitions().add(Definition.create(new DescriptorIdentifier("anId", "aVersion"),
-                "/a/file.jar", "filter.def", "groupId", "artifactID", "1.0.0"));
+                "/a/file.jar", "filter.def", GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getFilterImplementations().add(ActorFilterImplementation.create("aClassName",
                 new DescriptorIdentifier("aDefId", "aDefVersion"),
                 new DescriptorIdentifier("anImplId", "anImplVersion"),
                 "/a/file.jar",
                 "filter.impl",
-                "groupId", "artifactID", "1.0.0"));
+                GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getRestApiExtensions().add(RestAPIExtension.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                "groupId", "artifactID", "1.0.0"));
+                GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getForms().add(Form.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                "groupId", "artifactID", "1.0.0"));
+                GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getPages().add(Page.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                "groupId", "artifactID", "1.0.0"));
+                GAV.create("groupId", "artifactID", "1.0.0")));
         sourceResult.getThemes().add(Theme.create("aName", "aDisplayName", "aDesc", "/a/file.jar",
-                "groupId", "artifactID", "1.0.0"));
+                GAV.create("groupId", "artifactID", "1.0.0")));
 
         // When
         final String json = mapper.writeValueAsString(sourceResult);

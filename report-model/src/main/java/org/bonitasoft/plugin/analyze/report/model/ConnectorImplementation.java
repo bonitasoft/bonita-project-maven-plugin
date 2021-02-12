@@ -10,18 +10,14 @@ public class ConnectorImplementation extends Implementation {
             DescriptorIdentifier implementationIdentifier,
             String filePath,
             String jarEntry,
-            String groupId,
-            String artifactID,
-            String version) {
+            GAV gav) {
         return Implementation.create(className,
                 definitionIdentifier,
                 implementationIdentifier,
                 filePath,
                 jarEntry,
                 ConnectorImplementation.class,
-                groupId,
-                artifactID,
-                version);
+                gav);
     }
 
 }

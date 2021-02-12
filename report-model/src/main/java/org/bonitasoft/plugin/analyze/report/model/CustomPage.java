@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -15,8 +14,7 @@ import lombok.EqualsAndHashCode;
         @Type(value = Form.class, name = "FORM"),
         @Type(value = Page.class, name = "PAGE")
 })
-@EqualsAndHashCode(callSuper = true)
-public abstract class CustomPage extends GAV {
+public abstract class CustomPage {
 
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
 
@@ -32,23 +30,21 @@ public abstract class CustomPage extends GAV {
 
     private String filePath;
 
+    private GAV gav;
+
     protected static <T extends CustomPage> T create(String name,
             String displayName,
             String description,
             String filePath,
             Class<T> type,
-            String groupId,
-            String artifactID,
-            String version) {
+            GAV gav) {
         try {
             T o = type.getDeclaredConstructor().newInstance();
             o.setName(name);
             o.setDisplayName(displayName);
             o.setDescription(description);
             o.setFilePath(filePath);
-            o.setGroupId(groupId);
-            o.setArtifactId(artifactID);
-            o.setVersion(version);
+            o.setGav(gav);
             return o;
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create a new instance of class: " + type.getName(), e);
