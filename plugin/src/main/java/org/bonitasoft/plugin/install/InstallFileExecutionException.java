@@ -14,15 +14,20 @@
  */
 package org.bonitasoft.plugin.install;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class InstallFileExecutionException extends Exception {
 
-    private final List<Throwable> errors;
+    private final List<Throwable> errors = new ArrayList<>();
 
+    public InstallFileExecutionException(String message, Throwable exception) {
+        super(message, exception);
+    }
+    
     public InstallFileExecutionException(List<Throwable> errors) {
-        this.errors = errors;
+        this.errors.addAll(errors);
     }
     
     @Override
