@@ -131,6 +131,16 @@ class ConnectorResolverTest {
 				.get()
 				.isInstanceOf(ConnectorImplementation.class);
 	}
+	
+	@Test
+    void testFindAllDatabaseConnectorImplementation() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-connector-database-2.0.3.jar").getFile()));
+
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+
+        assertEquals(17, implementations.size());
+    }
 
 	@Test
 	void testFindSingleUserActorFilterImplementation() throws Exception {

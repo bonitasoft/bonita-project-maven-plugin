@@ -17,13 +17,16 @@ package org.bonitasoft.plugin.analyze;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Named;
 import javax.xml.XMLConstants;
@@ -54,8 +57,9 @@ import com.google.inject.Singleton;
 @Singleton
 public class ConnectorResolver {
 
+    public static final String CONNECTOR_TYPE = "org/bonitasoft/engine/connector/Connector";
+    public static final String FILTER_TYPE = "org/bonitasoft/engine/filter/UserFilter";
     public static final String ABSTRACT_CONNECTOR_TYPE = "org/bonitasoft/engine/connector/AbstractConnector";
-
     public static final String ABSTRACT_FILTER_TYPE = "org/bonitasoft/engine/filter/AbstractUserFilter";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorResolver.class);
@@ -72,7 +76,7 @@ public class ConnectorResolver {
 
     public static String readElement(Document document, String elementName) {
         String textContent = document.getElementsByTagName(elementName).item(0).getTextContent();
-        if(textContent != null) {
+        if (textContent != null) {
             textContent = textContent.trim();
         }
         return textContent;
@@ -88,14 +92,14 @@ public class ConnectorResolver {
                     String implementationVersion = readElement(document, "implementationVersion");
                     String definitionId = readElement(document, "definitionId");
                     String definitionVersion = readElement(document, "definitionVersion");
-                    String superType = detectImplementationSuperType(className, artifact.getFile());
-                    if (ABSTRACT_CONNECTOR_TYPE.equals(superType)) {
+                    Set<String> hierarchy = detectImplementationHierarchy(className, artifact.getFile());
+                    if (hierarchy.contains(CONNECTOR_TYPE) || hierarchy.contains(ABSTRACT_CONNECTOR_TYPE)) {
                         return ConnectorImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
                                 artifact.getFile().getAbsolutePath(),
                                 resource.getPath());
-                    } else if (ABSTRACT_FILTER_TYPE.equals(superType)) {
+                    } else if (hierarchy.contains(FILTER_TYPE) || hierarchy.contains(ABSTRACT_FILTER_TYPE)) {
                         return ActorFilterImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
@@ -172,27 +176,46 @@ public class ConnectorResolver {
         }
     }
 
-    public String detectImplementationSuperType(String className, File jarFile) {
+    public Set<String> detectImplementationHierarchy(String className, File jarFile) {
         DecompilerLoader loader = new DecompilerLoader(jarFile);
+        Set<String> hierarchy = new HashSet<>();
         try {
             ClassFile classFile = decompiler.loadClassFile(loader, className);
             String superType = null;
             if (classFile != null) {
                 superType = classFile.getSuperTypeName();
-            }
-            while (superType != null
-                    && !ABSTRACT_CONNECTOR_TYPE.equals(superType)
-                    && !ABSTRACT_FILTER_TYPE.equals(superType)) {
-                classFile = decompiler.loadClassFile(loader, superType);
-                if (classFile != null) {
-                    superType = classFile.getSuperTypeName();
+                hierarchy.add(classFile.getSuperTypeName());
+                if (classFile.getInterfaceTypeNames() != null) {
+                    Stream.of(classFile.getInterfaceTypeNames())
+                            .filter(Objects::nonNull)
+                            .forEach(hierarchy::add);
                 }
             }
-            return superType;
+            while (superType != null
+                    && !superType.equals("java/lang/Object")
+                    && (!hierarchy.contains(CONNECTOR_TYPE) 
+                            || !hierarchy.contains(FILTER_TYPE)
+                            || !hierarchy.contains(ABSTRACT_CONNECTOR_TYPE)
+                            || !hierarchy.contains(ABSTRACT_FILTER_TYPE))) {
+                classFile = decompiler.loadClassFile(loader, toClassName(superType));
+                if (classFile != null) {
+                    superType = classFile.getSuperTypeName();
+                    hierarchy.add(superType);
+                    if (classFile.getInterfaceTypeNames() != null) {
+                        Stream.of(classFile.getInterfaceTypeNames())
+                                .filter(Objects::nonNull)
+                                .forEach(hierarchy::add);
+                    }
+                }
+            }
         } catch (Exception e) {
             LOGGER.error("Implementation super type resolution failed", e);
         }
-        return null;
+        return hierarchy;
+    }
+
+    private String toClassName(String type) {
+        return type.replace("/", ".");
     }
 
     private Document asXMLDocument(InputStream source, String namespace) {
