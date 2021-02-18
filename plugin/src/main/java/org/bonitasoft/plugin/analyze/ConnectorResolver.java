@@ -180,6 +180,7 @@ public class ConnectorResolver {
         DecompilerLoader loader = new DecompilerLoader(jarFile);
         Set<String> hierarchy = new HashSet<>();
         try {
+            LOGGER.debug("Resolving connector type for {} in {}",className, jarFile);
             ClassFile classFile = decompiler.loadClassFile(loader, className);
             String superType = null;
             if (classFile != null) {
@@ -194,10 +195,12 @@ public class ConnectorResolver {
             while (superType != null
                     && !superType.equals("java/lang/Object")
                     && (!hierarchy.contains(CONNECTOR_TYPE) 
-                            || !hierarchy.contains(FILTER_TYPE)
-                            || !hierarchy.contains(ABSTRACT_CONNECTOR_TYPE)
-                            || !hierarchy.contains(ABSTRACT_FILTER_TYPE))) {
-                classFile = decompiler.loadClassFile(loader, toClassName(superType));
+                            && !hierarchy.contains(FILTER_TYPE)
+                            && !hierarchy.contains(ABSTRACT_CONNECTOR_TYPE)
+                            && !hierarchy.contains(ABSTRACT_FILTER_TYPE))) {
+                className = toClassName(superType);
+                LOGGER.debug("Resolving connector type for {} in {}",className, jarFile);
+                classFile = decompiler.loadClassFile(loader, className);
                 if (classFile != null) {
                     superType = classFile.getSuperTypeName();
                     hierarchy.add(superType);
