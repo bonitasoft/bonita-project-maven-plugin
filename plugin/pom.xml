@@ -24,7 +24,7 @@
 		<artifact-lookup-maven-plugin.version>0.6.0</artifact-lookup-maven-plugin.version>
 
 		<!-- Test -->
-		<maven-invoker-plugin.version>3.2.1</maven-invoker-plugin.version>
+		<maven-invoker-plugin.version>3.2.2</maven-invoker-plugin.version>
 		<groovy.version>3.0.7</groovy.version>
 	</properties>
 
