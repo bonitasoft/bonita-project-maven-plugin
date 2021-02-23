@@ -8,12 +8,12 @@ public class ConnectorImplementation extends Implementation {
     public static ConnectorImplementation create(String className,
             DescriptorIdentifier definitionIdentifier,
             DescriptorIdentifier implementationIdentifier,
-            String filePath,
+            Artifact artifact,
             String jarEntry) {
         return Implementation.create(className, 
                 definitionIdentifier,
                 implementationIdentifier,
-                filePath, 
+                artifact, 
                 jarEntry, 
                 ConnectorImplementation.class);
     }

@@ -6,7 +6,12 @@
     "implementationVersion" : "anImplementationVersion",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
-    "filePath" : "/tmp/a-connector-1.0.0.jar",
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-connector",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-connector-1.0.0.jar"
+    },
     "jarEntry" : "connector.impl"
   } ],
   "filterImplementations" : [ {
@@ -16,19 +21,34 @@
     "implementationVersion" : "anImplementationVersion",
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
-    "filePath" : "/tmp/a-filter-1.0.0.jar",
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-filter",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-filter-1.0.0.jar"
+    },
     "jarEntry" : "filter.impl"
   } ],
   "connectorDefinitions" : [ {
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
-    "filePath" : "/tmp/a-connector-1.0.0.jar",
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-connector",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-connector-1.0.0.jar"
+    },
     "jarEntry" : "connector.def"
   } ],
   "filterDefinitions" : [ {
     "definitionId" : "aDefinitionId",
     "definitionVersion" : "aDefinitionVersion",
-    "filePath" : "/tmp/a-filter-1.0.0.jar",
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-filter",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-filter-1.0.0.jar"
+    },
     "jarEntry" : "filter.def"
   } ],
   "restApiExtensions" : [ {
@@ -36,27 +56,47 @@
     "name" : "rest_name",
     "displayName" : "rest_displayName",
     "description" : "rest_description",
-    "filePath" : "/tmp/a-rest-1.0.0.jar"
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-rest-api",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-rest-1.0.0.jar"
+    }
   } ],
   "pages" : [ {
     "type" : "PAGE",
     "name" : "page_name",
     "displayName" : "page_displayName",
     "description" : "page_description",
-    "filePath" : "/tmp/a-page-1.0.0.jar"
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-page",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-page-1.0.0.jar"
+    }
   } ],
   "forms" : [ {
     "type" : "FORM",
     "name" : "form_name",
     "displayName" : "form_displayName",
     "description" : "form_description",
-    "filePath" : "/tmp/a-form-1.0.0.jar"
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-form",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-form-1.0.0.zip"
+    }
   } ],
   "themes" : [ {
     "type" : "THEME",
     "name" : "theme_name",
     "displayName" : "theme_displayName",
     "description" : "theme_description",
-    "filePath" : "/tmp/a-theme-1.0.0.jar"
+    "artifact" : {
+      "groupId" : "org.bonita",
+      "artifactId" : "a-theme",
+      "version" : "1.0.0",
+      "file" : "/tmp/a-theme-1.0.0.zip"
+    }
   } ]
 }

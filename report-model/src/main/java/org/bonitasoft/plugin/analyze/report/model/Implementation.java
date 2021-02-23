@@ -25,9 +25,9 @@ public abstract class Implementation {
     private String definitionVersion;
 
     /**
-     * Jar file containing the implementation descriptor file
+     * Artifact containing the implementation descriptor file
      */
-    private String filePath;
+    private Artifact artifact;
 
     /**
      * Implementation descriptor file entry path in the jar file
@@ -37,7 +37,7 @@ public abstract class Implementation {
     public static <T extends Implementation> T create(String className, 
             DescriptorIdentifier definitionIdentifier,
             DescriptorIdentifier implementationIdentifier,
-            String filePath, 
+            Artifact artifact,
             String jarEntry,
             Class<T> type) {
         try {
@@ -47,7 +47,7 @@ public abstract class Implementation {
             implementation.setDefinitionVersion(definitionIdentifier.getVersion());
             implementation.setImplementationId(implementationIdentifier.getId());
             implementation.setImplementationVersion(implementationIdentifier.getVersion());
-            implementation.setFilePath(filePath);
+            implementation.setArtifact(artifact);
             implementation.setJarEntry(jarEntry);
             return implementation;
         } catch (Exception e) {

@@ -5,31 +5,41 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.bonitasoft.plugin.analyze.report.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import lombok.Data;
 
-import org.junit.jupiter.api.Test;
-
-class CustomPageTest {
-
-    @Test
-    void should_throw_illegal_argument_exception() throws Exception {
-        Artifact artifact = Artifact.create("", "", "", "", "");
-        assertThrows(IllegalArgumentException.class, () -> CustomPage.create("", "", "", artifact, InvalidPageType.class));
+@Data
+public class Artifact {
+    
+    private String groupId;
+    private String artifactId;
+    private String version;
+    private String classifier;
+    private String file;
+    
+    public static Artifact create(String groupId, String artifactId, String version, String classifier, String file) {
+        Artifact artifact = new Artifact();
+        artifact.setGroupId(groupId);
+        artifact.setArtifactId(artifactId);
+        artifact.setVersion(version);
+        artifact.setClassifier(classifier);
+        artifact.setFile(file);
+        return artifact;
     }
-
-    class InvalidPageType extends CustomPage {
-
-        public InvalidPageType(String noEmptyConstructor) { }
-
+    
+    @Override
+    public String toString() {
+        return String.format("%s:%s:%s", groupId, artifactId, version);
     }
-
+    
 }

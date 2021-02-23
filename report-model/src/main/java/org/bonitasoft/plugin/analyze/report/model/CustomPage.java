@@ -27,15 +27,15 @@ public abstract class CustomPage {
 
 	private String description;
 
-	private String filePath;
+	private Artifact artifact;
 
-	protected static <T extends CustomPage> T create(String name, String displayName, String description, String filePath, Class<T> type) {
+	protected static <T extends CustomPage> T create(String name, String displayName, String description, Artifact artifact, Class<T> type) {
 		try {
 			T o = type.getDeclaredConstructor().newInstance();
 			o.setName(name);
 			o.setDisplayName(displayName);
 			o.setDescription(description);
-			o.setFilePath(filePath);
+			o.setArtifact(artifact);
 			return o;
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Failed to create a new instance of class: " + type.getName(), e);

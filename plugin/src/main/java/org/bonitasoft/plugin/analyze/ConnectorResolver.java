@@ -97,13 +97,13 @@ public class ConnectorResolver {
                         return ConnectorImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
-                                artifact.getFile().getAbsolutePath(),
+                                create(artifact),
                                 resource.getPath());
                     } else if (hierarchy.contains(FILTER_TYPE) || hierarchy.contains(ABSTRACT_FILTER_TYPE)) {
                         return ActorFilterImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
-                                artifact.getFile().getAbsolutePath(),
+                                create(artifact),
                                 resource.getPath());
                     } else {
                         return null;
@@ -111,6 +111,14 @@ public class ConnectorResolver {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    private static org.bonitasoft.plugin.analyze.report.model.Artifact create(Artifact artifact) {
+        return org.bonitasoft.plugin.analyze.report.model.Artifact.create(artifact.getGroupId(), 
+                artifact.getArtifactId(), 
+                artifact.getVersion(), 
+                artifact.getClassifier(), 
+                artifact.getFile().getAbsolutePath());
     }
 
     public List<Definition> findAllDefinitions(Artifact artifact) throws IOException {
@@ -121,7 +129,7 @@ public class ConnectorResolver {
                     String definitionId = readElement(document, "id");
                     String definitionVersion = readElement(document, "version");
                     return Definition.create(new DescriptorIdentifier(definitionId, definitionVersion),
-                            artifact.getFile().getAbsolutePath(),
+                            create(artifact),
                             resource.getPath());
                 })
                 .collect(Collectors.toList());
