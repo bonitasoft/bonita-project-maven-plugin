@@ -1,6 +1,7 @@
 package org.bonitasoft.plugin.analyze.report;
 
 import org.apache.maven.plugin.logging.Log;
+import org.bonitasoft.plugin.analyze.report.model.Artifact;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
@@ -17,21 +18,21 @@ public class LogDependencyReporter implements DependencyReporter {
     }
 
     private static String asString(CustomPage customPage) {
-        return customPage.getName() + asStringLocation( customPage.getFilePath());
+        return customPage.getName() + asStringLocation(customPage.getArtifact());
     }
 
-    private static String asStringLocation(String filePath) {
-        return " in file " + filePath;
+    private static String asStringLocation(Artifact artifact) {
+        return " in " + artifact;
     }
 
     private static String asString(Definition definition) {
-        return definition.getDefinitionId() + "-" + definition.getDefinitionVersion() + asStringLocation(definition.getFilePath());
+        return definition.getDefinitionId() + "-" + definition.getDefinitionVersion() + asStringLocation(definition.getArtifact());
     }
 
     private static String asString(Implementation implementation) {
         return implementation.getImplementationId() + "-" + implementation.getImplementationVersion()
                 + " for " + implementation.getDefinitionId() + "-" + implementation.getDefinitionVersion()
-                +  asStringLocation(implementation.getFilePath());
+                +  asStringLocation(implementation.getArtifact());
     }
 
     @Override

@@ -8,12 +8,12 @@ public class ActorFilterImplementation extends Implementation {
     public static ActorFilterImplementation create(String className,
             DescriptorIdentifier definitionIdentifier,
             DescriptorIdentifier implementationIdentifier,
-            String filePath,
+            Artifact artifact,
             String jarEntry) {
         return Implementation.create(className,
                 definitionIdentifier,
                 implementationIdentifier,
-                filePath,
+                artifact,
                 jarEntry,
                 ActorFilterImplementation.class);
     }

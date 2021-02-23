@@ -9,16 +9,21 @@ if ( !bonitaDependencyAnalisysOutputFile.isFile() ) {
 
 def report = new JsonSlurper().parse(bonitaDependencyAnalisysOutputFile)
 
-assert report.connectorImplementations.definitionId == ['email']
-assert report.connectorImplementations.definitionVersion == ['1.2.0']
-assert report.connectorImplementations.implementationId == ['email-impl']
-assert report.connectorImplementations.implementationVersion == ['1.3.0']
-assert report.connectorImplementations.className == ['org.bonitasoft.connectors.email.EmailConnector']
-assert report.connectorImplementations.jarEntry == ['email.impl']
-assert report.connectorImplementations.type == ['CONNECTOR']
+def emailImpl = report.connectorImplementations.find{ it.definitionId == 'email' }
+
+assert emailImpl.definitionId == 'email'
+assert emailImpl.definitionVersion == '1.2.0'
+assert emailImpl.implementationId == 'email-impl'
+assert emailImpl.implementationVersion == '1.3.0'
+assert emailImpl.className == 'org.bonitasoft.connectors.email.EmailConnector'
+assert emailImpl.jarEntry == 'email.impl'
+assert emailImpl.type ==  'CONNECTOR'
+assert emailImpl.artifact.groupId ==  'org.bonitasoft.connectors'
+assert emailImpl.artifact.artifactId ==  'bonita-connector-email'
+assert emailImpl.artifact.version ==  '1.3.0'
 
 assert report.filterDefinitions.definitionId == ['bonita-actorfilter-single-user']
 assert report.filterDefinitions.definitionVersion == ['1.0.0']
 assert report.filterDefinitions.jarEntry == ['bonita-actorfilter-single-user.def']
-assert report.filterDefinitions[0].filePath.endsWith('bonita-actorfilter-single-user-1.0.0.jar')
+assert report.filterDefinitions[0].artifact.file.endsWith('bonita-actorfilter-single-user-1.0.0.jar')
 

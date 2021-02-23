@@ -10,9 +10,9 @@ public class Definition {
     private String definitionVersion;
 
     /**
-     * Jar file containing the definition descriptor file
+     * Artifact containing the definition descriptor file
      */
-    private String filePath;
+    private Artifact artifact;
 
     /**
      * Definition descriptor file entry path in the jar file
@@ -20,12 +20,12 @@ public class Definition {
     private String jarEntry;
 
     public static Definition create(DescriptorIdentifier definitionIdentifier,
-            String filePath,
+            Artifact artifact,
             String jarEntry) {
         final Definition definition = new Definition();
         definition.setDefinitionId(definitionIdentifier.getId());
         definition.setDefinitionVersion(definitionIdentifier.getVersion());
-        definition.setFilePath(filePath);
+        definition.setArtifact(artifact);
         definition.setJarEntry(jarEntry);
         return definition;
     }
