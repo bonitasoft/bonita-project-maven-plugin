@@ -138,7 +138,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                 try {
                     installArtifactFromProjectStore(artifact, installPluginVersion);
                 } catch (InstallFileExecutionException | ArtifactNotFoundException ex) {
-                    throw new MojoExecutionException(ex.getMessage());
+                    throw new MojoExecutionException(ex.getMessage(), ex);
                 }
             }
         }
@@ -167,7 +167,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
             if (executionResult.hasExceptions()) {
                 throw new InstallFileExecutionException(executionResult.getExceptions());
             }
-        } catch (IOException | ProjectBuildingException e) {
+        } catch (IOException e) {
             throw new InstallFileExecutionException("Failed to create artifact a pom file.", e);
         } finally {
             try {
@@ -181,7 +181,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
 
     }
 
-    private boolean shouldCreateDummyPomFile(File artifactFile) throws IOException, ProjectBuildingException {
+    private boolean shouldCreateDummyPomFile(File artifactFile) throws IOException {
         Optional<Model> existingPom = findPomFile(artifactFile);
         if (existingPom.isPresent()) {
             try (StringWriter stringWriter = new StringWriter()) {
@@ -195,6 +195,8 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                         .build(new StringModelSource(stringWriter.toString()), buildingRequest);
                 DependencyResolutionResult dependencyResolutionResult = buildingResult.getDependencyResolutionResult();
                 return !dependencyResolutionResult.getUnresolvedDependencies().isEmpty();
+            }catch (ProjectBuildingException e) {
+                return true;
             }
         }
         return false;
