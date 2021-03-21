@@ -36,11 +36,10 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- We don't want to use the old studio version of jackson -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.12.1</version>
+			<version>${jackson.version}</version>
 			<scope>compile</scope>
 		</dependency>
 

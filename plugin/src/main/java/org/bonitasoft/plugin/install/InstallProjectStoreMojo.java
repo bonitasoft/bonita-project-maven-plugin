@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -69,6 +70,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Mojo(name = "install", defaultPhase = LifecyclePhase.VALIDATE)
 public class InstallProjectStoreMojo extends AbstractMojo {
 
+    private static final String DEFAULT_INSTALL_PLUGIN_VERSION = "2.5.2";
     private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
 
@@ -114,7 +116,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Set<Artifact> artifacts = project.getDependencyArtifacts();
-        String installPluginVersion = "2.5.2";
+        String installPluginVersion = DEFAULT_INSTALL_PLUGIN_VERSION;
         try {
             installPluginVersion = resolveInstallFilePluginVersion();
         } catch (PluginVersionResolutionException e) {
@@ -195,7 +197,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                         .build(new StringModelSource(stringWriter.toString()), buildingRequest);
                 DependencyResolutionResult dependencyResolutionResult = buildingResult.getDependencyResolutionResult();
                 return !dependencyResolutionResult.getUnresolvedDependencies().isEmpty();
-            }catch (ProjectBuildingException e) {
+            } catch (ProjectBuildingException e) {
                 return true;
             }
         }
