@@ -22,7 +22,6 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -97,6 +96,11 @@ public class InstallProjectStoreMojo extends AbstractMojo {
 
     @Component
     private ProjectBuilder projectBuilder;
+    
+
+    @Parameter(defaultValue = "${project.build.directory}", required = true, readonly = true)
+    private File buildDirectory;
+
 
     /**
      * Remote repositories which will be searched for artifacts.
@@ -248,7 +252,11 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     }
 
     private File createDummyPomFile(Artifact artifact) throws IOException {
-        Path pomFile = Files.createTempFile("pom", ".xml");
+        File workdir = buildDirectory.toPath().resolve("install-plugin-workdir").toFile();
+        if(!workdir.exists()) {
+            workdir.mkdirs();
+        }
+        Path pomFile = Files.createTempFile(workdir.toPath(),"pom", ".xml");
         Model model = new Model();
         model.setModelVersion("4.0.0");
         model.setGroupId(artifact.getGroupId());
