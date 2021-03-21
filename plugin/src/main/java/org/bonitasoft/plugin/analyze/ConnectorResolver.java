@@ -17,16 +17,15 @@ package org.bonitasoft.plugin.analyze;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Named;
 import javax.xml.XMLConstants;
@@ -40,10 +39,6 @@ import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DescriptorIdentifier;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
-import org.jd.core.v1.api.loader.Loader;
-import org.jd.core.v1.api.loader.LoaderException;
-import org.jd.core.v1.model.classfile.ClassFile;
-import org.jd.core.v1.service.deserializer.classfile.DeserializeClassFileProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -52,6 +47,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.google.inject.Singleton;
+import com.strobel.assembler.metadata.DeobfuscationUtilities;
+import com.strobel.assembler.metadata.ITypeLoader;
+import com.strobel.assembler.metadata.JarTypeLoader;
+import com.strobel.assembler.metadata.MetadataSystem;
+import com.strobel.assembler.metadata.TypeDefinition;
+import com.strobel.assembler.metadata.TypeReference;
+import com.strobel.decompiler.DecompilerSettings;
 
 @Named
 @Singleton
@@ -62,6 +64,10 @@ public class ConnectorResolver {
     public static final String ABSTRACT_CONNECTOR_TYPE = "org/bonitasoft/engine/connector/AbstractConnector";
     public static final String ABSTRACT_FILTER_TYPE = "org/bonitasoft/engine/filter/AbstractUserFilter";
 
+    private static final Set<String> FILTER_TYPES = Set.of(FILTER_TYPE, ABSTRACT_FILTER_TYPE);
+    private static final Set<String> CONNECTOR_TYPES = Set.of(CONNECTOR_TYPE, ABSTRACT_CONNECTOR_TYPE);
+    private static final Set<String> IMPLEMENTATION_SUPER_TYPES = Set.of(FILTER_TYPE,ABSTRACT_FILTER_TYPE, CONNECTOR_TYPE, ABSTRACT_CONNECTOR_TYPE);
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorResolver.class);
 
     private static final String IMPLEMENTATION_EXTENSION = ".impl";
@@ -71,8 +77,6 @@ public class ConnectorResolver {
     private static final String IMPLEMENTATION_NS = "http://www.bonitasoft.org/ns/connector/implementation/6.0";
 
     private static final String DEFINITION_NS = "http://www.bonitasoft.org/ns/connector/definition/6.1";
-
-    private DeserializeClassFileProcessor decompiler = new DeserializeClassFileProcessor();
 
     public static String readElement(Document document, String elementName) {
         String textContent = document.getElementsByTagName(elementName).item(0).getTextContent();
@@ -93,13 +97,13 @@ public class ConnectorResolver {
                     String definitionId = readElement(document, "definitionId");
                     String definitionVersion = readElement(document, "definitionVersion");
                     Set<String> hierarchy = detectImplementationHierarchy(className, artifact.getFile());
-                    if (hierarchy.contains(CONNECTOR_TYPE) || hierarchy.contains(ABSTRACT_CONNECTOR_TYPE)) {
+                    if (!Collections.disjoint(hierarchy, CONNECTOR_TYPES)) {
                         return ConnectorImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
                                 create(artifact),
                                 resource.getPath());
-                    } else if (hierarchy.contains(FILTER_TYPE) || hierarchy.contains(ABSTRACT_FILTER_TYPE)) {
+                    } else if (!Collections.disjoint(hierarchy, FILTER_TYPES)) {
                         return ActorFilterImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
                                 new DescriptorIdentifier(implementationId, implementationVersion),
@@ -114,10 +118,10 @@ public class ConnectorResolver {
     }
 
     private static org.bonitasoft.plugin.analyze.report.model.Artifact create(Artifact artifact) {
-        return org.bonitasoft.plugin.analyze.report.model.Artifact.create(artifact.getGroupId(), 
-                artifact.getArtifactId(), 
-                artifact.getVersion(), 
-                artifact.getClassifier(), 
+        return org.bonitasoft.plugin.analyze.report.model.Artifact.create(artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getVersion(),
+                artifact.getClassifier(),
                 artifact.getFile().getAbsolutePath());
     }
 
@@ -175,58 +179,63 @@ public class ConnectorResolver {
         }
     }
 
-    static Optional<JarEntry> findJarEntry(File file, Predicate<? super JarEntry> entryPredicate)
-            throws IOException {
-        try (JarFile jarFile = new JarFile(file)) {
-            return jarFile.stream()
-                    .filter(entryPredicate)
-                    .findFirst();
-        }
-    }
-
-    public Set<String> detectImplementationHierarchy(String className, File jarFile) {
-        DecompilerLoader loader = new DecompilerLoader(jarFile);
+    public Set<String> detectImplementationHierarchy(String className, File file) {
         Set<String> hierarchy = new HashSet<>();
-        try {
-            LOGGER.debug("Resolving connector type for {} in {}",className, jarFile);
-            ClassFile classFile = decompiler.loadClassFile(loader, className);
+        LOGGER.debug("Resolving connector type for {} in {}", className, file);
+        try (JarFile jarFile = new JarFile(file)) {
+            ITypeLoader loader = new JarTypeLoader(jarFile);
+            DecompilerSettings decompilerSettings = DecompilerSettings.javaDefaults();
+            decompilerSettings.setTypeLoader(loader);
+            final MetadataSystem metadataSystem = new MetadataSystem(loader);
+
+            TypeDefinition resolvedType = lookupType(className, metadataSystem);
             String superType = null;
-            if (classFile != null) {
-                superType = classFile.getSuperTypeName();
-                hierarchy.add(classFile.getSuperTypeName());
-                if (classFile.getInterfaceTypeNames() != null) {
-                    Stream.of(classFile.getInterfaceTypeNames())
-                            .filter(Objects::nonNull)
+            if (resolvedType != null) {
+                if (resolvedType.getBaseType() != null) {
+                    superType = resolvedType.getBaseType().getInternalName();
+                    hierarchy.add(superType);
+                }
+                resolvedType.getExplicitInterfaces().stream()
+                        .map(TypeReference::getInternalName)
+                        .forEach(hierarchy::add);
+            }
+            while (resolvedType!= null 
+                    && superType != null
+                    && !superType.equals("java/lang/Object")
+                    && Collections.disjoint(hierarchy, IMPLEMENTATION_SUPER_TYPES)) {
+                className = superType;
+                LOGGER.debug("Resolving connector type for {} in {}", className, jarFile);
+                resolvedType = lookupType(className, metadataSystem);
+                if (resolvedType != null) {
+                    if (resolvedType.getBaseType() != null) {
+                        superType = resolvedType.getBaseType().getInternalName();
+                        hierarchy.add(superType);
+                    }
+                    resolvedType.getExplicitInterfaces().stream()
+                            .map(TypeReference::getInternalName)
                             .forEach(hierarchy::add);
                 }
             }
-            while (superType != null
-                    && !superType.equals("java/lang/Object")
-                    && (!hierarchy.contains(CONNECTOR_TYPE) 
-                            && !hierarchy.contains(FILTER_TYPE)
-                            && !hierarchy.contains(ABSTRACT_CONNECTOR_TYPE)
-                            && !hierarchy.contains(ABSTRACT_FILTER_TYPE))) {
-                className = toClassName(superType);
-                LOGGER.debug("Resolving connector type for {} in {}",className, jarFile);
-                classFile = decompiler.loadClassFile(loader, className);
-                if (classFile != null) {
-                    superType = classFile.getSuperTypeName();
-                    hierarchy.add(superType);
-                    if (classFile.getInterfaceTypeNames() != null) {
-                        Stream.of(classFile.getInterfaceTypeNames())
-                                .filter(Objects::nonNull)
-                                .forEach(hierarchy::add);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("Implementation super type resolution failed", e);
+        } catch (IOException e) {
+            LOGGER.error("Failed to read jar file.", e);
         }
         return hierarchy;
     }
 
-    private String toClassName(String type) {
-        return type.replace("/", ".");
+    private TypeDefinition lookupType(String className, final MetadataSystem metadataSystem) {
+        final TypeReference type = metadataSystem.lookupType(toTypeFormat(className));
+
+        final TypeDefinition resolvedType;
+        if (type == null || (resolvedType = type.resolve()) == null) {
+            LOGGER.error("Failed to resolved type {}.", className);
+            return null;
+        }
+        DeobfuscationUtilities.processType(resolvedType);
+        return resolvedType;
+    }
+
+    private String toTypeFormat(String className) {
+        return className.replace(".", "/");
     }
 
     private Document asXMLDocument(InputStream source, String namespace) {
@@ -246,45 +255,6 @@ public class ConnectorResolver {
             return null;
         }
         return null;
-    }
-
-    private static class DecompilerLoader implements Loader {
-
-        private final File jarFile;
-
-        public DecompilerLoader(File jarFile) {
-            this.jarFile = jarFile;
-        }
-
-        @Override
-        public boolean canLoad(String internalName) {
-            String classPath = internalName.replace(".", "/") + ".class";
-            try {
-                return findJarEntry(jarFile, entry -> entry.getName().equals(classPath))
-                        .isPresent();
-            } catch (IOException e) {
-                return false;
-            }
-        }
-
-        @Override
-        public byte[] load(String internalName) throws LoaderException {
-            String classPath = internalName.replace(".", "/") + ".class";
-            try {
-                return findJarEntry(jarFile, entry -> entry.getName().equals(classPath))
-                        .map(entry -> {
-                            try (InputStream in = new JarFile(jarFile).getInputStream(entry)) {
-                                return in == null ? new byte[0] : in.readAllBytes();
-                            } catch (IOException e) {
-                                LOGGER.error(String.format("Failed to read %s in %s", entry, jarFile), e);
-                                return new byte[0];
-                            }
-                        })
-                        .orElse(new byte[0]);
-            } catch (IOException e) {
-                throw new LoaderException(e);
-            }
-        }
     }
 
     public static class DocumentResource {
