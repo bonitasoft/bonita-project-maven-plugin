@@ -32,149 +32,172 @@ import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ConnectorResolverTest {
 
-	private static final String GROUP_ID = "test";
+    private static final String GROUP_ID = "test";
 
-	private static final String ARTIFACT_ID = "test";
+    private static final String ARTIFACT_ID = "test";
 
-	private static final String VERSION = "0.0.1";
+    private static final String VERSION = "0.0.1";
 
-	private static final String SCOPE = "compile";
+    private static final String SCOPE = "compile";
 
-	private static final String TYPE = "jar";
+    private static final String TYPE = "jar";
 
-	private static final String CLASSIFIER = null;
+    private static final String CLASSIFIER = null;
 
-	private Artifact artifact;
+    private Artifact artifact;
 
-	@BeforeEach
-	void createArtifact() throws Exception {
-		artifact = new DefaultArtifact(GROUP_ID, ARTIFACT_ID, VERSION, SCOPE, TYPE, CLASSIFIER, new DefaultArtifactHandler());
-	}
+    @BeforeEach
+    void createArtifact() throws Exception {
+        artifact = new DefaultArtifact(GROUP_ID, ARTIFACT_ID, VERSION, SCOPE, TYPE, CLASSIFIER,
+                new DefaultArtifactHandler());
+    }
 
-	@Test
-	void testFindEmailConnectorImplementation() throws Exception {
-		ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-		artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
+    @Test
+    void testFindEmailConnectorImplementation() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(
+                new File(ConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
 
-		List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
-		assertEquals(1, implementations.size());
-		Implementation emailImplementation = implementations.get(0);
-		assertTrue(emailImplementation instanceof ConnectorImplementation);
-		assertEquals("email-impl", emailImplementation.getImplementationId());
-		assertEquals("1.3.0", emailImplementation.getImplementationVersion());
-		assertEquals("email", emailImplementation.getDefinitionId());
-		assertEquals("1.2.0", emailImplementation.getDefinitionVersion());
-	}
+        assertEquals(1, implementations.size());
+        Implementation emailImplementation = implementations.get(0);
+        assertTrue(emailImplementation instanceof ConnectorImplementation);
+        assertEquals("email-impl", emailImplementation.getImplementationId());
+        assertEquals("1.3.0", emailImplementation.getImplementationVersion());
+        assertEquals("email", emailImplementation.getDefinitionId());
+        assertEquals("1.2.0", emailImplementation.getDefinitionVersion());
+    }
 
-	@Test
-	void testFindEmailConnectorDefinition() throws Exception {
-		ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-		artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
+    @Test
+    void testFindEmailConnectorDefinition() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(
+                new File(ConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
 
-		List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
 
-		assertEquals(1, definitions.size());
-		Definition emailDefinition = definitions.get(0);
-		assertEquals("email", emailDefinition.getDefinitionId());
-		assertEquals("1.2.0", emailDefinition.getDefinitionVersion());
-	}
+        assertEquals(1, definitions.size());
+        Definition emailDefinition = definitions.get(0);
+        assertEquals("email", emailDefinition.getDefinitionId());
+        assertEquals("1.2.0", emailDefinition.getDefinitionVersion());
+    }
 
-	@Test
-	void testFindRestConnectorDefinitions() throws Exception {
-		ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-		artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
+    @Test
+    void testFindRestConnectorDefinitions() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(
+                new File(ConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
 
-		List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
 
-		assertEquals(4, definitions.size());
-	}
+        assertEquals(4, definitions.size());
+    }
 
+    @Test
+    void testFindAllRestConnectorImplementation() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(
+                new File(ConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
 
-	@Test
-	void testFindAllRestConnectorImplementation() throws Exception {
-		ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-		artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
-		List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        assertEquals(4, implementations.size());
 
-		assertEquals(4, implementations.size());
+        Optional<Implementation> postImplementationSearchResult = findImplemetationById("rest-post-impl",
+                implementations);
+        assertThat(postImplementationSearchResult)
+                .isPresent()
+                .get()
+                .isInstanceOf(ConnectorImplementation.class);
 
-		Optional<Implementation> postImplementationSearchResult = findImplemetationById("rest-post-impl",
-				implementations);
-		assertThat(postImplementationSearchResult)
-				.isPresent()
-				.get()
-				.isInstanceOf(ConnectorImplementation.class);
+        Optional<Implementation> getImplementationSearchResult = findImplemetationById("rest-get-impl",
+                implementations);
+        assertThat(getImplementationSearchResult)
+                .isPresent()
+                .get()
+                .isInstanceOf(ConnectorImplementation.class);
 
-		Optional<Implementation> getImplementationSearchResult = findImplemetationById("rest-get-impl",
-				implementations);
-		assertThat(getImplementationSearchResult)
-				.isPresent()
-				.get()
-				.isInstanceOf(ConnectorImplementation.class);
+        Optional<Implementation> putImplementationSearchResult = findImplemetationById("rest-put-impl",
+                implementations);
+        assertThat(putImplementationSearchResult)
+                .isPresent()
+                .get()
+                .isInstanceOf(ConnectorImplementation.class);
 
-		Optional<Implementation> putImplementationSearchResult = findImplemetationById("rest-put-impl",
-				implementations);
-		assertThat(putImplementationSearchResult)
-				.isPresent()
-				.get()
-				.isInstanceOf(ConnectorImplementation.class);
+        Optional<Implementation> deleteImplementationSearchResult = findImplemetationById("rest-delete-impl",
+                implementations);
+        assertThat(deleteImplementationSearchResult)
+                .isPresent()
+                .get()
+                .isInstanceOf(ConnectorImplementation.class);
+    }
 
-		Optional<Implementation> deleteImplementationSearchResult = findImplemetationById("rest-delete-impl",
-				implementations);
-		assertThat(deleteImplementationSearchResult)
-				.isPresent()
-				.get()
-				.isInstanceOf(ConnectorImplementation.class);
-	}
-	
-	@Test
+    @Test
     void testFindAllDatabaseConnectorImplementation() throws Exception {
         ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-        artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-connector-database-2.0.3.jar").getFile()));
+        artifact.setFile(
+                new File(ConnectorResolverTest.class.getResource("/bonita-connector-database-2.0.3.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
         assertEquals(17, implementations.size());
     }
 
-	@Test
-	void testFindSingleUserActorFilterImplementation() throws Exception {
-		ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-		artifact.setFile(new File(ConnectorResolverTest.class.getResource("/bonita-actorfilter-single-user-1.0.0.jar").getFile()));
+    @Test
+    void testFindSingleUserActorFilterImplementation() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(new File(
+                ConnectorResolverTest.class.getResource("/bonita-actorfilter-single-user-1.0.0.jar").getFile()));
 
-		List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
-		assertEquals(1, implementations.size());
-		Implementation singleUserImplementation = implementations.get(0);
-		assertTrue(singleUserImplementation instanceof ActorFilterImplementation);
-		assertEquals("bonita-actorfilter-single-user-impl", singleUserImplementation.getImplementationId());
-		assertEquals("1.0.0", singleUserImplementation.getImplementationVersion());
-		assertEquals("bonita-actorfilter-single-user", singleUserImplementation.getDefinitionId());
-		assertEquals("1.0.0", singleUserImplementation.getDefinitionVersion());
-	}
+        assertEquals(1, implementations.size());
+        Implementation singleUserImplementation = implementations.get(0);
+        assertTrue(singleUserImplementation instanceof ActorFilterImplementation);
+        assertEquals("bonita-actorfilter-single-user-impl", singleUserImplementation.getImplementationId());
+        assertEquals("1.0.0", singleUserImplementation.getImplementationVersion());
+        assertEquals("bonita-actorfilter-single-user", singleUserImplementation.getDefinitionId());
+        assertEquals("1.0.0", singleUserImplementation.getDefinitionVersion());
+    }
 
-	@Test
-	void testInvalidDescriptorsAreIgnored() throws Exception {
-		ConnectorResolver connectorTypeResolver = new ConnectorResolver();
-		artifact.setFile(new File(ConnectorResolverTest.class.getResource("/jar-with-invalid-descriptors.jar").getFile()));
+    @Test
+    void testInvalidDescriptorsAreIgnored() throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(
+                new File(ConnectorResolverTest.class.getResource("/jar-with-invalid-descriptors.jar").getFile()));
 
-		List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
-		List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
 
-		assertEquals(0, implementations.size());
-		assertEquals(0, definitions.size());
-	}
+        assertEquals(0, implementations.size());
+        assertEquals(0, definitions.size());
+    }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "/connector-with-invalid-implemetation-class.jar",
+            "/connector-with-missing-implementation-class.jar" })
+    void testJarWithInvalidImplemetationClasses(String testJarFile) throws Exception {
+        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        artifact.setFile(new File(
+                ConnectorResolverTest.class.getResource(testJarFile).getFile()));
 
-	private Optional<Implementation> findImplemetationById(String id, List<Implementation> implementations) {
-		return implementations.stream()
-				.filter(impl -> Objects.equals(id, impl.getImplementationId()))
-				.findFirst();
-	}
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+
+        assertEquals(0, implementations.size());
+        assertEquals(1, definitions.size());
+    }
+
+    private Optional<Implementation> findImplemetationById(String id, List<Implementation> implementations) {
+        return implementations.stream()
+                .filter(impl -> Objects.equals(id, impl.getImplementationId()))
+                .findFirst();
+    }
 
 }

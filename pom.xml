@@ -47,6 +47,7 @@
 		<junit-jupiter-engine.version>5.7.1</junit-jupiter-engine.version>
 		<junit-platform-runner.version>1.7.0</junit-platform-runner.version>
 		<maven-invoker-plugin.version>3.2.2</maven-invoker-plugin.version>
+		<mockito-junit-jupiter.version>3.8.0</mockito-junit-jupiter.version>
 		<assertj-core.version>3.19.0</assertj-core.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 
@@ -87,7 +88,7 @@
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>3.8.0</version>
+				<version>${mockito-junit-jupiter.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -205,17 +206,6 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<repositories>
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>jcenter</id>
-			<name>jcenter</name>
-			<url>https://jcenter.bintray.com</url>
-		</repository>
-	</repositories>
 
 	<distributionManagement>
 		<!-- Central Repository -->

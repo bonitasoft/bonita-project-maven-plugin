@@ -2,7 +2,6 @@ package org.bonitasoft.plugin.analyze;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.bonitasoft.plugin.analyze.ConnectorResolver.findJarEntry;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Predicate;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -168,6 +169,15 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
                 .filter(Objects::nonNull)
                 .orElseThrow(
                         () -> new IllegalArgumentException(format("No page.properties found in %s", artifactFile)));
+    }
+    
+    static Optional<JarEntry> findJarEntry(File file, Predicate<? super JarEntry> entryPredicate)
+            throws IOException {
+        try (JarFile jarFile = new JarFile(file)) {
+            return jarFile.stream()
+                    .filter(entryPredicate)
+                    .findFirst();
+        }
     }
 
 }
