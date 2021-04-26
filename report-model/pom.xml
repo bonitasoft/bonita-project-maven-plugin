@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>bonita-project-maven-plugin-parent</artifactId>
 		<groupId>org.bonitasoft.maven</groupId>
-		<version>0.0.7-SNAPSHOT</version>
+		<version>0.0.6</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>bonita-project-report-model</artifactId>
