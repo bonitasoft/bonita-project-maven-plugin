@@ -39,7 +39,7 @@ jobs:
         id: create_release
         uses: actions/github-script@v4
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{secrets.GH_TOKEN_DOC_TRIGGER_WF}}
           script: |
             github.repos.createRelease({
               owner: context.repo.owner,
