@@ -46,5 +46,6 @@ jobs:
               repo: context.repo.repo,
               tag_name: '${{github.event.inputs.version}}',
               name: 'Release ${{github.event.inputs.version}}',
-              body: '${{ steps.changelog.outputs.changes }}'
+              body: |
+                ${{ steps.changelog.outputs.changes }}
             })
