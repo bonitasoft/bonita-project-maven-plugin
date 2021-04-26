@@ -231,8 +231,6 @@
 
 	<scm>
 		<developerConnection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</developerConnection>
-		<connection>scm:git:git@github.com:bonitasoft/bonita-project-maven-plugin.git</connection>
-		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
 		<tag>HEAD</tag>
 	</scm>
 </project>
