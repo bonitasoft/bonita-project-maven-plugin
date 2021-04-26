@@ -29,9 +29,11 @@ jobs:
       - name: Build bonita-project-maven-plugin release 
         run: ./mvnw --batch-mode release:prepare -DreleaseVersion=${{ github.event.inputs.version }}
 
-      - name: changelog # IN CASE YOU WANT TO COPY PAST ME, I NEED A PACKAGE.JSON FILE TO WORK! :)
-        uses: scottbrenner/generate-changelog-action@master 
-        id: Changelog
+      - name: Create changelog text
+        id: changelog
+        uses: loopwerk/tag-changelog@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
     
       - name: Create Github Release
         id: create_release
@@ -44,5 +46,5 @@ jobs:
               repo: context.repo.repo,
               tag_name: '${{github.event.inputs.version}}',
               name: 'Release ${{github.event.inputs.version}}',
-              body: '${{ steps.Changelog.outputs.changelog }}'
+              body: '${{ steps.changelog.outputs.changes }}'
             })
