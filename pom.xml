@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bonitasoft.maven</groupId>
 	<artifactId>bonita-project-maven-plugin-parent</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.4</version>
 	<name>Bonita Project Maven Plugin Parent</name>
 	<packaging>pom</packaging>
 	<url>https://www.bonitasoft.com/</url>
@@ -229,6 +229,6 @@
 
 	<scm>
 		<developerConnection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>0.0.4</tag>
 	</scm>
 </project>
