@@ -8,8 +8,8 @@
 
 A Maven plug-in used by Bonita projects to: 
 * Install custom dependencies from the project store (where external projects dependencies are stored) to the local Maven repository.
-* Analyze Bonita dependencies and their content (Connector, Actor filters, Rest API Extensions...)
-* Lookup jar dependencies (find the maven artifacts for existing dependencies found in the `lib` folder)
+* Analyze Bonita dependencies and their content (Connector, Actor filters, Rest API Extensions...).
+* Lookup jar dependencies (find the maven artifacts for existing dependencies found in the `lib` folder).
 
 ## Usage
 
