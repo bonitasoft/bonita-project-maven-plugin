@@ -32,8 +32,6 @@ jobs:
       - name: changelog # IN CASE YOU WANT TO COPY PAST ME, I NEED A PACKAGE.JSON FILE TO WORK! :)
         uses: scottbrenner/generate-changelog-action@master 
         id: Changelog
-        env:
-          REPO: ${{ github.repository }}
     
       - name: Create Github Release
         id: create_release
