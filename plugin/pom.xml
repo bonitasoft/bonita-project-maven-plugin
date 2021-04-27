@@ -23,7 +23,7 @@
 
 		<!-- Test -->
 		<maven-invoker-plugin.version>3.2.2</maven-invoker-plugin.version>
-		<groovy.version>3.0.7</groovy.version>
+		<groovy.version>3.0.8</groovy.version>
 	</properties>
 
 	<dependencies>
