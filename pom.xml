@@ -155,6 +155,7 @@
 					<version>${maven-release-plugin.version}</version>
 					<configuration>
 						<tagNameFormat>@{project.version}</tagNameFormat>
+						<releaseProfiles>release</releaseProfiles>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -180,9 +181,8 @@
 	</build>
 
 	<profiles>
-		<!-- Deployment profile (required so these plugins are only used when deploying) -->
 		<profile>
-			<id>deploy</id>
+			<id>release</id>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
 			</properties>
