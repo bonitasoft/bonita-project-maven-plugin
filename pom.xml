@@ -3,8 +3,10 @@
 	<groupId>org.bonitasoft.maven</groupId>
 	<artifactId>bonita-project-maven-plugin-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
 	<name>Bonita Project Maven Plugin Parent</name>
-	<packaging>pom</packaging>
+    <description>Maven plug-in used by Bonita to manage project dependencies.</description>
 	<url>https://www.bonitasoft.com/</url>
 
 	<developers>
@@ -263,6 +265,8 @@
 
 	<scm>
 		<developerConnection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</developerConnection>
+        <connection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</connection>
+        <url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
 		<tag>HEAD</tag>
 	</scm>
 </project>
