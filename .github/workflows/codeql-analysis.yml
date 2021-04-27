@@ -51,6 +51,7 @@ jobs:
     - name: Setup Java
       uses: actions/setup-java@v2
       with:
+        distribution: 'adopt'
         java-version: 11
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
