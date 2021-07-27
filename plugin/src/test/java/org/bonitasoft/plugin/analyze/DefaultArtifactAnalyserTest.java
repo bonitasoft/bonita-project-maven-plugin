@@ -10,6 +10,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage.CustomPageType;
+import org.bonitasoft.plugin.analyze.cfr.CFRConnectorResolver;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
@@ -40,7 +41,7 @@ class DefaultArtifactAnalyserTest {
 	DefaultArtifactAnalyser analyser;
 
 	@Mock
-	ConnectorResolver connectorResolver;
+	CFRConnectorResolver connectorResolver;
 
 	@Test
 	void should_analyse() throws URISyntaxException {

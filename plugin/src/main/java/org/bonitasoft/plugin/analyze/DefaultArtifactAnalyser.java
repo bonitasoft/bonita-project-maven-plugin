@@ -20,6 +20,7 @@ import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
@@ -34,8 +35,6 @@ import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.bonitasoft.plugin.analyze.report.model.Page;
 import org.bonitasoft.plugin.analyze.report.model.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.report.model.Theme;
-
-import com.google.inject.Singleton;
 
 @Named
 @Singleton
