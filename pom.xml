@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bonitasoft.maven</groupId>
 	<artifactId>bonita-project-maven-plugin-parent</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
 	<name>Bonita Project Maven Plugin Parent</name>
@@ -47,7 +47,7 @@
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 
 		<!-- Test -->
-		<junit-jupiter-engine.version>5.7.1</junit-jupiter-engine.version>
+		<junit-jupiter-engine.version>5.7.2</junit-jupiter-engine.version>
 		<junit-platform-runner.version>1.7.0</junit-platform-runner.version>
 		<maven-invoker-plugin.version>3.2.2</maven-invoker-plugin.version>
 		<mockito-junit-jupiter.version>3.11.2</mockito-junit-jupiter.version>
