@@ -17,7 +17,7 @@ A Maven plug-in used by Bonita projects to:
 
 It is possible to directly invoke the plug-in like this:  
 ```sh
-~/my-bonita-project> mvn org.bonitasoft:bonita-project-maven-plugin:install
+~/my-bonita-project> mvn org.bonitasoft.maven:bonita-project-maven-plugin:install
 ```
 
 Or use the `validate` goal:
@@ -29,7 +29,7 @@ Or use the `validate` goal:
 
 It is possible to directly invoke the plug-in like this:  
 ```sh
-~/my-bonita-project> mvn org.bonitasoft:bonita-project-maven-plugin:analyze
+~/my-bonita-project> mvn org.bonitasoft.maven:bonita-project-maven-plugin:analyze
 ```
 The  analysis report is written in the `target` folder
 
