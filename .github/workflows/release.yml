@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         
       - name: Setup Java
         uses: actions/setup-java@v2
@@ -36,13 +36,13 @@ jobs:
 
       - name: Create changelog text
         id: changelog
-        uses: loopwerk/tag-changelog@v1
+        uses: loopwerk/tag-changelog@v1.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
     
       - name: Create Github Release
         id: create_release
-        uses: actions/github-script@v4
+        uses: actions/github-script@v4.0.2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
