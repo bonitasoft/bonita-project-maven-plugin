@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.analyze;
+package org.bonitasoft.plugin.analyze.cfr;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +26,8 @@ import java.util.Optional;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.bonitasoft.plugin.analyze.ConnectorResolver;
+import org.bonitasoft.plugin.analyze.cfr.CFRConnectorResolver;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
@@ -35,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class ConnectorResolverTest {
+class CFRConnectorResolverTest {
 
     private static final String GROUP_ID = "test";
 
@@ -59,9 +61,9 @@ class ConnectorResolverTest {
 
     @Test
     void testFindEmailConnectorImplementation() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(ConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
+                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
@@ -76,9 +78,9 @@ class ConnectorResolverTest {
 
     @Test
     void testFindEmailConnectorDefinition() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(ConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
+                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
 
         List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
 
@@ -90,9 +92,9 @@ class ConnectorResolverTest {
 
     @Test
     void testFindRestConnectorDefinitions() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(ConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
+                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
 
         List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
 
@@ -101,9 +103,9 @@ class ConnectorResolverTest {
 
     @Test
     void testFindAllRestConnectorImplementation() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(ConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
+                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
@@ -140,9 +142,9 @@ class ConnectorResolverTest {
 
     @Test
     void testFindAllDatabaseConnectorImplementation() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(ConnectorResolverTest.class.getResource("/bonita-connector-database-2.0.3.jar").getFile()));
+                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-database-2.0.3.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
@@ -151,9 +153,9 @@ class ConnectorResolverTest {
 
     @Test
     void testFindSingleUserActorFilterImplementation() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(new File(
-                ConnectorResolverTest.class.getResource("/bonita-actorfilter-single-user-1.0.0.jar").getFile()));
+                CFRConnectorResolverTest.class.getResource("/bonita-actorfilter-single-user-1.0.0.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
 
@@ -168,9 +170,9 @@ class ConnectorResolverTest {
 
     @Test
     void testInvalidDescriptorsAreIgnored() throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(ConnectorResolverTest.class.getResource("/jar-with-invalid-descriptors.jar").getFile()));
+                new File(CFRConnectorResolverTest.class.getResource("/jar-with-invalid-descriptors.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
         List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
@@ -183,14 +185,27 @@ class ConnectorResolverTest {
     @ValueSource(strings = { "/connector-with-invalid-implemetation-class.jar",
             "/connector-with-missing-implementation-class.jar" })
     void testJarWithInvalidImplemetationClasses(String testJarFile) throws Exception {
-        ConnectorResolver connectorTypeResolver = new ConnectorResolver();
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(new File(
-                ConnectorResolverTest.class.getResource(testJarFile).getFile()));
+                CFRConnectorResolverTest.class.getResource(testJarFile).getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
         List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
 
         assertEquals(0, implementations.size());
+        assertEquals(1, definitions.size());
+    }
+    
+    @Test
+    void testCustomConnectorFailingWithProcyon() throws Exception {
+        ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
+        artifact.setFile(
+                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-templating-2.5-SNAPSHOT.jar").getFile()));
+
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+
+        assertEquals(1, implementations.size());
         assertEquals(1, definitions.size());
     }
 
