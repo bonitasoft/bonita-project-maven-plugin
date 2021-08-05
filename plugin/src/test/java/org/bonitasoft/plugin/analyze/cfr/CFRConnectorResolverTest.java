@@ -27,7 +27,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
-import org.bonitasoft.plugin.analyze.cfr.CFRConnectorResolver;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
