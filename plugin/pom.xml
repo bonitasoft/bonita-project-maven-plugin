@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.bonitasoft.maven</groupId>
@@ -10,7 +12,6 @@
     <packaging>maven-plugin</packaging>
 
     <properties>
-
         <!-- Dependencies -->
         <maven-plugin-api.version>3.6.3</maven-plugin-api.version>
         <maven-plugin-annotations.version>3.6.1</maven-plugin-annotations.version>
@@ -20,6 +21,7 @@
         <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
         <cfr.version>0.151</cfr.version>
         <artifact-lookup-maven-plugin.version>0.6.0</artifact-lookup-maven-plugin.version>
+        <maven-dependency-tree.version>3.1.0</maven-dependency-tree.version>
 
         <!-- Test -->
         <groovy.version>3.0.8</groovy.version>
@@ -49,6 +51,11 @@
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-artifact-transfer</artifactId>
             <version>${maven-artifact-transfer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-dependency-tree</artifactId>
+            <version>${maven-dependency-tree.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>

@@ -1,5 +1,13 @@
 package org.bonitasoft.plugin.analyze;
 
+import static java.util.Collections.singletonList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +20,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
@@ -19,62 +29,99 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AnalyzeBonitaDependencyMojoTest {
 
-	AnalyzeBonitaDependencyMojo mojo;
+    AnalyzeBonitaDependencyMojo mojo;
 
-	@Mock
-	ArtifactResolver artifactResolver;
+    @Mock
+    ArtifactResolver artifactResolver;
 
-	@Mock
-	MavenProject project;
+    @Mock
+    MavenProject project;
 
-	@Mock
-	ArtifactAnalyser artifactAnalyser;
+    @Mock
+    ArtifactAnalyser artifactAnalyser;
 
-	@Mock
-	DependencyReporter reporter;
+    @Mock
+    DependencyGraphBuilder dependencyGraphBuilder;
 
-	@BeforeEach
-	void setUp() {
-		mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser));
-		mojo.project = project;
-		mojo.setLog(mock(Log.class));
-	}
+    @Mock
+    DependencyReporter reporter;
 
-	@Test
-	void sould_run_analysis() throws MojoFailureException, MojoExecutionException {
-		// Given
-		mojo = spy(mojo);
+    @Mock
+    DependencyValidator dependencyValidator;
 
-		when(mojo.getReporters()).thenReturn(singletonList(reporter));
+    @Mock
+    ProjectBuildingRequest buildingRequest;
 
-		List<Artifact> resolvedArtifacts = new ArrayList<>();
+    @BeforeEach
+    void setUp() throws MojoExecutionException {
+        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser, dependencyValidator));
+        mojo.project = project;
+        mojo.setLog(mock(Log.class));
+    }
 
-		final DefaultArtifact artifact = new DefaultArtifact("g", "a", "v", "runtime", "jar", null, new DefaultArtifactHandler("jar"));
-		artifact.setFile(new File(artifact.getArtifactId() + "-" + artifact.getVersion() + "." + artifact.getType()));
-		resolvedArtifacts.add(artifact);
+    @Test
+    void sould_run_analysis_without_validation() throws MojoFailureException, MojoExecutionException {
+        // Given
+        mojo = spy(mojo);
 
-		when(project.getDependencyArtifacts()).thenReturn(new HashSet<>());
-		doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any());
-		when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+        when(mojo.getReporters()).thenReturn(singletonList(reporter));
 
-		// When
-		mojo.execute();
+        List<Artifact> resolvedArtifacts = new ArrayList<>();
 
-		// Then
-		verify(artifactAnalyser).analyse(resolvedArtifacts);
-		verify(reporter).report(any());
-	}
+        final DefaultArtifact artifact = new DefaultArtifact("g", "a", "v", "runtime", "jar", null,
+                new DefaultArtifactHandler("jar"));
+        artifact.setFile(new File(artifact.getArtifactId() + "-" + artifact.getVersion() + "." + artifact.getType()));
+        resolvedArtifacts.add(artifact);
+
+        when(project.getDependencyArtifacts()).thenReturn(new HashSet<>());
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
+        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+       
+
+        // When
+        mojo.execute();
+
+        // Then
+        verify(artifactAnalyser).analyse(resolvedArtifacts);
+        verify(reporter).report(any());
+    }
+    
+    @Test
+    void sould_run_analysis_with_dep_validation() throws MojoFailureException, MojoExecutionException {
+        // Given
+        mojo = spy(mojo);
+        
+        mojo.validateDeps = true ;
+
+        when(mojo.getReporters()).thenReturn(singletonList(reporter));
+        when(dependencyValidator.validate(project, buildingRequest)).thenReturn(List.of());
+
+        List<Artifact> resolvedArtifacts = new ArrayList<>();
+
+        final DefaultArtifact artifact = new DefaultArtifact("g", "a", "v", "runtime", "jar", null,
+                new DefaultArtifactHandler("jar"));
+        artifact.setFile(new File(artifact.getArtifactId() + "-" + artifact.getVersion() + "." + artifact.getType()));
+        resolvedArtifacts.add(artifact);
+
+        when(project.getDependencyArtifacts()).thenReturn(new HashSet<>());
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
+        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+       
+
+        // When
+        mojo.execute();
+
+        // Then
+        verify(artifactAnalyser).analyse(resolvedArtifacts);
+        verify(dependencyValidator).validate(project, buildingRequest);
+        verify(reporter).report(any());
+    }
 }

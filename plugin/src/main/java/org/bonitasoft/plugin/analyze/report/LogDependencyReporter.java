@@ -6,6 +6,7 @@ import org.bonitasoft.plugin.analyze.report.model.CustomPage;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Severity;
 
 import static java.lang.String.format;
 
@@ -26,17 +27,30 @@ public class LogDependencyReporter implements DependencyReporter {
     }
 
     private static String asString(Definition definition) {
-        return definition.getDefinitionId() + "-" + definition.getDefinitionVersion() + asStringLocation(definition.getArtifact());
+        return definition.getDefinitionId() + "-" + definition.getDefinitionVersion()
+                + asStringLocation(definition.getArtifact());
     }
 
     private static String asString(Implementation implementation) {
         return implementation.getImplementationId() + "-" + implementation.getImplementationVersion()
                 + " for " + implementation.getDefinitionId() + "-" + implementation.getDefinitionVersion()
-                +  asStringLocation(implementation.getArtifact());
+                + asStringLocation(implementation.getArtifact());
     }
 
     @Override
     public void report(DependencyReport dependencyReport) {
+        dependencyReport.getIssues().stream()
+                .filter(issue -> Severity.valueOf(issue.getSeverity()) == Severity.ERROR)
+                .forEach(issue -> log.error(issue.getMessage()));
+
+        dependencyReport.getIssues().stream()
+                .filter(issue -> Severity.valueOf(issue.getSeverity()) == Severity.WARNING)
+                .forEach(issue -> log.warn(issue.getMessage()));
+
+        dependencyReport.getIssues().stream()
+                .filter(issue -> Severity.valueOf(issue.getSeverity()) == Severity.INFO)
+                .forEach(issue -> log.info(issue.getMessage()));
+
         log.info(format("=== %s Connector definitions found ===", dependencyReport.getConnectorDefinitions().size()));
         dependencyReport.getConnectorDefinitions().stream().map(LogDependencyReporter::asString).forEach(log::info);
 

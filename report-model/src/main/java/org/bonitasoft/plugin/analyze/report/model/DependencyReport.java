@@ -37,6 +37,8 @@ public class DependencyReport {
 	private final List<Form> forms = new ArrayList<>();
 
 	private final List<Theme> themes = new ArrayList<>();
+	
+	private final List<Issue> issues = new ArrayList<>();
 
 	public void addConnectorImplementation(ConnectorImplementation connectorImplementation) {
 		connectorImplementations.add(connectorImplementation);
@@ -70,5 +72,8 @@ public class DependencyReport {
 		themes.add(theme);
 	}
 
+	public void addIssue(Issue issue) {
+        issues.add(issue);
+    }
 
 }

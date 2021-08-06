@@ -14,6 +14,9 @@
  */
 package org.bonitasoft.plugin.analyze;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,88 +44,102 @@ import org.bonitasoft.plugin.analyze.report.JsonDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.LogDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-
 @Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
-	protected final ArtifactResolver artifactResolver;
+    protected final ArtifactResolver artifactResolver;
 
-	protected final ArtifactAnalyser artifactAnalyser;
+    protected final ArtifactAnalyser artifactAnalyser;
 
-	@Parameter(defaultValue = "${session}", readonly = true, required = true)
-	protected MavenSession session;
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    protected MavenSession session;
 
-	/**
-	 * Local Repository.
-	 */
-	@Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
-	protected ArtifactRepository localRepository;
+    /**
+     * Local Repository.
+     */
+    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
+    protected ArtifactRepository localRepository;
 
-	@Parameter(defaultValue = "${project}", required = true, readonly = true)
-	protected MavenProject project;
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
+    protected MavenProject project;
 
-	/**
-	 * Remote repositories which will be searched for artifacts.
-	 */
-	@Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
-	protected List<ArtifactRepository> remoteRepositories;
+    /**
+     * Remote repositories which will be searched for artifacts.
+     */
+    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
+    protected List<ArtifactRepository> remoteRepositories;
 
-	/**
-	 * Analysis report output file
-	 */
-	@Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.json")
-	protected File outputFile;
+    /**
+     * Analysis report output file
+     */
+    @Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.json")
+    protected File outputFile;
 
-	@Inject
-	public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver, ArtifactAnalyser artifactAnalyser) {
-		this.artifactResolver = artifactResolver;
-		this.artifactAnalyser = artifactAnalyser;
-	}
+    /**
+     * Look for incompatible dependencies
+     */
+    @Parameter(defaultValue = "true", property = "bonita.validateDependencies")
+    protected boolean validateDeps;
 
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		List<Artifact> resolvedArtifacts = resolveArtifacts(project.getDependencyArtifacts());
-		DependencyReport dependencyReport = artifactAnalyser.analyse(resolvedArtifacts);
-		getReporters().forEach(reporter -> reporter.report(dependencyReport));
-	}
+    private DependencyValidator dependencyValidator;
 
-	protected List<DependencyReporter> getReporters() {
-		List<DependencyReporter> reporters = new ArrayList<>();
-		reporters.add(new LogDependencyReporter(getLog()));
-		if (outputFile != null) {
-			reporters.add(new JsonDependencyReporter(outputFile));
-		}
-		return reporters;
-	}
+    @Inject
+    public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver,
+            ArtifactAnalyser artifactAnalyser,
+            DependencyValidator dependencyValidator) {
+        this.artifactResolver = artifactResolver;
+        this.artifactAnalyser = artifactAnalyser;
+        this.dependencyValidator = dependencyValidator;
+    }
 
-	protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts) {
-		return artifacts.stream().map(artifact -> {
-			ProjectBuildingRequest buildingRequest = newResolveArtifactProjectBuildingRequest();
-			try {
-				ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
-				final Artifact resolvedArtifact = result.getArtifact();
-				File artifactFile = resolvedArtifact.getFile();
-				if (artifactFile == null || !artifactFile.exists()) {
-					throw new MojoExecutionException(format("Failed to resolve artifact %s", artifact));
-				}
-				return resolvedArtifact;
-			}
-			catch (Exception e) {
-				throw new AnalysisResultReportException(format("Failed to analyse artifact %s", artifact), e);
-			}
-		}).collect(toList());
-	}
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        ProjectBuildingRequest buildingRequest = newProjectBuildingRequest();
+        List<Artifact> resolvedArtifacts = resolveArtifacts(project.getDependencyArtifacts(), buildingRequest);
+        DependencyReport dependencyReport = artifactAnalyser.analyse(resolvedArtifacts);
 
-	/*
-	 * @return Returns a new ProjectBuildingRequest populated from the current session and the current project remote
-	 * repositories, used to resolve artifacts.
-	 */
-	private ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
-		ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-		buildingRequest.setRemoteRepositories(remoteRepositories);
-		return buildingRequest;
-	}
+        if (validateDeps) {
+            dependencyValidator.validate(project, buildingRequest).stream()
+                    .forEach(dependencyReport::addIssue);
+        }
+
+        getReporters().forEach(reporter -> reporter.report(dependencyReport));
+    }
+
+    protected List<DependencyReporter> getReporters() {
+        List<DependencyReporter> reporters = new ArrayList<>();
+        reporters.add(new LogDependencyReporter(getLog()));
+        if (outputFile != null) {
+            reporters.add(new JsonDependencyReporter(outputFile));
+        }
+        return reporters;
+    }
+
+    protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts, ProjectBuildingRequest buildingRequest) {
+        return artifacts.stream().map(artifact -> {
+            try {
+                ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
+                final Artifact resolvedArtifact = result.getArtifact();
+                File artifactFile = resolvedArtifact.getFile();
+                if (artifactFile == null || !artifactFile.exists()) {
+                    throw new MojoExecutionException(format("Failed to resolve artifact %s", artifact));
+                }
+                return resolvedArtifact;
+            } catch (Exception e) {
+                throw new AnalysisResultReportException(format("Failed to analyse artifact %s", artifact), e);
+            }
+        }).collect(toList());
+    }
+
+    /*
+     * @return Returns a new ProjectBuildingRequest populated from the current session and the current project remote
+     * repositories, used to resolve artifacts.
+     */
+    ProjectBuildingRequest newProjectBuildingRequest() {
+        ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+        buildingRequest.setRemoteRepositories(remoteRepositories);
+        buildingRequest.setProject(project);
+        return buildingRequest;
+    }
 
 }
