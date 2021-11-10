@@ -128,7 +128,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
     private static org.bonitasoft.plugin.analyze.report.model.Artifact create(Artifact artifact) {
         return org.bonitasoft.plugin.analyze.report.model.Artifact.create(artifact.getGroupId(),
                 artifact.getArtifactId(),
-                artifact.getVersion(),
+                artifact.getBaseVersion() == null ? artifact.getVersion() :  artifact.getBaseVersion(),
                 artifact.getClassifier(),
                 artifact.getFile().getAbsolutePath());
     }
