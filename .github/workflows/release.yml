@@ -32,28 +32,10 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-      - name: Build bonita-project-maven-plugin release 
+      
+      - name: Build Release 
         run: ./mvnw --batch-mode release:prepare -DreleaseVersion=${{ github.event.inputs.version }}
 
-      - name: Create changelog text
-        id: changelog
-        uses: loopwerk/tag-changelog@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-    
-      - name: Create Github Release
-        id: create_release
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: '${{github.event.inputs.version}}',
-              name: 'Release ${{github.event.inputs.version}}',
-              body: ` ${{ steps.changelog.outputs.changes }} `
-            })
             
       - name: Publish
         env:
