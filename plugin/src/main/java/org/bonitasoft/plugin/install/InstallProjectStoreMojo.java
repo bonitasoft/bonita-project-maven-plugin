@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
@@ -69,6 +70,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Mojo(name = "install", defaultPhase = LifecyclePhase.VALIDATE)
 public class InstallProjectStoreMojo extends AbstractMojo {
 
+    private static final String GROUP_ID = "groupId";
+    private static final String VERSION = "version";
+    private static final String ARTIFACT_ID = "artifactId";
+    
     private static final String DEFAULT_INSTALL_PLUGIN_VERSION = "2.5.2";
     private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
@@ -224,26 +229,36 @@ public class InstallProjectStoreMojo extends AbstractMojo {
             try (JarFile jarFile = new JarFile(artifactFile)) {
                 return jarFile.stream()
                         .filter(entry -> entry.getName()
-                                .matches("META-INF/maven/[^/]*/[^/]*/pom.xml"))
+                                .matches("META-INF/maven/[^/]*/[^/]*/pom.properties"))
                         .map(entry -> {
+                            var properties = new Properties();
                             try (InputStream is = jarFile.getInputStream(entry)) {
-                                return mavenXpp3Reader.read(is);
-                            } catch (IOException | XmlPullParserException e) {
+                                 properties.load(is);
+                                 return properties;
+                            } catch (IOException e) {
                                 getLog().error(e);
                                 return null;
                             }
                         })
                         .filter(Objects::nonNull)
-                        .filter(model -> {
-                            String artifactId = model.getArtifactId();
-                            String version = model.getVersion();
-                            if (version == null && model.getParent() != null) {
-                                version = model.getParent().getVersion();
-                            }
+                        .filter(properties -> {
+                            String artifactId = properties.getProperty(ARTIFACT_ID);
+                            String version = properties.getProperty(VERSION);
                             return fileNameWithoutExtension.equals(String.format("%s-%s", artifactId, version))
                                     || fileNameWithoutExtension.equals(artifactId);
                         })
-                        .findFirst();
+                        .findFirst()
+                        .map(pomProperties -> {
+                            ZipEntry pomEntry = jarFile.getEntry(String.format("META-INF/maven/%s/%s/pom.xml", 
+                                    pomProperties.getProperty(GROUP_ID), 
+                                    pomProperties.getProperty(ARTIFACT_ID)));
+                            try (InputStream is = jarFile.getInputStream(pomEntry)) {
+                                return mavenXpp3Reader.read(is);
+                           } catch (IOException | XmlPullParserException e) {
+                               getLog().error(e);
+                               return null;
+                           }
+                        });
             } catch (IOException e) {
                 getLog().error("Failed to read jar " + artifactFile.getName(), e);
             }
@@ -297,9 +312,9 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                 installPluginVersion)));
         executionRequest.setLocalRepository(localRepository);
         Properties installFileProperties = new Properties();
-        installFileProperties.setProperty("groupId", artifact.getGroupId());
-        installFileProperties.setProperty("artifactId", artifact.getArtifactId());
-        installFileProperties.setProperty("version", artifact.getVersion());
+        installFileProperties.setProperty(GROUP_ID, artifact.getGroupId());
+        installFileProperties.setProperty(ARTIFACT_ID, artifact.getArtifactId());
+        installFileProperties.setProperty(VERSION, artifact.getVersion());
         installFileProperties.setProperty("file", artifactFile.getAbsolutePath());
         if (pomFile != null) {
             installFileProperties.setProperty("pomFile", pomFile.getAbsolutePath());

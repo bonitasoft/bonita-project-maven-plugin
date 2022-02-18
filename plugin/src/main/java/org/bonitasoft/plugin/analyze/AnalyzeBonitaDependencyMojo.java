@@ -126,7 +126,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
                 }
                 return resolvedArtifact;
             } catch (Exception e) {
-                throw new AnalysisResultReportException(format("Failed to analyse artifact %s", artifact), e);
+                throw new AnalysisResultReportException(format("Failed to analyze artifact %s", artifact), e);
             }
         }).collect(toList());
     }
