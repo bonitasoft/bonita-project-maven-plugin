@@ -7,9 +7,10 @@ on:
 jobs:
 
   build:
+    if: github.repository == 'bonitasoft/bonita-project-maven-plugin'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache SonarCloud packages
         uses: actions/cache@v2.1.7
         with:
@@ -27,3 +28,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        
+  build-fork:
+      if: github.repository != 'bonitasoft/bonita-project-maven-plugin'
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Setup Java
+          uses: actions/setup-java@v2
+          with:
+            distribution: 'temurin'
+            java-version: 11
+            cache: 'maven'
+        - name: Build and test project
+          run: ./mvnw -B -ntp clean verify
