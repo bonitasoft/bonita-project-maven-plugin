@@ -4,13 +4,9 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  SONAR_TOKEN: 'Hello'
-
 jobs:
 
   build:
-    if: ${{ env.SONAR_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,21 +22,16 @@ jobs:
           distribution: 'temurin'
           java-version: 11
           cache: 'maven'
-      - name: Build and test project
+      - name: Build with Sonarcloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: ${{ env.SONAR_TOKEN != '' }}
         run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: ${{ env.SONAR_TOKEN == '' }}
+        run: ./mvnw -B -ntp clean verify
         
-  build-fork:
-      if: ${{ env.SONAR_TOKEN == '' }}
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-        - name: Setup Java
-          uses: actions/setup-java@v2
-          with:
-            distribution: 'temurin'
-            java-version: 11
-            cache: 'maven'
-        - name: Build and test project
-          run: ./mvnw -B -ntp clean verify
