@@ -4,11 +4,12 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}
+
 jobs:
 
   build:
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     if: ${{ env.SONAR_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
@@ -31,8 +32,6 @@ jobs:
         run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         
   build-fork:
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       if: ${{ env.SONAR_TOKEN == '' }}
       runs-on: ubuntu-latest
       steps:
