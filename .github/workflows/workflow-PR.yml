@@ -7,7 +7,9 @@ on:
 jobs:
 
   build:
-    if: env.SONAR_TOKEN != ''
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    if: ${{ env.SONAR_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,11 +28,12 @@ jobs:
       - name: Build and test project
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         
   build-fork:
-      if: env.SONAR_TOKEN == ''
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      if: ${{ env.SONAR_TOKEN == '' }}
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
