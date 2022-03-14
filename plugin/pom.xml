@@ -22,7 +22,7 @@
         <maven-dependency-tree.version>3.1.0</maven-dependency-tree.version>
 
         <!-- Test -->
-        <groovy.version>3.0.9</groovy.version>
+        <groovy.version>3.0.10</groovy.version>
     </properties>
 
     <dependencies>
