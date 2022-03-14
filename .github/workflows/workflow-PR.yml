@@ -7,7 +7,7 @@ on:
 jobs:
 
   build:
-    if: github.repository == 'bonitasoft/bonita-project-maven-plugin'
+    if: secrets.SONAR_TOKEN
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
         run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         
   build-fork:
-      if: github.repository != 'bonitasoft/bonita-project-maven-plugin'
+      if: ${{!secrets.SONAR_TOKEN}}
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
