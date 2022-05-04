@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,6 +16,8 @@ import java.util.Properties;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,6 +35,9 @@ import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Form;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.Issue;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Severity;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Type;
 import org.bonitasoft.plugin.analyze.report.model.Page;
 import org.bonitasoft.plugin.analyze.report.model.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.report.model.Theme;
@@ -41,10 +47,12 @@ import org.bonitasoft.plugin.analyze.report.model.Theme;
 public class DefaultArtifactAnalyser implements ArtifactAnalyser {
 
     private final ConnectorResolver connectorResolver;
+    private IssueCollector issueCollector;
 
     @Inject
-    public DefaultArtifactAnalyser(ConnectorResolver connectorResolver) {
+    public DefaultArtifactAnalyser(ConnectorResolver connectorResolver, IssueCollector issueCollector) {
         this.connectorResolver = connectorResolver;
+        this.issueCollector = issueCollector;
     }
 
     @Override
@@ -69,12 +77,13 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
         if (fileName.endsWith(".zip") && hasCustomPageDescriptor(artifactFile)) {
             analyseCustomPageArtifact(artifact, result);
         }
+        issueCollector.getIssues().forEach(result::addIssue);
         return result;
     }
 
     private void analyseConnectorArtifact(Artifact artifact, DependencyReport result) throws IOException {
-        List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact);
-        List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact);
+        List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact, issueCollector);
+        List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact, issueCollector);
         List<ConnectorImplementation> connectorImplementations = allImplementations.stream()
                 .filter(ConnectorImplementation.class::isInstance)
                 .map(ConnectorImplementation.class::cast)
@@ -89,6 +98,13 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
         allDefinitions.stream()
                 .filter(def -> hasMatchingImplementation(def, filterImplementations))
                 .forEach(result::addFilterDefinition);
+        allDefinitions.stream()
+                .filter(def -> !hasMatchingImplementation(def,
+                        Stream.of(connectorImplementations, filterImplementations)
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toList())))
+                .map(def -> Issue.create(Type.UNKNOWN_DEFINITION_TYPE, String.format("%s declares a definition '%s (%s)' but no matching implementation has been found. This definition will be ignored." ,def.getJarEntry(), def.getDefinitionId(), def.getDefinitionVersion()), Severity.WARNING, artifact.getId()))
+                .forEach(result::addIssue);
         connectorImplementations.forEach(result::addConnectorImplementation);
         filterImplementations.forEach(result::addFilterImplementation);
     }
@@ -128,7 +144,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
     private static org.bonitasoft.plugin.analyze.report.model.Artifact create(Artifact artifact) {
         return org.bonitasoft.plugin.analyze.report.model.Artifact.create(artifact.getGroupId(),
                 artifact.getArtifactId(),
-                artifact.getBaseVersion() == null ? artifact.getVersion() :  artifact.getBaseVersion(),
+                artifact.getBaseVersion() == null ? artifact.getVersion() : artifact.getBaseVersion(),
                 artifact.getClassifier(),
                 artifact.getFile().getAbsolutePath());
     }
@@ -169,7 +185,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
                 .orElseThrow(
                         () -> new IllegalArgumentException(format("No page.properties found in %s", artifactFile)));
     }
-    
+
     static Optional<JarEntry> findJarEntry(File file, Predicate<? super JarEntry> entryPredicate)
             throws IOException {
         try (JarFile jarFile = new JarFile(file)) {

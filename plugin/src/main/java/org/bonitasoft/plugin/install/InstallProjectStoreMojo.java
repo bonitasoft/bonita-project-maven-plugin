@@ -15,10 +15,10 @@
 package org.bonitasoft.plugin.install;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,7 +42,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.AbstractMojo;
@@ -73,7 +72,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private static final String GROUP_ID = "groupId";
     private static final String VERSION = "version";
     private static final String ARTIFACT_ID = "artifactId";
-    
+
     private static final String DEFAULT_INSTALL_PLUGIN_VERSION = "2.5.2";
     private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
@@ -101,11 +100,9 @@ public class InstallProjectStoreMojo extends AbstractMojo {
 
     @Component
     private ProjectBuilder projectBuilder;
-    
 
     @Parameter(defaultValue = "${project.build.directory}", required = true, readonly = true)
     private File buildDirectory;
-
 
     /**
      * Remote repositories which will be searched for artifacts.
@@ -195,19 +192,22 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private boolean shouldCreateDummyPomFile(File artifactFile) throws IOException {
         Optional<Model> existingPom = findPomFile(artifactFile);
         if (existingPom.isPresent()) {
-            try (StringWriter stringWriter = new StringWriter()) {
+            var pomFile = Files.createTempFile("pom", ".xml").toFile();
+            try (var fos = new FileOutputStream(pomFile)) {
                 Model model = existingPom.orElseThrow();
-                mavenXpp3Writer.write(stringWriter, model);
+                mavenXpp3Writer.write(fos, model);
                 ProjectBuildingRequest buildingRequest = newResolveArtifactProjectBuildingRequest();
                 buildingRequest.setProcessPlugins(false);
                 buildingRequest.setResolveDependencies(true);
                 buildingRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
                 ProjectBuildingResult buildingResult = projectBuilder
-                        .build(new StringModelSource(stringWriter.toString()), buildingRequest);
+                        .build(pomFile, buildingRequest);
                 DependencyResolutionResult dependencyResolutionResult = buildingResult.getDependencyResolutionResult();
                 return !dependencyResolutionResult.getUnresolvedDependencies().isEmpty();
             } catch (ProjectBuildingException e) {
                 return true;
+            } finally {
+                Files.deleteIfExists(pomFile.toPath());
             }
         }
         return false;
@@ -233,8 +233,8 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                         .map(entry -> {
                             var properties = new Properties();
                             try (InputStream is = jarFile.getInputStream(entry)) {
-                                 properties.load(is);
-                                 return properties;
+                                properties.load(is);
+                                return properties;
                             } catch (IOException e) {
                                 getLog().error(e);
                                 return null;
@@ -249,15 +249,15 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                         })
                         .findFirst()
                         .map(pomProperties -> {
-                            ZipEntry pomEntry = jarFile.getEntry(String.format("META-INF/maven/%s/%s/pom.xml", 
-                                    pomProperties.getProperty(GROUP_ID), 
+                            ZipEntry pomEntry = jarFile.getEntry(String.format("META-INF/maven/%s/%s/pom.xml",
+                                    pomProperties.getProperty(GROUP_ID),
                                     pomProperties.getProperty(ARTIFACT_ID)));
                             try (InputStream is = jarFile.getInputStream(pomEntry)) {
                                 return mavenXpp3Reader.read(is);
-                           } catch (IOException | XmlPullParserException e) {
-                               getLog().error(e);
-                               return null;
-                           }
+                            } catch (IOException | XmlPullParserException e) {
+                                getLog().error(e);
+                                return null;
+                            }
                         });
             } catch (IOException e) {
                 getLog().error("Failed to read jar " + artifactFile.getName(), e);
@@ -268,10 +268,10 @@ public class InstallProjectStoreMojo extends AbstractMojo {
 
     private File createDummyPomFile(Artifact artifact) throws IOException {
         File workdir = buildDirectory.toPath().resolve("install-plugin-workdir").toFile();
-        if(!workdir.exists()) {
+        if (!workdir.exists()) {
             workdir.mkdirs();
         }
-        Path pomFile = Files.createTempFile(workdir.toPath(),"pom", ".xml");
+        Path pomFile = Files.createTempFile(workdir.toPath(), "pom", ".xml");
         Model model = new Model();
         model.setModelVersion("4.0.0");
         model.setGroupId(artifact.getGroupId());

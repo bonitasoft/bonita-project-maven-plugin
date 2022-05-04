@@ -27,7 +27,7 @@ public class Issue {
     }
 
     public enum Type {
-        INCOMPATIBLE_DEPENDENCY
+        INCOMPATIBLE_DEPENDENCY, INVALID_DESCRIPTOR_FILE, UNKNOWN_DEFINITION_TYPE
     }
 
     private String severity;
