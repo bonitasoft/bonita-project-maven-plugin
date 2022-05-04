@@ -45,11 +45,15 @@ import org.benf.cfr.reader.util.getopt.GetOptSinkFactory;
 import org.benf.cfr.reader.util.getopt.Options;
 import org.benf.cfr.reader.util.getopt.OptionsImpl;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
+import org.bonitasoft.plugin.analyze.IssueCollector;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DescriptorIdentifier;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.Issue;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Severity;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -87,17 +91,19 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     @Override
-    public List<Implementation> findAllImplementations(Artifact artifact) throws IOException {
-        return findImplementationDescriptors(artifact.getFile())
+    public List<Implementation> findAllImplementations(Artifact artifact, IssueCollector issueCollector)
+            throws IOException {
+        return findImplementationDescriptors(artifact, issueCollector)
                 .stream()
                 .map(resource -> {
                     Document document = resource.getDocument();
                     String className = readElement(document, "implementationClassname");
+                    
                     String implementationId = readElement(document, "implementationId");
                     String implementationVersion = readElement(document, "implementationVersion");
                     String definitionId = readElement(document, "definitionId");
                     String definitionVersion = readElement(document, "definitionVersion");
-                    Set<String> hierarchy = detectImplementationHierarchy(className, artifact.getFile());
+                    Set<String> hierarchy = detectImplementationHierarchy(className, artifact, resource.getPath(), issueCollector);
                     if (!Collections.disjoint(hierarchy, CONNECTOR_TYPES)) {
                         return ConnectorImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
@@ -127,8 +133,8 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     @Override
-    public List<Definition> findAllDefinitions(Artifact artifact) throws IOException {
-        return findDefinitionDescriptors(artifact.getFile())
+    public List<Definition> findAllDefinitions(Artifact artifact, IssueCollector issueCollector) throws IOException {
+        return findDefinitionDescriptors(artifact, issueCollector)
                 .stream()
                 .map(resource -> {
                     Document document = resource.getDocument();
@@ -141,33 +147,45 @@ public class CFRConnectorResolver implements ConnectorResolver {
                 .collect(Collectors.toList());
     }
 
-    private List<DocumentResource> findImplementationDescriptors(File artifactFile) throws IOException {
-        return getDocumentResources(artifactFile, IMPLEMENTATION_EXTENSION, IMPLEMENTATION_NS);
+    private List<DocumentResource> findImplementationDescriptors(Artifact artifact, IssueCollector issueCollector)
+            throws IOException {
+        return getDocumentResources(artifact, IMPLEMENTATION_EXTENSION, IMPLEMENTATION_NS, issueCollector);
     }
 
-    private List<DocumentResource> findDefinitionDescriptors(File artifactFile) throws IOException {
-        return getDocumentResources(artifactFile, DEFINITION_EXTENSION, DEFINITION_NS);
+    private List<DocumentResource> findDefinitionDescriptors(Artifact artifact, IssueCollector issueCollector)
+            throws IOException {
+        return getDocumentResources(artifact, DEFINITION_EXTENSION, DEFINITION_NS, issueCollector);
     }
 
-    private List<DocumentResource> getDocumentResources(File artifactFile, String extension,
-            String namespace) throws IOException {
-        return findJarEntries(artifactFile, entry -> entry.getName().endsWith(extension))
+    private List<DocumentResource> getDocumentResources(Artifact artifact, String extension,
+            String namespace, IssueCollector issueCollector) throws IOException {
+        return findJarEntries(artifact.getFile(), entry -> entry.getName().endsWith(extension))
                 .stream()
-                .map(entry -> createDocumentResource(artifactFile, entry, namespace))
+                .map(entry -> createDocumentResource(artifact, entry, namespace, issueCollector))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private DocumentResource createDocumentResource(File file, JarEntry entry, String implementationNs) {
-        try (JarFile jarFile = new JarFile(file);
+    private DocumentResource createDocumentResource(Artifact artifact, JarEntry entry, String implementationNs,
+            IssueCollector issueCollector) {
+        try (JarFile jarFile = new JarFile(artifact.getFile());
                 InputStream is = jarFile.getInputStream(entry)) {
-            Document document = asXMLDocument(is, implementationNs);
+            var document = asXMLDocument(is, implementationNs);
             if (document != null) {
                 return new DocumentResource(entry.toString(), document);
             }
+            issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
+                    String.format("%s is not compliant with '%s' XML schema definition", entry, implementationNs),
+                    Severity.ERROR,
+                    artifact.getId()));
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("Failed to parser connector descriptor", e);
+        } catch (SAXException e) {
+            issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
+                    String.format("%s is not a valid XML file: %s", entry, e.toString()), Severity.ERROR,
+                    artifact.getId()));
         } catch (IOException e) {
-            LOGGER.error("Failed to read {} in {}.", entry, file, e);
-            return null;
+            LOGGER.error("Failed to read {} in {}.", entry, artifact.getFile(), e);
         }
         return null;
     }
@@ -191,8 +209,9 @@ public class CFRConnectorResolver implements ConnectorResolver {
                 .orElseThrow(() -> new ClassNotFoundException(className));
     }
 
-    private Set<String> detectImplementationHierarchy(String className, File file) {
+    private Set<String> detectImplementationHierarchy(String className, Artifact artifact, String resourcePath, IssueCollector issueCollector) {
         Set<String> hierarchy = new HashSet<>();
+        var file = artifact.getFile();
         LOGGER.debug("Resolving connector type for {} in {}", className, file);
         GetOptSinkFactory<Options> factory = OptionsImpl.getFactory();
         Options options = factory.create(Map.of());
@@ -211,26 +230,24 @@ public class CFRConnectorResolver implements ConnectorResolver {
             }
         } catch (ClassNotFoundException e) {
             LOGGER.error("Failed to load class {} from jar {}", className, file, e);
+            issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE, String.format("%s declares an unknown 'implementationClassname': %s", resourcePath, className), Severity.ERROR, artifact.getId()));
         }
 
         return hierarchy;
     }
 
-    private Document asXMLDocument(InputStream source, String namespace) {
+    private Document asXMLDocument(InputStream source, String namespace)
+            throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
         factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new InputSource(source));
-            Node firstChild = document.getFirstChild();
-            String namespaceURI = firstChild.getNamespaceURI();
-            if (namespace.equals(namespaceURI)) {
-                return document;
-            }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
-            return null;
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new InputSource(source));
+        Node firstChild = document.getFirstChild();
+        String namespaceURI = firstChild.getNamespaceURI();
+        if (namespace.equals(namespaceURI)) {
+            return document;
         }
         return null;
     }

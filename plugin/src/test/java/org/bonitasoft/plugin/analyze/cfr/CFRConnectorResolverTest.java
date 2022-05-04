@@ -27,10 +27,14 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
+import org.bonitasoft.plugin.analyze.DefaultIssueCollector;
+import org.bonitasoft.plugin.analyze.IssueCollector;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Severity;
+import org.bonitasoft.plugin.analyze.report.model.Issue.Type;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,9 +55,11 @@ class CFRConnectorResolverTest {
     private static final String CLASSIFIER = null;
 
     private Artifact artifact;
+    private IssueCollector issueCollector;
 
     @BeforeEach
     void createArtifact() throws Exception {
+        issueCollector = new DefaultIssueCollector();
         artifact = new DefaultArtifact(GROUP_ID, ARTIFACT_ID, VERSION, SCOPE, TYPE, CLASSIFIER,
                 new DefaultArtifactHandler());
     }
@@ -64,7 +70,7 @@ class CFRConnectorResolverTest {
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
 
         assertEquals(1, implementations.size());
         Implementation emailImplementation = implementations.get(0);
@@ -81,7 +87,7 @@ class CFRConnectorResolverTest {
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-1.3.0.jar").getFile()));
 
-        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact, issueCollector);
 
         assertEquals(1, definitions.size());
         Definition emailDefinition = definitions.get(0);
@@ -95,7 +101,7 @@ class CFRConnectorResolverTest {
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
 
-        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact, issueCollector);
 
         assertEquals(4, definitions.size());
     }
@@ -106,7 +112,7 @@ class CFRConnectorResolverTest {
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-rest-1.0.10.jar").getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
 
         assertEquals(4, implementations.size());
 
@@ -145,7 +151,7 @@ class CFRConnectorResolverTest {
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-database-2.0.3.jar").getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
 
         assertEquals(17, implementations.size());
     }
@@ -156,7 +162,7 @@ class CFRConnectorResolverTest {
         artifact.setFile(new File(
                 CFRConnectorResolverTest.class.getResource("/bonita-actorfilter-single-user-1.0.0.jar").getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
 
         assertEquals(1, implementations.size());
         Implementation singleUserImplementation = implementations.get(0);
@@ -168,16 +174,27 @@ class CFRConnectorResolverTest {
     }
 
     @Test
-    void testInvalidDescriptorsAreIgnored() throws Exception {
+    void testInvalidDescriptorsFillIssues() throws Exception {
         ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/jar-with-invalid-descriptors.jar").getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
-        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact, issueCollector);
 
         assertEquals(0, implementations.size());
         assertEquals(0, definitions.size());
+        assertThat(issueCollector.getIssues())
+            .hasSize(6)
+            .allSatisfy(issue -> assertThat(issue.getType()).isEqualTo(Type.INVALID_DESCRIPTOR_FILE.name()))
+            .allSatisfy(issue -> assertThat(issue.getSeverity()).isEqualTo(Severity.ERROR.name()))
+            .allSatisfy(issue -> assertThat(issue.getContext()).isEqualTo(List.of(artifact.getId())))
+            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("email-invalid-classname.impl declares an unknown 'implementationClassname': org.bonitasoft.connectors.email.EmailConnector"))
+            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("email.impl is not compliant with 'http://www.bonitasoft.org/ns/connector/implementation/6.0' XML schema definition"))
+            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("email.def is not compliant with 'http://www.bonitasoft.org/ns/connector/definition/6.1' XML schema definition"))
+            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("somethingElse.def is not compliant with 'http://www.bonitasoft.org/ns/connector/definition/6.1' XML schema definition"))
+            .anySatisfy(issue -> assertThat(issue.getMessage()).startsWith("notXmlContent.def is not a valid XML file:"))
+            .anySatisfy(issue -> assertThat(issue.getMessage()).startsWith("email-with-typo.def is not a valid XML file:"));
     }
 
     @ParameterizedTest
@@ -188,8 +205,8 @@ class CFRConnectorResolverTest {
         artifact.setFile(new File(
                 CFRConnectorResolverTest.class.getResource(testJarFile).getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
-        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact, issueCollector);
 
         assertEquals(0, implementations.size());
         assertEquals(1, definitions.size());
@@ -201,8 +218,8 @@ class CFRConnectorResolverTest {
         artifact.setFile(
                 new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-templating-2.5-SNAPSHOT.jar").getFile()));
 
-        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact);
-        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact);
+        List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
+        List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact, issueCollector);
 
         assertEquals(1, implementations.size());
         assertEquals(1, definitions.size());
