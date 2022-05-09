@@ -65,6 +65,7 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
                 throw new AnalysisResultReportException("Failed to analyse artifacts: " + artifact.getId(), e);
             }
         });
+        issueCollector.getIssues().forEach(dependencyReport::addIssue);
         return dependencyReport;
     }
 
@@ -77,7 +78,6 @@ public class DefaultArtifactAnalyser implements ArtifactAnalyser {
         if (fileName.endsWith(".zip") && hasCustomPageDescriptor(artifactFile)) {
             analyseCustomPageArtifact(artifact, result);
         }
-        issueCollector.getIssues().forEach(result::addIssue);
         return result;
     }
 
