@@ -26,7 +26,7 @@
         <maven-model-builder.version>3.8.5</maven-model-builder.version>
         <maven-settings.version>3.8.5</maven-settings.version>
         <maven-settings-builder.version>3.8.5</maven-settings-builder.version>
-        <maven-repository-metadata.version>3.8.5</maven-repository-metadata.version> 
+        <maven-repository-metadata.version>3.8.6</maven-repository-metadata.version> 
         <maven-aether-provider.version>3.3.9</maven-aether-provider.version>           
 
         <!-- Test -->
