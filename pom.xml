@@ -53,7 +53,7 @@
 		<maven-invoker-plugin.version>3.3.0</maven-invoker-plugin.version>
 		<mockito-junit-jupiter.version>4.7.0</mockito-junit-jupiter.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
-		<logback-classic.version>1.4.0</logback-classic.version>
+		<logback-classic.version>1.4.4</logback-classic.version>
 
 		<!-- Sonar -->
 		<sonar.projectKey>${sonar.organization}_bonita-project-maven-plugin</sonar.projectKey>
