@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>_PROJECT_GROUP_ID_PLACEHOLDER_</groupId>
+        <artifactId>_PROJECT_PARENT_ARTIFACT_ID_PLACEHOLDER_</artifactId>
+        <version>_PROJECT_PARENT_VERSION_PLACEHOLDER_</version>
+    </parent>
+ 
+    <artifactId>bdm</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>bdm-client</module>
+        <module>bdm-dao</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- TODO Declare version in the parent pom -->
+                <plugin>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.3.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+           <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <executions>
+                    <!-- enable flattening -->
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <!-- ensure proper cleanup -->
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+           </plugin>
+        </plugins>
+    </build>
+</project>

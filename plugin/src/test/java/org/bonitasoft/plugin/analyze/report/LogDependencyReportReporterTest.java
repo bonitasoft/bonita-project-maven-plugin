@@ -1,11 +1,11 @@
 package org.bonitasoft.plugin.analyze.report;
 
+import static java.util.Optional.ofNullable;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.codehaus.plexus.logging.AbstractLogger;
 import org.codehaus.plexus.logging.Logger;
-
-import static java.util.Optional.ofNullable;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class LogDependencyReportReporterTest extends AbstractDependencyReportReporterTest {
 

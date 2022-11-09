@@ -1,5 +1,7 @@
 package org.bonitasoft.plugin.analyze.report;
 
+import static java.lang.String.format;
+
 import org.apache.maven.plugin.logging.Log;
 import org.bonitasoft.plugin.analyze.report.model.Artifact;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage;
@@ -7,8 +9,6 @@ import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.bonitasoft.plugin.analyze.report.model.Issue.Severity;
-
-import static java.lang.String.format;
 
 public class LogDependencyReporter implements DependencyReporter {
 

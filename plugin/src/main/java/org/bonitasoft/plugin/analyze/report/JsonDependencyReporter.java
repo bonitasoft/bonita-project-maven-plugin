@@ -3,11 +3,12 @@ package org.bonitasoft.plugin.analyze.report;
 import java.io.File;
 import java.io.IOException;
 
+import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
 public class JsonDependencyReporter implements DependencyReporter {
 

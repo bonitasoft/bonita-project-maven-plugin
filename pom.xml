@@ -268,7 +268,7 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-
+	
 	<scm>
 		<developerConnection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</developerConnection>
         <connection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</connection>

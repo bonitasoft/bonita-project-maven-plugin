@@ -1,13 +1,13 @@
 package org.bonitasoft.plugin.analyze.report;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.plugin.test.TestFiles.getResourceAsFile;
+
 import java.io.File;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.plugin.test.TestFiles.getResourceAsFile;
 
 class JsonDependencyReportReporterTest extends AbstractDependencyReportReporterTest {
 

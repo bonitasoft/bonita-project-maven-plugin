@@ -27,7 +27,8 @@
         <maven-settings.version>3.8.6</maven-settings.version>
         <maven-settings-builder.version>3.8.6</maven-settings-builder.version>
         <maven-repository-metadata.version>3.8.6</maven-repository-metadata.version> 
-        <maven-aether-provider.version>3.3.9</maven-aether-provider.version>           
+        <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
+        <plexus-build-api.version>0.0.7</plexus-build-api.version>
 
         <!-- Test -->
         <groovy.version>3.0.12</groovy.version>
@@ -136,6 +137,20 @@
             <groupId>com.codspire.plugins</groupId>
             <artifactId>artifact-lookup-maven-plugin</artifactId>
             <version>${artifact-lookup-maven-plugin.version}</version>
+        </dependency>
+        <dependency>
+           <groupId>org.sonatype.plexus</groupId>
+           <artifactId>plexus-build-api</artifactId>
+           <version>${plexus-build-api.version}</version>
+         </dependency>
+        
+        <!-- POC BDM GENERATION -->
+        
+        <!-- Contains bdm code generator  -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.data</groupId>
+            <artifactId>bonita-business-data-generator</artifactId>
+            <version>7.15.0</version>
         </dependency>
 
         <!-- Test -->
