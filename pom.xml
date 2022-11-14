@@ -2,11 +2,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bonitasoft.maven</groupId>
 	<artifactId>bonita-project-maven-plugin-parent</artifactId>
-	<version>0.0.7-SNAPSHOT</version>
-    <packaging>pom</packaging>
+	<version>0.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
 	<name>Bonita Project Maven Plugin Parent</name>
-    <description>Maven plug-in used by Bonita to manage project dependencies.</description>
+	<description>Maven plug-in used by Bonita to manage project dependencies.</description>
 	<url>https://www.bonitasoft.com/</url>
 
 	<developers>
@@ -27,7 +27,7 @@
 	</licenses>
 
 	<properties>
-		<project.scm.id>github</project.scm.id> 
+		<project.scm.id>github</project.scm.id>
 
 		<java.version>11</java.version>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -45,7 +45,11 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
+		<maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
+		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
+		<maven-project-info-reports-plugin.version>3.4.1</maven-project-info-reports-plugin.version>
 
 		<!-- Test -->
 		<junit-jupiter-engine.version>5.9.1</junit-jupiter-engine.version>
@@ -53,7 +57,7 @@
 		<maven-invoker-plugin.version>3.3.0</maven-invoker-plugin.version>
 		<mockito-junit-jupiter.version>4.8.1</mockito-junit-jupiter.version>
 		<assertj-core.version>3.23.1</assertj-core.version>
-		<logback-classic.version>1.4.4</logback-classic.version>
+		<logback-classic.version>1.2.11</logback-classic.version>
 
 		<!-- Sonar -->
 		<sonar.projectKey>${sonar.organization}_bonita-project-maven-plugin</sonar.projectKey>
@@ -151,31 +155,36 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>${maven-deploy-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>${maven-site-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
 					<version>${maven-release-plugin.version}</version>
 					<configuration>
 						<tagNameFormat>@{project.version}</tagNameFormat>
-                        <releaseProfiles>release</releaseProfiles>
+						<releaseProfiles>release</releaseProfiles>
 					</configuration>
 				</plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven-javadoc-plugin.version}</version>
-                </plugin>
-                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                </plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven-javadoc-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -195,7 +204,7 @@
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
 			</plugin>
-            <plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
@@ -221,6 +230,16 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven-project-info-reports-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
 
 	<profiles>
 		<profile>
@@ -271,8 +290,8 @@
 
 	<scm>
 		<developerConnection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</developerConnection>
-        <connection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</connection>
-        <url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
+		<connection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</connection>
+		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
 		<tag>HEAD</tag>
 	</scm>
 </project>

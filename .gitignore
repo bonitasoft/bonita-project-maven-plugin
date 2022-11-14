@@ -3,6 +3,7 @@ target
 .classpath
 .project
 .mvn/wrapper/*.jar
+pom.xml.versionsBackup
 
 .idea
 *.iml

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.bonitasoft.example</groupId>
+		<artifactId>procurement-example-bdm</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>procurement-example-bdm-model</artifactId>
+
+	
+	<properties>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+          <dependency>
+            <groupId>org.bonitasoft.engine.data</groupId>
+            <artifactId>bonita-business-data-generator</artifactId>
+            <version>7.15.0</version>
+            <scope>provided</scope>
+        </dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.bonitasoft.maven</groupId>
+				<artifactId>bonita-project-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-bdm-model-sources</id>
+						<goals>
+							<goal>generate-bdm-model</goal>
+						</goals>
+						<configuration>
+							<bdmModelFile>../bom.xml</bdmModelFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+				<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
+
+
+</project>
