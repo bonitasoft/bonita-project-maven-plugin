@@ -20,6 +20,6 @@ import java.nio.file.Path;
 
 public interface BdmModuleGenerator {
     
-    Path createModule(String projectId, MavenProject parentProject) throws ModuleGenerationException;
+    Path create(String projectId, MavenProject parentProject) throws ModuleGenerationException;
     
 }

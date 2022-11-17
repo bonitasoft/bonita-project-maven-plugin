@@ -14,6 +14,7 @@
  */
 package org.bonitasoft.plugin.bdm.module;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -54,11 +55,13 @@ public class CreateBdmModuleMojo extends AbstractMojo {
         getLog().info("Creating Business Data Model maven modules...");
         var instant = Instant.now();
         try {
-            var modulePath = moduleGenerator.createModule(projectId, project);
-            var defaultBom = defaultBomFactory.createDefaultBom(project.getGroupId());
+            var modulePath = moduleGenerator.create(projectId, project);
+            var defaultBom = defaultBomFactory.createDefaultBom(project.getGroupId(), modulePath);
             buildContext.refresh(modulePath.toFile());
         } catch (ModuleGenerationException e) {
-            throw new MojoFailureException("Error while generating the Business Data Model Mmaven modules", e);
+            throw new MojoFailureException("Error while generating the Business Data Model maven modules", e);
+        } catch (IOException ioe) {
+            throw new MojoFailureException("Error while generating the default Business Data Model file descriptor", ioe);
         }
 
         getLog().info(String.format("Business Data Model Maven modules generation completed in %s.",

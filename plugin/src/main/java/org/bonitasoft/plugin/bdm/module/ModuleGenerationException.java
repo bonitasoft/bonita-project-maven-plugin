@@ -17,6 +17,10 @@ package org.bonitasoft.plugin.bdm.module;
 
 public class ModuleGenerationException extends Exception {
 
+    public ModuleGenerationException(String message) {
+        super(message);
+    }
+
     public ModuleGenerationException(String message, Throwable cause) {
        super(message, cause);
     }
