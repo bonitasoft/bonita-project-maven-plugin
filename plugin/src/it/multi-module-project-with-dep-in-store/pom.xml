@@ -3,8 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bonitasoft</groupId>
-	<artifactId>dep-in-store</artifactId>
+	<artifactId>dep-in-store-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
 	<properties>
 		<java.version>11</java.version>
@@ -14,13 +15,8 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.bonitasoft</groupId>
-			<artifactId>in-store</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
-
+	<modules>
+		<module>app</module>
+	</modules>
 
 </project>

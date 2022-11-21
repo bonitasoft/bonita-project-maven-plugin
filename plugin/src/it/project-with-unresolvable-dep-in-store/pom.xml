@@ -22,21 +22,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.bonitasoft.maven</groupId>
-				<artifactId>bonita-project-maven-plugin</artifactId>
-				<version>@project.version@</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>install</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>
