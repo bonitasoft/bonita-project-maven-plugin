@@ -17,6 +17,7 @@ package org.bonitasoft.plugin.bdm.module;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -60,11 +61,12 @@ public class CreateBdmModuleMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        getLog().info("Creating Business Data Model maven modules...");
-        var instant = Instant.now();
-        if(!"pom".equals(project.getPackaging())) {
-            throw new MojoExecutionException("The project must have a pom packaging.");
+        if(!"pom".equals(project.getPackaging()) 
+                || !Objects.equals(project.getArtifactId(), bonitaProjectId+"-parent")) {
+          return;
         }
+        var instant = Instant.now();
+        getLog().info("Creating Business Data Model maven modules...");
         try {
             var modulePath = moduleGenerator.create(bonitaProjectId, project);
             defaultBomFactory.createDefaultBom(project.getGroupId(), modulePath);
