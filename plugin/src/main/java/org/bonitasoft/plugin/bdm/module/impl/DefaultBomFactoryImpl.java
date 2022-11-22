@@ -1,6 +1,7 @@
 package org.bonitasoft.plugin.bdm.module.impl;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -16,17 +17,24 @@ import org.xml.sax.SAXException;
 
 public class DefaultBomFactoryImpl implements DefaultBomFactory {
 
-    private static final String DEFAULT_BO_NAME = "BusinessObject";
-    private static final String DEFAULT_FIELD_NAME = "attribute";
+    static final String DEFAULT_BO_NAME = "BusinessObject";
+    static final String DEFAULT_FIELD_NAME = "attribute";
+    static final String BOM_FILE_NAME = "bom.xml";
 
     private BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
 
     @Override
     public Path createDefaultBom(String projectGroupId, Path modulePath) throws IOException {
+        if (modulePath.resolve(BOM_FILE_NAME).toFile().exists()) {
+            throw new FileAlreadyExistsException(
+                    String.format("The %s for the module %s already exist for the project %s", BOM_FILE_NAME,
+                            modulePath.getFileName(), projectGroupId));
+        }
+
         var newBDM = new BusinessObjectModel();
         newBDM.getBusinessObjects().add(createFirstBusinessObject(projectGroupId));
         try {
-            var bomFile = Files.createFile(modulePath.resolve("bom.xml"));
+            var bomFile = Files.createFile(modulePath.resolve(BOM_FILE_NAME));
             Files.write(bomFile, converter.marshall(newBDM));
             return bomFile;
         } catch (JAXBException | SAXException e) {
