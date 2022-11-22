@@ -5,6 +5,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
@@ -15,6 +16,7 @@ import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.plugin.bdm.module.DefaultBomFactory;
 import org.xml.sax.SAXException;
 
+@Named
 public class DefaultBomFactoryImpl implements DefaultBomFactory {
 
     static final String DEFAULT_BO_NAME = "BusinessObject";

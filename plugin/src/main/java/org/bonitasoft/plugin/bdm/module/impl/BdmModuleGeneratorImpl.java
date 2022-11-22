@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.maven.model.Parent;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
@@ -38,6 +38,7 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
     static final String DAO_CLIENT_MODULE_NAME = "dao-client";
     static final String DAO_CLIENT_MODULE_NAME_SUFFIX = "-bdm-dao-client";
     static final String POM_FILE_NAME = "pom.xml";
+    static final String BDM_MODEL_ARTIFACT_ID_PLACEHOLDER = "_BDM_MODEL_ARTIFACT_ID_PLACEHOLDER_";
 
     private ModelReader modelReader;
     private ModelWriter modelWriter;
@@ -50,16 +51,19 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
 
     @Override
     public Path create(String projectId, MavenProject parentProject) throws ModuleGenerationException {
-
-        var parentModuleFolder = createModule(projectId, parentProject,
+        var parentModuleFolder = createModule(projectId, parentProject.getModel(),
                 parentProject.getBasedir().toPath().resolve(BDM_PARENT_MODULE), "/bdm.parent.module.xml",
                 BDM_PARENT_MODULE_SUFFIX);
-        createModule(projectId, parentProject, parentModuleFolder.resolve(DAO_CLIENT_MODULE_NAME),
-                "/bdm.dao.module.xml", DAO_CLIENT_MODULE_NAME_SUFFIX);
-        createModule(projectId, parentProject, parentModuleFolder.resolve(MODEL_MODULE_NAME), "/bdm.model.module.xml",
-                MODEL_MODULE_NAME_SUFFIX);
-
         try {
+            var parentModel = modelReader.read(parentModuleFolder.resolve(POM_FILE_NAME).toFile(), null);
+            parentModel.setGroupId(parentProject.getGroupId());
+            parentModel.setVersion(parentProject.getVersion());
+            createModule(projectId, parentModel, parentModuleFolder.resolve(MODEL_MODULE_NAME), "/bdm.model.module.xml",
+                    MODEL_MODULE_NAME_SUFFIX);
+            Path daoClientModule = createModule(projectId, parentModel,
+                    parentModuleFolder.resolve(DAO_CLIENT_MODULE_NAME),
+                    "/bdm.dao.module.xml", DAO_CLIENT_MODULE_NAME_SUFFIX);
+            updateBdmModelDependency(daoClientModule, parentProject.getGroupId(), projectId + MODEL_MODULE_NAME_SUFFIX);
             var parentProjectModel = modelReader.read(parentProject.getFile(), null);
             if (parentProjectModel.getModules().stream().noneMatch(BDM_PARENT_MODULE::equals)) {
                 parentProjectModel.getModules().add(BDM_PARENT_MODULE);
@@ -71,11 +75,25 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
         return parentModuleFolder;
     }
 
-    Path createModule(String projectId, MavenProject parentProject, Path moduleFolder, String templateFileName,
+    private void updateBdmModelDependency(Path daoClientModule, String groupId, String bdmModelArtifactId)
+            throws IOException {
+        var pomFile = daoClientModule.resolve(POM_FILE_NAME).toFile();
+        var model = modelReader.read(pomFile, null);
+        var dep = model.getDependencies().stream()
+                .filter(d -> BDM_MODEL_ARTIFACT_ID_PLACEHOLDER.equals(d.getArtifactId()))
+                .findFirst()
+                .orElseThrow();
+        dep.setGroupId(groupId);
+        dep.setArtifactId(bdmModelArtifactId);
+        modelWriter.write(pomFile, null, model);
+    }
+
+    Path createModule(String projectId, Model parent, Path moduleFolder, String templateFileName,
             String moduleNameSuffix) throws ModuleGenerationException {
 
         if (moduleFolder.toFile().exists()) {
-            throw new ModuleGenerationException(String.format("The module %s already exist for the project %s", moduleFolder.getFileName(), projectId));
+            throw new ModuleGenerationException(String.format("The module %s already exist for the project %s",
+                    moduleFolder.getFileName(), projectId));
         }
 
         Path modulePom = moduleFolder.resolve(POM_FILE_NAME);
@@ -84,10 +102,10 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
                 var os = Files.newOutputStream(modulePom)) {
             var modelTemplate = modelReader.read(is, null);
             modelTemplate.setArtifactId(projectId + moduleNameSuffix);
-            Parent parent = modelTemplate.getParent();
-            parent.setGroupId(parentProject.getGroupId());
-            parent.setArtifactId(parentProject.getArtifactId());
-            parent.setVersion(parentProject.getVersion());
+            var parentModel = modelTemplate.getParent();
+            parentModel.setGroupId(parent.getGroupId());
+            parentModel.setArtifactId(parent.getArtifactId());
+            parentModel.setVersion(parent.getVersion());
             modelWriter.write(os, null, modelTemplate);
         } catch (IOException e) {
             throw new ModuleGenerationException(

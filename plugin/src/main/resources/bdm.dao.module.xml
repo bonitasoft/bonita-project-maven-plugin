@@ -13,8 +13,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bonitasoft.example</groupId>
-            <artifactId>procurement-example-bdm-model</artifactId>
+            <groupId>_PROJECT_GROUP_ID_PLACEHOLDER_</groupId>
+            <artifactId>_BDM_MODEL_ARTIFACT_ID_PLACEHOLDER_</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -58,6 +58,11 @@
                         <goals>
                             <goal>add-source</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/java</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

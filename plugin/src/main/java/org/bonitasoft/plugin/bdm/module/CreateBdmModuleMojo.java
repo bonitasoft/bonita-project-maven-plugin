@@ -29,14 +29,22 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+/**
+ * This goal create a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
+ *
+ */
 @Mojo(name = "create-bdm-module", defaultPhase = LifecyclePhase.NONE)
 public class CreateBdmModuleMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
 
-    @Parameter(required = true)
-    protected String projectId;
+    /**
+     * Specify the Bonita project id that will determine the artifact ids of the generated modules.
+     * This id must be consistent with the parent project.
+     */
+    @Parameter(required = true, property = "bonitaProjectId")
+    protected String bonitaProjectId;
 
     private BuildContext buildContext;
     private BdmModuleGenerator moduleGenerator;
@@ -54,9 +62,12 @@ public class CreateBdmModuleMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("Creating Business Data Model maven modules...");
         var instant = Instant.now();
+        if(!"pom".equals(project.getPackaging())) {
+            throw new MojoExecutionException("The project must have a pom packaging.");
+        }
         try {
-            var modulePath = moduleGenerator.create(projectId, project);
-            var defaultBom = defaultBomFactory.createDefaultBom(project.getGroupId(), modulePath);
+            var modulePath = moduleGenerator.create(bonitaProjectId, project);
+            defaultBomFactory.createDefaultBom(project.getGroupId(), modulePath);
             buildContext.refresh(modulePath.toFile());
         } catch (ModuleGenerationException e) {
             throw new MojoFailureException("Error while generating the Business Data Model maven modules", e);
