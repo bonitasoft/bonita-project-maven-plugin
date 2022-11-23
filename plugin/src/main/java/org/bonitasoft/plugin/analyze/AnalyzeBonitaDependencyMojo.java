@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -36,6 +38,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
@@ -83,19 +86,23 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     private DependencyValidator dependencyValidator;
 
+    private ProjectArtifactFactory artifactFactory;
+
     @Inject
     public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver,
             ArtifactAnalyser artifactAnalyser,
-            DependencyValidator dependencyValidator) {
+            DependencyValidator dependencyValidator,
+            ProjectArtifactFactory artifactFactory) {
         this.artifactResolver = artifactResolver;
         this.artifactAnalyser = artifactAnalyser;
         this.dependencyValidator = dependencyValidator;
+        this.artifactFactory = artifactFactory;
     }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         ProjectBuildingRequest buildingRequest = newProjectBuildingRequest();
-        List<Artifact> resolvedArtifacts = resolveArtifacts(project.getDependencyArtifacts(), buildingRequest);
+        List<Artifact> resolvedArtifacts = resolveArtifacts(getProjectArtifacts(), buildingRequest);
         DependencyReport dependencyReport = artifactAnalyser.analyse(resolvedArtifacts);
 
         if (validateDeps) {
@@ -106,6 +113,15 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         getReporters().forEach(reporter -> reporter.report(dependencyReport));
     }
 
+    private Set<Artifact> getProjectArtifacts() throws MojoExecutionException {
+        try {
+           return artifactFactory.createArtifacts(project);
+        } catch (InvalidDependencyVersionException e) {
+           throw new MojoExecutionException(e);
+        }
+    }
+
+    
     protected List<DependencyReporter> getReporters() {
         List<DependencyReporter> reporters = new ArrayList<>();
         reporters.add(new LogDependencyReporter(getLog()));
@@ -116,7 +132,9 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     }
 
     protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts, ProjectBuildingRequest buildingRequest) {
-        return artifacts.stream().map(artifact -> {
+        return artifacts.stream()
+                .filter(artifact -> Objects.equals(artifact.getScope(), Artifact.SCOPE_COMPILE))
+                .map(artifact -> {
             try {
                 ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
                 final Artifact resolvedArtifact = result.getArtifact();

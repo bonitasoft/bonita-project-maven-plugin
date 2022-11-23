@@ -16,8 +16,8 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -57,16 +57,19 @@ class AnalyzeBonitaDependencyMojoTest {
 
     @Mock
     ProjectBuildingRequest buildingRequest;
+    
+    @Mock
+    ProjectArtifactFactory artifactFactory;
 
     @BeforeEach
     void setUp() throws MojoExecutionException {
-        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser, dependencyValidator));
+        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser, dependencyValidator, artifactFactory));
         mojo.project = project;
         mojo.setLog(mock(Log.class));
     }
 
     @Test
-    void sould_run_analysis_without_validation() throws MojoFailureException, MojoExecutionException {
+    void sould_run_analysis_without_validation() throws Exception {
         // Given
         mojo = spy(mojo);
 
@@ -79,7 +82,7 @@ class AnalyzeBonitaDependencyMojoTest {
         artifact.setFile(new File(artifact.getArtifactId() + "-" + artifact.getVersion() + "." + artifact.getType()));
         resolvedArtifacts.add(artifact);
 
-        when(project.getDependencyArtifacts()).thenReturn(new HashSet<>());
+        when(artifactFactory.createArtifacts(project)).thenReturn(new HashSet<>());
         doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
         doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
         when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
@@ -94,7 +97,7 @@ class AnalyzeBonitaDependencyMojoTest {
     }
     
     @Test
-    void sould_run_analysis_with_dep_validation() throws MojoFailureException, MojoExecutionException {
+    void sould_run_analysis_with_dep_validation() throws Exception {
         // Given
         mojo = spy(mojo);
         
@@ -110,7 +113,7 @@ class AnalyzeBonitaDependencyMojoTest {
         artifact.setFile(new File(artifact.getArtifactId() + "-" + artifact.getVersion() + "." + artifact.getType()));
         resolvedArtifacts.add(artifact);
 
-        when(project.getDependencyArtifacts()).thenReturn(new HashSet<>());
+        when(artifactFactory.createArtifacts(project)).thenReturn(new HashSet<>());
         doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
         doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
         when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
