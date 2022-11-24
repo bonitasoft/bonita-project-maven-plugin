@@ -17,7 +17,6 @@ import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
-import org.assertj.core.groups.Tuple;
 import org.bonitasoft.plugin.bdm.module.ModuleGenerationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -69,7 +68,7 @@ class BdmModuleGeneratorImplTest {
         assertThat(bdmDaoClientModuleModel.getParent().getVersion()).isEqualTo("2.1");
         assertThat(bdmDaoClientModuleModel.getArtifactId()).isEqualTo("procurement-example-bdm-dao-client");
         assertThat(bdmDaoClientModuleModel.getDependencies()).extracting("groupId","artifactId", "version")
-            .contains(tuple("com.bonitasoft.example","procurement-example-bdm-model", "${project.version}"));
+            .contains(tuple("${project.groupId}","procurement-example-bdm-model", "${project.version}"));
     }
 
     @Test

@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>_PROJECT_GROUP_ID_PLACEHOLDER_</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>_BDM_MODEL_ARTIFACT_ID_PLACEHOLDER_</artifactId>
             <version>${project.version}</version>
         </dependency>

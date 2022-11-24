@@ -1,6 +1,7 @@
 package org.bonitasoft.plugin.bdm.module.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
@@ -57,12 +58,11 @@ class DefaultBomFactooryImplTest {
         var modulePath = generator.create(PROCUREMENT_EXAMPLE_PROJECT_ID, mavenProject);
 
         var bomFactory = new DefaultBomFactoryImpl();
-        var bomPath = bomFactory.createDefaultBom(mavenProject.getGroupId(), modulePath);
+        bomFactory.createDefaultBom(mavenProject.getGroupId(), modulePath);
 
-        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(FileAlreadyExistsException.class,
-                () -> bomFactory.createDefaultBom(mavenProject.getGroupId(), modulePath));
-        assertThat(exception.getMessage())
-                .isEqualTo(String.format("The %s for the module %s already exist for the project %s",
+        assertThrows(FileAlreadyExistsException.class,
+                () -> bomFactory.createDefaultBom(mavenProject.getGroupId(), modulePath),
+                        String.format("The %s for the module %s already exist for the project %s",
                         DefaultBomFactoryImpl.BOM_FILE_NAME,
                         modulePath.getFileName(), mavenProject.getGroupId()));
     }

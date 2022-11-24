@@ -83,7 +83,6 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
                 .filter(d -> BDM_MODEL_ARTIFACT_ID_PLACEHOLDER.equals(d.getArtifactId()))
                 .findFirst()
                 .orElseThrow();
-        dep.setGroupId(groupId);
         dep.setArtifactId(bdmModelArtifactId);
         modelWriter.write(pomFile, null, model);
     }
