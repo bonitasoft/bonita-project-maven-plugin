@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.toList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -39,6 +38,9 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
+import org.apache.maven.shared.artifact.filter.collection.FilterArtifacts;
+import org.apache.maven.shared.artifact.filter.collection.ScopeFilter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
@@ -46,6 +48,7 @@ import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.JsonDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.LogDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
+import org.codehaus.plexus.util.StringUtils;
 
 @Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
@@ -88,6 +91,42 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     private ProjectArtifactFactory artifactFactory;
 
+    /**
+     * Scope threshold to include. An empty string indicates include all dependencies. Default value is runtime.<br>
+     * The scope threshold value being interpreted is the scope as
+     * Maven filters for creating a classpath, not as specified in the pom. In summary:
+     * <ul>
+     * <li><code>runtime</code> include scope gives runtime and compile dependencies,</li>
+     * <li><code>compile</code> include scope gives compile, provided, and system dependencies,</li>
+     * <li><code>test</code> include scope gives all dependencies (equivalent to default),</li>
+     * <li><code>provided</code> include scope just gives provided dependencies,</li>
+     * <li><code>system</code> include scope just gives system dependencies.</li>
+     * </ul>
+     *
+     * @since 0.1.0
+     */
+    @Parameter(property = "includeScope", defaultValue = "runtime")
+    protected String includeScope = "runtime";
+
+    /**
+     * Scope threshold to exclude, if no value is defined for include.
+     * An empty string indicates no dependencies (default).<br>
+     * The scope threshold value being interpreted is the scope as
+     * Maven filters for creating a classpath, not as specified in the pom. In summary:
+     * <ul>
+     * <li><code>runtime</code> exclude scope excludes runtime and compile dependencies,</li>
+     * <li><code>compile</code> exclude scope excludes compile, provided, and system dependencies,</li>
+     * <li><code>test</code> exclude scope excludes all dependencies, then not really a legitimate option: it will
+     * fail, you probably meant to configure includeScope = compile</li>
+     * <li><code>provided</code> exclude scope just excludes provided dependencies,</li>
+     * <li><code>system</code> exclude scope just excludes system dependencies.</li>
+     * </ul>
+     *
+     * @since 0.1.0
+     */
+    @Parameter(property = "excludeScope", defaultValue = "")
+    protected String excludeScope;
+
     @Inject
     public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver,
             ArtifactAnalyser artifactAnalyser,
@@ -102,7 +141,12 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         ProjectBuildingRequest buildingRequest = newProjectBuildingRequest();
-        List<Artifact> resolvedArtifacts = resolveArtifacts(getProjectArtifacts(), buildingRequest);
+        List<Artifact> resolvedArtifacts;
+        try {
+            resolvedArtifacts = resolveArtifacts(getProjectArtifacts(), buildingRequest);
+        } catch (MojoExecutionException | ArtifactFilterException e) {
+            throw new MojoExecutionException(e);
+        }
         DependencyReport dependencyReport = artifactAnalyser.analyse(resolvedArtifacts);
 
         if (validateDeps) {
@@ -115,13 +159,12 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     private Set<Artifact> getProjectArtifacts() throws MojoExecutionException {
         try {
-           return artifactFactory.createArtifacts(project);
+            return artifactFactory.createArtifacts(project);
         } catch (InvalidDependencyVersionException e) {
-           throw new MojoExecutionException(e);
+            throw new MojoExecutionException(e);
         }
     }
 
-    
     protected List<DependencyReporter> getReporters() {
         List<DependencyReporter> reporters = new ArrayList<>();
         reporters.add(new LogDependencyReporter(getLog()));
@@ -131,22 +174,28 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         return reporters;
     }
 
-    protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts, ProjectBuildingRequest buildingRequest) {
-        return artifacts.stream()
-                .filter(artifact -> Objects.equals(artifact.getScope(), Artifact.SCOPE_COMPILE))
-                .map(artifact -> {
-            try {
-                ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
-                final Artifact resolvedArtifact = result.getArtifact();
-                File artifactFile = resolvedArtifact.getFile();
-                if (artifactFile == null || !artifactFile.exists()) {
-                    throw new MojoExecutionException(format("Failed to resolve artifact %s", artifact));
-                }
-                return resolvedArtifact;
-            } catch (Exception e) {
-                throw new AnalysisResultReportException(format("Failed to analyze artifact %s", artifact), e);
+    protected List<Artifact> resolveArtifacts(Set<Artifact> artifacts, ProjectBuildingRequest buildingRequest)
+            throws ArtifactFilterException {
+        var filter = new FilterArtifacts();
+        filter.addFilter(new ScopeFilter(cleanToBeTokenizedString(this.includeScope),
+                cleanToBeTokenizedString(this.excludeScope)));
+        return filter.filter(artifacts).stream()
+                .map(artifact -> resolve(buildingRequest, artifact))
+                .collect(toList());
+    }
+
+    Artifact resolve(ProjectBuildingRequest buildingRequest, Artifact artifact) {
+        try {
+            ArtifactResult result = artifactResolver.resolveArtifact(buildingRequest, artifact);
+            final Artifact resolvedArtifact = result.getArtifact();
+            File artifactFile = resolvedArtifact.getFile();
+            if (artifactFile == null || !artifactFile.exists()) {
+                throw new MojoExecutionException(format("Failed to resolve artifact %s", artifact));
             }
-        }).collect(toList());
+            return resolvedArtifact;
+        } catch (Exception e) {
+            throw new AnalysisResultReportException(format("Failed to analyze artifact %s", artifact), e);
+        }
     }
 
     /*
@@ -158,6 +207,22 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         buildingRequest.setRemoteRepositories(remoteRepositories);
         buildingRequest.setProject(project);
         return buildingRequest;
+    }
+
+    /**
+     * Clean up configuration string before it can be tokenized.
+     * 
+     * @param str the string which should be cleaned
+     * @return cleaned up string
+     */
+    static String cleanToBeTokenizedString(String str) {
+        String ret = "";
+        if (!StringUtils.isEmpty(str)) {
+            // remove initial and ending spaces, plus all spaces next to commas
+            ret = str.trim().replaceAll("[\\s]*,[\\s]*", ",");
+        }
+
+        return ret;
     }
 
 }
