@@ -1,9 +1,11 @@
 package org.bonitasoft.plugin.analyze;
 
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -23,11 +26,14 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -60,6 +66,9 @@ class AnalyzeBonitaDependencyMojoTest {
     
     @Mock
     ProjectArtifactFactory artifactFactory;
+    
+    @Captor
+    ArgumentCaptor<List<Artifact>> resolvedArtifacts;
 
     @BeforeEach
     void setUp() throws MojoExecutionException {
@@ -69,7 +78,7 @@ class AnalyzeBonitaDependencyMojoTest {
     }
 
     @Test
-    void sould_run_analysis_without_validation() throws Exception {
+    void should_run_analysis_without_validation() throws Exception {
         // Given
         mojo = spy(mojo);
 
@@ -93,6 +102,77 @@ class AnalyzeBonitaDependencyMojoTest {
 
         // Then
         verify(artifactAnalyser).analyse(resolvedArtifacts);
+        verify(reporter).report(any());
+    }
+    
+    @Test
+    void shouldIncludeOnlyRuntimeScopeByDefault() throws Exception {
+        // Given
+        mojo = spy(mojo);
+
+        when(mojo.getReporters()).thenReturn(singletonList(reporter));
+
+
+        var artifactWithRuntimeScope = new DefaultArtifact("g", "a", "v", "compile", "jar", null,
+                new DefaultArtifactHandler("jar"));
+        artifactWithRuntimeScope.setFile(new File(artifactWithRuntimeScope.getArtifactId() + "-" + artifactWithRuntimeScope.getVersion() + "." + artifactWithRuntimeScope.getType()));
+        
+        var artifactWithProvidedScope = new DefaultArtifact("g", "b", "v", "provided", "jar", null,
+                new DefaultArtifactHandler("jar"));
+        artifactWithProvidedScope.setFile(new File(artifactWithProvidedScope.getArtifactId() + "-" + artifactWithProvidedScope.getVersion() + "." + artifactWithProvidedScope.getType()));
+
+        when(artifactFactory.createArtifacts(project)).thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(artifactWithRuntimeScope).when(mojo).resolve(buildingRequest, artifactWithRuntimeScope);
+        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+       
+
+        // When
+        mojo.execute();
+        
+      
+        // Then
+        verify(artifactAnalyser).analyse(resolvedArtifacts.capture());
+        assertThat(resolvedArtifacts.getValue())
+            .hasSize(1)
+            .extracting("scope").containsOnly("compile");
+        verify(mojo, never()).resolve(buildingRequest, artifactWithProvidedScope);
+        verify(reporter).report(any());
+    }
+    
+    @Test
+    void shouldIncludeCompileScope() throws Exception {
+        // Given
+        mojo = spy(mojo);
+        mojo.includeScope = "compile";
+
+        when(mojo.getReporters()).thenReturn(singletonList(reporter));
+
+
+        var artifactWithRuntimeScope = new DefaultArtifact("g", "a", "v", "compile", "jar", null,
+                new DefaultArtifactHandler("jar"));
+        artifactWithRuntimeScope.setFile(new File(artifactWithRuntimeScope.getArtifactId() + "-" + artifactWithRuntimeScope.getVersion() + "." + artifactWithRuntimeScope.getType()));
+        
+        var artifactWithProvidedScope = new DefaultArtifact("g", "b", "v", "provided", "jar", null,
+                new DefaultArtifactHandler("jar"));
+        artifactWithProvidedScope.setFile(new File(artifactWithProvidedScope.getArtifactId() + "-" + artifactWithProvidedScope.getVersion() + "." + artifactWithProvidedScope.getType()));
+
+        when(artifactFactory.createArtifacts(project)).thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(artifactWithRuntimeScope).when(mojo).resolve(buildingRequest, artifactWithRuntimeScope);
+        doReturn(artifactWithProvidedScope).when(mojo).resolve(buildingRequest, artifactWithProvidedScope);
+        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+       
+
+        // When
+        mojo.execute();
+        
+      
+        // Then
+        verify(artifactAnalyser).analyse(resolvedArtifacts.capture());
+        assertThat(resolvedArtifacts.getValue())
+            .hasSize(2)
+            .extracting("scope").contains("compile","provided");
         verify(reporter).report(any());
     }
     
