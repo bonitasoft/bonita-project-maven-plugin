@@ -113,21 +113,5 @@ class BdmModuleGeneratorImplTest {
                 .isEqualTo("Failed to write " + BdmModuleGeneratorImpl.DAO_CLIENT_MODULE_NAME + " module pom.");
     }
 
-    @Test
-    void throwMojoFailureExceptionWhenModuleAlreadyExist(@TempDir Path tmpDir) throws Exception {
-        var parentPomTemp = tmpDir.resolve(BdmModuleGeneratorImpl.POM_FILE_NAME);
-        MavenProject mavenProject = new MavenProject();
-        var parentPom = new File(BdmModuleGeneratorImplTest.class.getResource("/parentPom.xml").getFile());
-        Files.copy(parentPom.toPath(), parentPomTemp);
-        mavenProject.setFile(parentPomTemp.toFile());
-        var generator = new BdmModuleGeneratorImpl(modelReader, modelWriter);
-
-        generator.create(PROCUREMENT_EXAMPLE_PROJECT_ID, mavenProject);
-
-        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(ModuleGenerationException.class,
-                () -> generator.create(PROCUREMENT_EXAMPLE_PROJECT_ID, mavenProject));
-        assertThat(exception.getMessage()).isEqualTo("The module " + BdmModuleGeneratorImpl.BDM_PARENT_MODULE
-                + " already exist for the project " + PROCUREMENT_EXAMPLE_PROJECT_ID);
-    }
 
 }
