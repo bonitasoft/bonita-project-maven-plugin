@@ -90,11 +90,6 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
     Path createModule(String projectId, Model parent, Path moduleFolder, String templateFileName,
             String moduleNameSuffix) throws ModuleGenerationException {
 
-        if (moduleFolder.toFile().exists()) {
-            throw new ModuleGenerationException(String.format("The module %s already exist for the project %s",
-                    moduleFolder.getFileName(), projectId));
-        }
-
         Path modulePom = moduleFolder.resolve(POM_FILE_NAME);
         modulePom.toFile().getParentFile().mkdirs();
         try (var is = BdmModuleGeneratorImpl.class.getResourceAsStream(templateFileName);
