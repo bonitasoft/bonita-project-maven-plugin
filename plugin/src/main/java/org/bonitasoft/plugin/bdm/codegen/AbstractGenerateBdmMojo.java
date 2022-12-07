@@ -71,8 +71,8 @@ public abstract class AbstractGenerateBdmMojo extends AbstractMojo {
             getLog().info("Skipping Business Data Model sources generation (no descriptor found)...");
             return;
         }
-        
-        if (!buildContext.hasDelta(bdmModelFile)) {
+        var relpath = bdmModelFile.toPath().getFileName().toString();
+        if (!buildContext.hasDelta(relpath)) {
             getLog().info("Skipping Business Data Model sources generation (generated sources are up to date)...");
             return;
         }

@@ -4,8 +4,8 @@
 package org.bonitasoft.plugin.bdm.codegen;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.mockito.Mock.Strictness;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.sonatype.plexus.build.incremental.BuildContext;
@@ -35,12 +36,12 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 @ExtendWith(MockitoExtension.class)
 class GenerateBdmModelSourceMojoTest {
 
-    @Mock
+    @Mock(strictness = Strictness.LENIENT)
     BuildContext buildContext;
 
     @BeforeEach
     void configureBuildContext() throws Exception {
-        lenient().when(buildContext.hasDelta(Mockito.any(File.class))).thenReturn(true);
+        when(buildContext.hasDelta(Mockito.any(String.class))).thenReturn(true);
     }
 
     @Test
@@ -117,7 +118,7 @@ class GenerateBdmModelSourceMojoTest {
         mojo.bdmModelFile = new File(GenerateBdmModelSourceMojoTest.class.getResource("/bom.xml").getFile());
         mojo.outputFolder = outputFolder.toFile();
         mojo.project = new MavenProject();
-        when(buildContext.hasDelta(Mockito.any(File.class))).thenReturn(false);
+        when(buildContext.hasDelta(Mockito.any(String.class))).thenReturn(false);
 
         mojo.execute();
 
@@ -146,7 +147,7 @@ class GenerateBdmModelSourceMojoTest {
         mojo.outputFolder = outputFolder.toFile();
         mojo.project = new MavenProject();
 
-        org.junit.jupiter.api.Assertions.assertThrows(MojoFailureException.class,
+        assertThrows(MojoFailureException.class,
                 () -> mojo.execute(),
                 "Error while parsing the model descriptor");
     }

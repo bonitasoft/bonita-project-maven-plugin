@@ -31,7 +31,7 @@ class GenerateBdmDaoClientSourceMojoTest {
     
     @BeforeEach
     void configureBuildContext() throws Exception {
-        lenient().when(buildContext.hasDelta(Mockito.any(File.class))).thenReturn(true);
+        lenient().when(buildContext.hasDelta(Mockito.any(String.class))).thenReturn(true);
     }
     
     @Test
