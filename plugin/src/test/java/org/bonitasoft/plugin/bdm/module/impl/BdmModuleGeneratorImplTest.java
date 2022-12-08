@@ -2,6 +2,7 @@ package org.bonitasoft.plugin.bdm.module.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -48,8 +49,7 @@ class BdmModuleGeneratorImplTest {
         assertThat(bdmModuleModel.getParent().getArtifactId()).isEqualTo("procurement-example-parent");
         assertThat(bdmModuleModel.getParent().getVersion()).isEqualTo("2.1");
         assertThat(bdmModuleModel.getArtifactId()).isEqualTo("procurement-example-bdm-parent");
-      
-        
+
         Path modelModule = tmpDir.resolve("bdm").resolve("model");
         assertThat(modelModule).exists().isDirectoryContaining(
                 path -> path.getFileName().toString().equals(BdmModuleGeneratorImpl.POM_FILE_NAME));
@@ -58,7 +58,7 @@ class BdmModuleGeneratorImplTest {
         assertThat(bdmModelModuleModel.getParent().getArtifactId()).isEqualTo("procurement-example-bdm-parent");
         assertThat(bdmModelModuleModel.getParent().getVersion()).isEqualTo("2.1");
         assertThat(bdmModelModuleModel.getArtifactId()).isEqualTo("procurement-example-bdm-model");
-        
+
         var daoClientModule = tmpDir.resolve("bdm").resolve("dao-client");
         assertThat(daoClientModule).exists().isDirectoryContaining(
                 path -> path.getFileName().toString().equals(BdmModuleGeneratorImpl.POM_FILE_NAME));
@@ -67,8 +67,8 @@ class BdmModuleGeneratorImplTest {
         assertThat(bdmDaoClientModuleModel.getParent().getArtifactId()).isEqualTo("procurement-example-bdm-parent");
         assertThat(bdmDaoClientModuleModel.getParent().getVersion()).isEqualTo("2.1");
         assertThat(bdmDaoClientModuleModel.getArtifactId()).isEqualTo("procurement-example-bdm-dao-client");
-        assertThat(bdmDaoClientModuleModel.getDependencies()).extracting("groupId","artifactId", "version")
-            .contains(tuple("${project.groupId}","procurement-example-bdm-model", "${project.version}"));
+        assertThat(bdmDaoClientModuleModel.getDependencies()).extracting("groupId", "artifactId", "version")
+                .contains(tuple("${project.groupId}", "procurement-example-bdm-model", "${project.version}"));
     }
 
     @Test
@@ -85,17 +85,16 @@ class BdmModuleGeneratorImplTest {
 
         var generator = new BdmModuleGeneratorImpl(modelReader, mockedModelWriter);
 
-        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(ModuleGenerationException.class,
-                () -> generator.create(PROCUREMENT_EXAMPLE_PROJECT_ID, mavenProject));
-        assertThat(exception.getMessage())
-                .isEqualTo("Failed to add " + BdmModuleGeneratorImpl.BDM_PARENT_MODULE + " module to parent pom.");
+        assertThrows(ModuleGenerationException.class,
+                () -> generator.create(PROCUREMENT_EXAMPLE_PROJECT_ID, mavenProject),
+                "Failed to add " + BdmModuleGeneratorImpl.BDM_PARENT_MODULE + " module to parent pom.");
     }
 
     @Test
     void throwModuleGenerationExceptionWhenFailToAddBdmModule(@TempDir Path tmpDir) throws Exception {
         var parentPomTemp = tmpDir.resolve(BdmModuleGeneratorImpl.POM_FILE_NAME);
         var mockedModelWriter = mock(ModelWriter.class);
-        
+
         var parentPom = new File(BdmModuleGeneratorImplTest.class.getResource("/parentPom.xml").getFile());
         Files.copy(parentPom.toPath(), parentPomTemp);
         var mavenProject = new DefaultModelReader().read(parentPom, null);
@@ -105,13 +104,11 @@ class BdmModuleGeneratorImplTest {
 
         var generator = new BdmModuleGeneratorImpl(modelReader, mockedModelWriter);
 
-        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(ModuleGenerationException.class,
+        assertThrows(ModuleGenerationException.class,
                 () -> generator.createModule(PROCUREMENT_EXAMPLE_PROJECT_ID, mavenProject,
                         parentPomTemp.getParent().resolve("bdm").resolve("dao-client"),
-                        "/bdm.dao.module.xml", "-bdm-dao-client"));
-        assertThat(exception.getMessage())
-                .isEqualTo("Failed to write " + BdmModuleGeneratorImpl.DAO_CLIENT_MODULE_NAME + " module pom.");
+                        "/bdm.dao.module.xml", "-bdm-dao-client"),
+                "Failed to write " + BdmModuleGeneratorImpl.DAO_CLIENT_MODULE_NAME + " module pom.");
     }
-
 
 }

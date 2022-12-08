@@ -19,6 +19,9 @@ import org.xml.sax.SAXException;
 @Named
 public class DefaultBomFactoryImpl implements DefaultBomFactory {
 
+    private static final String RESERVED_COM_PREFIX = "com.bonitasoft";
+    private static final String RESERVED_ORG_PREFIX = "org.bonitasoft";
+    static final String DEFAULT_PACKAGE_PREFIX = "com.company";
     static final String DEFAULT_BO_NAME = "BusinessObject";
     static final String DEFAULT_FIELD_NAME = "attribute";
     static final String BOM_FILE_NAME = "bom.xml";
@@ -45,7 +48,8 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
     }
 
     private BusinessObject createFirstBusinessObject(String projectGroupId) {
-        String defaultName = String.format("%s.model.%s", projectGroupId,
+        var packagePrefix = toValidPackagePrefix(projectGroupId);
+        String defaultName = String.format("%s.model.%s", packagePrefix,
                 DEFAULT_BO_NAME);
         var bo = new BusinessObject(defaultName);
         SimpleField stringField = new SimpleField();
@@ -54,5 +58,17 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
         stringField.setLength(255);
         bo.addField(stringField);
         return bo;
+    }
+
+    private String toValidPackagePrefix(String projectGroupId) {
+        var packagePrefix = projectGroupId;
+        if(packagePrefix.startsWith(RESERVED_ORG_PREFIX) || packagePrefix.startsWith(RESERVED_COM_PREFIX) ) {
+            packagePrefix = DEFAULT_PACKAGE_PREFIX;
+        }
+        // Regexp validating package name format
+        if(!packagePrefix.matches("^[a-z]+(\\.[a-z0-9]+)*$")) {
+            packagePrefix = DEFAULT_PACKAGE_PREFIX;
+        }
+        return packagePrefix;
     }
 }
