@@ -78,7 +78,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     /**
      * Analysis report output file
      */
-    @Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.json")
+    @Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.json", property = "bonita.analyze.outputFile")
     protected File outputFile;
 
     /**
