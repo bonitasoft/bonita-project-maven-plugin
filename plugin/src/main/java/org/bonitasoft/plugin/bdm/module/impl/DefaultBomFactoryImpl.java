@@ -86,7 +86,7 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
             packagePrefix = DEFAULT_PACKAGE_PREFIX;
         }
         // Regexp validating package name format
-        if (!packagePrefix.matches("^[a-z]+(\\.[a-z0-9]+)*$")) {
+        if (!packagePrefix.matches("^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$")) {
             packagePrefix = DEFAULT_PACKAGE_PREFIX;
         }
         return packagePrefix;
