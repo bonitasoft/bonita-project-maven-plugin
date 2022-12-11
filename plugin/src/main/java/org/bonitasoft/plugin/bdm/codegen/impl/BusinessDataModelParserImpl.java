@@ -20,28 +20,55 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 
-import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.plugin.bdm.codegen.BusinessDataModelParser;
 import org.bonitasoft.plugin.bdm.codegen.ParseException;
 
+@Singleton
 @Named
 public class BusinessDataModelParserImpl implements BusinessDataModelParser {
-    
-    private BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+
+    private static Unmarshaller um;
+    static {
+        try {
+            var schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+                    .newSchema(BusinessObjectModel.class.getResource("/bom.xsd"));
+            final JAXBContext contextObj = JAXBContext.newInstance(BusinessObjectModel.class);
+            um = contextObj.createUnmarshaller();
+            um.setSchema(schema);
+        } catch (Exception e) {
+           throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public BusinessObjectModel parse(File modelFile) throws ParseException {
         var file = requireNonNull(modelFile, "modelFile cannot be null !");
         try {
-            return converter.unmarshall(Files.readAllBytes(file.toPath()));
+            return unmarshall(file.toPath());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (Exception e) {
             throw new ParseException(String.format("Failed to parse %s.", modelFile), e);
+        }
+    }
+
+    private static BusinessObjectModel unmarshall(Path bomFile) throws Exception {
+        try (var is = Files.newInputStream(bomFile)) {
+            final JAXBElement<BusinessObjectModel> jaxbElement = um.unmarshal(new StreamSource(is),
+                    BusinessObjectModel.class);
+            return jaxbElement.getValue();
         }
     }
 
