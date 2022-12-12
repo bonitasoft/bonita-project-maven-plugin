@@ -7,17 +7,15 @@ import java.nio.file.Path;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.validation.SchemaFactory;
 
+import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.plugin.bdm.module.DefaultBomFactory;
+import org.xml.sax.SAXException;
 
 @Singleton
 @Named
@@ -30,20 +28,7 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
     static final String DEFAULT_FIELD_NAME = "attribute";
     static final String BOM_FILE_NAME = "bom.xml";
 
-    private static Marshaller marshaller;
-    static {
-        try {
-            var schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-                    .newSchema(BusinessObjectModel.class.getResource("/bom.xsd"));
-            var contextObj = JAXBContext.newInstance(BusinessObjectModel.class);
-            marshaller = contextObj.createMarshaller();
-            marshaller.setSchema(schema);
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
 
     @Override
     public Path createDefaultBom(String projectGroupId, Path modulePath) throws IOException {
@@ -55,14 +40,11 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
 
         var newBDM = new BusinessObjectModel();
         newBDM.getBusinessObjects().add(createFirstBusinessObject(projectGroupId));
-        return marshall(newBDM, Files.createFile(modulePath.resolve(BOM_FILE_NAME)));
-    }
-
-    private static Path marshall(BusinessObjectModel newBDM, Path bomFile) throws IOException {
-        try (var os = Files.newOutputStream(bomFile)) {
-            marshaller.marshal(newBDM, os);
+        try {
+            var bomFile = Files.createFile(modulePath.resolve(BOM_FILE_NAME));
+            Files.write(bomFile, converter.marshall(newBDM));
             return bomFile;
-        } catch (JAXBException e) {
+        } catch (JAXBException | SAXException e) {
             throw new IOException(e);
         }
     }
@@ -82,11 +64,11 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
 
     private String toValidPackagePrefix(String projectGroupId) {
         var packagePrefix = projectGroupId;
-        if (packagePrefix.startsWith(RESERVED_ORG_PREFIX) || packagePrefix.startsWith(RESERVED_COM_PREFIX)) {
+        if(packagePrefix.startsWith(RESERVED_ORG_PREFIX) || packagePrefix.startsWith(RESERVED_COM_PREFIX) ) {
             packagePrefix = DEFAULT_PACKAGE_PREFIX;
         }
         // Regexp validating package name format
-        if (!packagePrefix.matches("^[a-z_]+(\\.[a-z_][a-z0-9_]*)*$")) {
+        if(!packagePrefix.matches("^[a-z]+(\\.[a-z0-9]+)*$")) {
             packagePrefix = DEFAULT_PACKAGE_PREFIX;
         }
         return packagePrefix;
