@@ -21,6 +21,8 @@ import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.plugin.bdm.module.ModuleGenerationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xml.sax.SAXException;
 
 class DefaultBomFactoryImplTest {
@@ -29,9 +31,12 @@ class DefaultBomFactoryImplTest {
     private static final String PROCUREMENT_EXAMPLE_GROUP_ID = "org.company.example";
     private ModelReader modelReader = new DefaultModelReader();
     private ModelWriter modelWriter = new DefaultModelWriter();
+    
+    @TempDir
+    private Path tmpDir;
 
     @Test
-    void createDefaultBom(@TempDir Path tmpDir) throws Exception {
+    void createDefaultBom() throws Exception {
         var returnedBom = createBom(tmpDir, PROCUREMENT_EXAMPLE_GROUP_ID);
 
         assertThat(returnedBom.getBusinessObjects().get(0).getQualifiedName())
@@ -39,35 +44,18 @@ class DefaultBomFactoryImplTest {
                         DefaultBomFactoryImpl.DEFAULT_BO_NAME));
     }
 
-    @Test
-    void useDefaultPackagePrefixWhenReservedOrgPrefixInGroupId(@TempDir Path tmpDir) throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = { "org.bonitasoft.example", "com.bonitasoft.example", "org.company-group-id" })
+    void useDefaultPackagePrefixForNonCompliantPackageNameGroupIds(String packageName) throws Exception {
         var returnedBom = createBom(tmpDir, "org.bonitasoft.example");
 
         assertThat(returnedBom.getBusinessObjects().get(0).getQualifiedName())
                 .isEqualTo(String.format("%s.model.%s", DefaultBomFactoryImpl.DEFAULT_PACKAGE_PREFIX,
                         DefaultBomFactoryImpl.DEFAULT_BO_NAME));
     }
-    
-    @Test
-    void useDefaultPackagePrefixWhenReservedComPrefixInGroupId(@TempDir Path tmpDir) throws Exception {
-        var returnedBom = createBom(tmpDir, "com.bonitasoft.example");
-
-        assertThat(returnedBom.getBusinessObjects().get(0).getQualifiedName())
-                .isEqualTo(String.format("%s.model.%s", DefaultBomFactoryImpl.DEFAULT_PACKAGE_PREFIX,
-                        DefaultBomFactoryImpl.DEFAULT_BO_NAME));
-    }
 
     @Test
-    void useDefaultPackagePrefixWhenRGroupIdHasNotAPackageFormat(@TempDir Path tmpDir) throws Exception {
-        var returnedBom = createBom(tmpDir, "company-group-id");
-        
-        assertThat(returnedBom.getBusinessObjects().get(0).getQualifiedName())
-                .isEqualTo(String.format("%s.model.%s", DefaultBomFactoryImpl.DEFAULT_PACKAGE_PREFIX,
-                        DefaultBomFactoryImpl.DEFAULT_BO_NAME));
-    }
-
-    @Test
-    void throwFileAlreadyExistsExceptionWhenBomAlreadyExist(@TempDir Path tmpDir) throws Exception {
+    void throwFileAlreadyExistsExceptionWhenBomAlreadyExist() throws Exception {
         var parentPomTemp = tmpDir.resolve(BdmModuleGeneratorImpl.POM_FILE_NAME);
         MavenProject mavenProject = new MavenProject();
         var parentPom = new File(DefaultBomFactoryImplTest.class.getResource("/parentPom.xml").getFile());

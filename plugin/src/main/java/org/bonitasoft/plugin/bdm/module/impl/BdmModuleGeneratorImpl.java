@@ -63,7 +63,7 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
             Path daoClientModule = createModule(projectId, parentModel,
                     parentModuleFolder.resolve(DAO_CLIENT_MODULE_NAME),
                     "/bdm.dao.module.xml", DAO_CLIENT_MODULE_NAME_SUFFIX);
-            updateBdmModelDependency(daoClientModule, parentProject.getGroupId(), projectId + MODEL_MODULE_NAME_SUFFIX);
+            updateBdmModelDependency(daoClientModule, projectId + MODEL_MODULE_NAME_SUFFIX);
             var parentProjectModel = modelReader.read(parentProject.getFile(), null);
             if (parentProjectModel.getModules().stream().noneMatch(BDM_PARENT_MODULE::equals)) {
                 parentProjectModel.getModules().add(BDM_PARENT_MODULE);
@@ -75,7 +75,7 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
         return parentModuleFolder;
     }
 
-    private void updateBdmModelDependency(Path daoClientModule, String groupId, String bdmModelArtifactId)
+    private void updateBdmModelDependency(Path daoClientModule, String bdmModelArtifactId)
             throws IOException {
         var pomFile = daoClientModule.resolve(POM_FILE_NAME).toFile();
         var model = modelReader.read(pomFile, null);
