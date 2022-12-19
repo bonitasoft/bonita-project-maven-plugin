@@ -16,7 +16,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11
-          server-id: github
           
       - name: Configure Git user
         run: |
