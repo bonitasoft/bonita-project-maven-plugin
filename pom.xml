@@ -86,6 +86,8 @@
 		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
 		<maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
 		<maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
+		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-install-plugin.version>3.1.0</maven-install-plugin.version>
 
 		<!-- Test -->
 		<junit-jupiter-engine.version>5.9.1</junit-jupiter-engine.version>
@@ -201,6 +203,16 @@
 						<tagNameFormat>@{project.version}</tagNameFormat>
 						<releaseProfiles>release</releaseProfiles>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>${maven-install-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
