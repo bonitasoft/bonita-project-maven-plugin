@@ -6,18 +6,41 @@
 	<packaging>pom</packaging>
 
 	<name>Bonita Project Maven Plugin Parent</name>
-	<description>Maven plug-in used by Bonita to manage project dependencies.</description>
-	<url>https://www.bonitasoft.com/</url>
+	<description>Maven plug-in used for Bonita Project.</description>
+	<url>https://bonitasoft.github.io/</url>
+	<inceptionYear>2021</inceptionYear>
 
 	<developers>
 		<developer>
-			<id>bonitasoft</id>
-			<name>Bonitasoft</name>
-			<email>rd.user@bonitasoft.com</email>
+			<id>rbioteau</id>
+			<name>Romain Bioteau</name>
+			<email>romain.bioteau@bonitasoft.com</email>
+			<timezone>Europe/Paris</timezone>
+			<organization>Bonitasoft</organization>
+			<organizationUrl>https://www.bonitasoft.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>julienmege</id>
+			<name>Julien Mege</name>
+			<email>julien.mege@bonitasoft.com</email>
+			<timezone>Europe/Paris</timezone>
+			<organization>Bonitasoft</organization>
+			<organizationUrl>https://www.bonitasoft.com</organizationUrl>
+		</developer>
+		<developer>
+			<id>uguy</id>
+			<name>Hugues Bretin</name>
+			<email>hgues.bretin@bonitasoft.com</email>
+			<timezone>Europe/Paris</timezone>
 			<organization>Bonitasoft</organization>
 			<organizationUrl>https://www.bonitasoft.com</organizationUrl>
 		</developer>
 	</developers>
+	
+	<organization>
+		<name>Bonitasoft</name>
+		<url>https://www.bonitasoft.com</url>
+	</organization>
 
 	<licenses>
 		<license>
@@ -25,6 +48,16 @@
 			<url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
 		</license>
 	</licenses>
+	
+	<issueManagement>
+		<system>jira</system>
+		<url>https://bonita.atlassian.net/jira/software/c/projects/BBPMC/issues</url>
+	</issueManagement>
+	
+	<ciManagement>
+		<system>github</system>
+		<url>https://github.com/bonitasoft/bonita-project-maven-plugin/actions</url>
+	</ciManagement>
 
 	<properties>
 		<project.scm.id>github</project.scm.id>

@@ -1,0 +1,42 @@
+~~ Copyright (C) 2022 BonitaSoft S.A.
+~~ BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+~~ This program is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU General Public License as published by
+~~ the Free Software Foundation, either version 2.0 of the License, or
+~~ (at your option) any later version.
+~~ This program is distributed in the hope that it will be useful,
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+~~ GNU General Public License for more details.
+~~ You should have received a copy of the GNU General Public License
+~~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+  ------
+  Introduction
+  ------
+  Romain Bioteau
+  ------
+  2022-12-19
+  ------
+
+${project.name}
+
+  The Bonita Project plugin provides the capability to handle Bonita specific actions. It
+  can build BDM artifacts and analyze the project dependencies to find Bonita specific extensions.
+
+* Goals Overview
+
+  The Bonita Project plugin has several goals:
+
+  *{{{./analyze-mojo.html}bonita-project:analyze}} analyzes the dependencies of this project and determines which are Bonita specific
+  among connectors, actor fitlers, rest api extensions, themes or custom pages.
+
+  *{{{./create-bdm-module-mojo.html}bonita-project:create-bdm-module}} adds a child 'bdm' maven module to a Bonita Project.
+
+  *{{{./generate-bdm-dao-client.html}bonita-project:generate-bdm-dao-client}} generates dao-client java sources for a given BDM descriptor.
+
+  *{{{./generate-bdm-model.html}bonita-project:generate-bdm-model}} generates model java sources for a given BDM descriptor.
+
+  *{{{./help-mojo.html}bonita-project:help}} Display help information on bonita-project-maven-plugin.
+
+  *{{{./install-mojo.html}bonita-project:install}} install project local dependencies in the local repository.
