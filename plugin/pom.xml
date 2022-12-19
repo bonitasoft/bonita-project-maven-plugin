@@ -272,4 +272,7 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	<scm>
+		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
+	</scm>
 </project>
