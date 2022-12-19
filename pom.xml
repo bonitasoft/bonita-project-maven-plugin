@@ -240,6 +240,7 @@
 			  <configuration>
 			  	<serverId>github</serverId>
 			    <scmBranch>gh-pages</scmBranch>
+			    <content>${project.build.directory}/staging/bonita-project-maven-plugin</content>	
 			  </configuration>
 			</plugin>
 		</plugins>
