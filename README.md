@@ -1,4 +1,4 @@
-![Build](https://github.com/bonitasoft/bonita-project-maven-plugin/workflows/workflow-build/badge.svg)
+[![Build](https://github.com/bonitasoft/bonita-project-maven-plugin/workflows/workflow-build/badge.svg)](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/workflow-build.yml)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=bonitasoft_bonita-project-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=bonitasoft_bonita-project-maven-plugin)
 [![GitHub release](https://img.shields.io/github/v/release/bonitasoft/bonita-project-maven-plugin?color=blue&label=Release)](https://github.com/bonitasoft/bonita-project-maven-plugin/releases)
 [![Maven Central](https://img.shields.io/maven-central/v/org.bonitasoft.maven/bonita-project-maven-plugin.svg?label=Maven%20Central&color=orange)](https://search.maven.org/search?q=g:%22org.bonitasoft%22%20AND%20a:%22bonita-project-maven-plugin%22)
