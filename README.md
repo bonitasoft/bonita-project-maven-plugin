@@ -9,28 +9,17 @@
 A Maven plug-in used by Bonita projects to: 
 * Install custom dependencies from the project store (where external projects dependencies are stored) to the local Maven repository.
 * Analyze Bonita dependencies and their content (Connector, Actor filters, Rest API Extensions...).
+* Generate Business Object Model artifacts from the BDM descriptor file
 
-## Usage
+## Plugin Documentation Site
 
-### Install
+https://bonitasoft.github.io/bonita-project-maven-plugin/
 
-It is possible to directly invoke the plug-in like this:  
-```sh
-~/my-bonita-project> mvn bonita-project:install
-```
+## Release
 
-### Analyze
-
-It is possible to directly invoke the plug-in like this:  
-```sh
-~/my-bonita-project> mvn bonita-project:analyze
-```
-The analysis report is written in the `target` folder
-
-
-## Philosophy
-
-The Bonita project store is a local folder where projects dependencies are stored. It follows the Maven repository folders layout to be able to match a dependency declared in the `pom.xml` of the project. The plugin execution tries to resolve declared dependencies in the `pom.xml` of the project and if it fails (the dependency cannot be resolved against any provided Maven repositories), it searches in the Project Store for a matching artifact and installs it in the local Maven repository.
+* Run the [Release action](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/release.yml)
+* Publish the staging repository from [oss.sonatype.org portal](https://oss.sonatype.org/#stagingRepositories)
+* Deploy the latest site version using the [Publish Maven Site action](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish-site.yml)
 
 ## Contributing
 
