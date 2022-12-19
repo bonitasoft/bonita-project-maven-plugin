@@ -7,6 +7,11 @@ on:
         description: 'The version of the release. Used as tag name.'
         required: true
         default: 'x.y.z'
+      dryRun:
+        description: 'Run a dry-run release'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
@@ -34,7 +39,7 @@ jobs:
           git config user.name "GitHub Actions"
       
       - name: Build Release 
-        run: ./mvnw --batch-mode release:prepare -DreleaseVersion=${{ github.event.inputs.version }}
+        run: ./mvnw --batch-mode release:prepare -DreleaseVersion=${{ github.event.inputs.version }} -DdryRun=${{ github.event.inputs.dryRun }}
 
             
       - name: Publish
@@ -42,4 +47,4 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.ossrh_username }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.ossrh_password }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.gpg_passphrase }}
-        run: mvn --batch-mode release:perform
+        run: mvn --batch-mode release:perform -DdryRun=${{ github.event.inputs.dryRun }}
