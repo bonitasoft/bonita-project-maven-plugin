@@ -24,7 +24,10 @@ jobs:
           git config --global user.name "GitHub Actions"  
       
       - name: Publish Site 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./mvnw -pl plugin -am --batch-mode clean compile site site:stage scm-publish:publish-scm
+        
 
             
 
