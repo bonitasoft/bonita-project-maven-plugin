@@ -21,7 +21,7 @@ jobs:
           server-password: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Publish Site 
-        run: ./mvnw -f plugin --batch-mode site-deploy
+        run: ./mvnw -pl plugin -am --batch-mode site-deploy
 
             
 
