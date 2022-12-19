@@ -19,7 +19,7 @@ jobs:
           server-id: github
       
       - name: Publish Site 
-        run: ./mvnw -pl plugin -am --batch-mode site-deploy
+        run: ./mvnw -pl plugin -am --batch-mode clean site site:stage scm-publish:publish-scm
 
             
 
