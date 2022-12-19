@@ -70,20 +70,22 @@
 		<jackson.version>2.14.1</jackson.version>
 
 		<!-- Maven plugins -->
-		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+		<surefire.version>3.0.0-M7</surefire.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
 		<maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
-		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-release-plugin.version>3.0.0-M7</maven-release-plugin.version>
 		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
 		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
 		<maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
 		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
 		<maven-project-info-reports-plugin.version>3.4.1</maven-project-info-reports-plugin.version>
 		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
+		<maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+		<maven-resource-plugin.version>3.3.0</maven-resource-plugin.version>
 
 		<!-- Test -->
 		<junit-jupiter-engine.version>5.9.1</junit-jupiter-engine.version>
@@ -147,20 +149,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>${maven-surefire-plugin.version}</version>
-					<configuration>
-						<enableAssertions>true</enableAssertions>
-						<forkCount>1</forkCount>
-						<reuseForks>true</reuseForks>
-						<includes>
-							<include>**/*IT.java</include>
-							<include>**/*Test.java</include>
-						</includes>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco-maven-plugin.version}</version>
@@ -188,6 +176,16 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>${maven-clean-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resource-plugin</artifactId>
+					<version>${maven-resource-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${maven-deploy-plugin.version}</version>
 				</plugin>
@@ -208,6 +206,16 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
 					<version>${maven-source-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${surefire.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>${surefire.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
