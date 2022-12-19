@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.bonitasoft.maven</groupId>
 		<artifactId>bonita-project-maven-plugin-parent</artifactId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.1.0</version>
 	</parent>
 	<artifactId>bonita-project-maven-plugin</artifactId>
 	<name>Bonita Project Maven Plugin</name>
@@ -274,5 +274,6 @@
 	</reporting>
 	<scm>
 		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
-	</scm>
+	  <tag>0.1.0</tag>
+  </scm>
 </project>
