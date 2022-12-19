@@ -8,7 +8,6 @@
 	<artifactId>bonita-project-maven-plugin</artifactId>
 	<name>Bonita Project Maven Plugin</name>
 	<packaging>maven-plugin</packaging>
-
 	<properties>
 		<!-- Dependencies -->
 		<maven-plugin-api.version>3.8.6</maven-plugin-api.version>
@@ -18,7 +17,6 @@
 		<maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
 		<maven-plugin-plugin.version>3.7.0</maven-plugin-plugin.version>
 		<cfr.version>0.152</cfr.version>
-		<artifact-lookup-maven-plugin.version>0.6.0</artifact-lookup-maven-plugin.version>
 		<maven-dependency-tree.version>3.2.1</maven-dependency-tree.version>
 		<maven-core.version>3.8.6</maven-core.version>
 		<maven-artifact.version>3.8.6</maven-artifact.version>
@@ -30,15 +28,12 @@
 		<maven-aether-provider.version>3.3.9</maven-aether-provider.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
-
 		<!-- Test -->
 		<groovy.version>3.0.13</groovy.version>
 	</properties>
-
 	<prerequisites>
 		<maven>3.6</maven>
 	</prerequisites>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -97,15 +92,12 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<dependencies>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>bonita-project-report-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -139,16 +131,10 @@
 			<version>${cfr.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.codspire.plugins</groupId>
-			<artifactId>artifact-lookup-maven-plugin</artifactId>
-			<version>${artifact-lookup-maven-plugin.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.sonatype.plexus</groupId>
 			<artifactId>plexus-build-api</artifactId>
 			<version>${plexus-build-api.version}</version>
 		</dependency>
-
 		<!-- Contains bdm code generator  -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data</groupId>
@@ -173,7 +159,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<!-- Test -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -206,7 +191,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -282,9 +266,24 @@
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.12</version>
+				<configuration>
+					<message>Creating site for ${project.version}</message>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>site</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
 	<reporting>
 		<plugins>
 			<plugin>
@@ -294,5 +293,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
 </project>

@@ -9,7 +9,6 @@
 A Maven plug-in used by Bonita projects to: 
 * Install custom dependencies from the project store (where external projects dependencies are stored) to the local Maven repository.
 * Analyze Bonita dependencies and their content (Connector, Actor filters, Rest API Extensions...).
-* Lookup jar dependencies (find the maven artifacts for existing dependencies found in the `lib` folder).
 
 ## Usage
 
@@ -17,21 +16,16 @@ A Maven plug-in used by Bonita projects to:
 
 It is possible to directly invoke the plug-in like this:  
 ```sh
-~/my-bonita-project> mvn org.bonitasoft.maven:bonita-project-maven-plugin:install
-```
-
-Or use the `validate` goal:
-```sh
-~/my-bonita-project> mvn validate
+~/my-bonita-project> mvn bonita-project:install
 ```
 
 ### Analyze
 
 It is possible to directly invoke the plug-in like this:  
 ```sh
-~/my-bonita-project> mvn org.bonitasoft.maven:bonita-project-maven-plugin:analyze
+~/my-bonita-project> mvn bonita-project:analyze
 ```
-The  analysis report is written in the `target` folder
+The analysis report is written in the `target` folder
 
 
 ## Philosophy

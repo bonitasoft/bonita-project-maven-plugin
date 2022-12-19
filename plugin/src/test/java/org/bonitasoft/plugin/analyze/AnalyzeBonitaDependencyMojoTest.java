@@ -26,7 +26,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.junit.jupiter.api.BeforeEach;
