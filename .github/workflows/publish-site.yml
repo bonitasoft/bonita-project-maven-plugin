@@ -16,8 +16,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11
-          server-id: github 
-          server-password: ${{ secrets.GITHUB_TOKEN }}
+          server-id: github
       
       - name: Publish Site 
         run: ./mvnw -pl plugin -am --batch-mode site-deploy
