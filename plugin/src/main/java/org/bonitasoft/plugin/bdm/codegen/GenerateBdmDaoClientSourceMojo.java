@@ -24,7 +24,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
- * This goal generates the BDM dao client java source code from the given Business Object Model descriptor file.
+ * This mojo generates the BDM dao client java source code from the given Business Object Model descriptor file.
  *
  */
 @Mojo(name = "generate-bdm-dao-client", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)

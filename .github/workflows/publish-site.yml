@@ -1,0 +1,27 @@
+name: Publish Maven Site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Publish maven site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          cache: 'maven'
+          server-id: github 
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish Site 
+        run: ./mvnw -f plugin --batch-mode site-deploy
+
+            
+

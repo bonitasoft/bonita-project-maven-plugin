@@ -32,7 +32,7 @@ import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
- * This goal create a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
+ * This mojo create a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
  *
  */
 @Mojo(name = "create-bdm-module", defaultPhase = LifecyclePhase.NONE)

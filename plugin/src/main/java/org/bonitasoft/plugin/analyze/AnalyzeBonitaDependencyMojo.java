@@ -50,6 +50,10 @@ import org.bonitasoft.plugin.analyze.report.LogDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * This mojo runs an analysis on the current project dependencies to detect Bonita specific extensions.
+ *
+ */
 @Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
@@ -76,13 +80,13 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     protected List<ArtifactRepository> remoteRepositories;
 
     /**
-     * Analysis report output file
+     * Analysis report output file.
      */
     @Parameter(defaultValue = "${project.build.directory}/bonita-dependencies.json", property = "bonita.analyze.outputFile")
     protected File outputFile;
 
     /**
-     * Look for incompatible dependencies
+     * Look for incompatible dependencies.
      */
     @Parameter(defaultValue = "true", property = "bonita.validateDependencies")
     protected boolean validateDeps;

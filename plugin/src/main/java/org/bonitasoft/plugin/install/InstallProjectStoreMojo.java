@@ -64,6 +64,11 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 
+/**
+ * This mojo looks for unknown dependencies in the current project 
+ * and look for them in a project local dependency store (.store folder by default).
+ * Install missing dependencies found in the local store in the local repository.
+ */
 @Mojo(name = "install", defaultPhase = LifecyclePhase.NONE)
 public class InstallProjectStoreMojo extends AbstractMojo {
 
