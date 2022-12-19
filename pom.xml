@@ -85,7 +85,7 @@
 		<maven-project-info-reports-plugin.version>3.4.1</maven-project-info-reports-plugin.version>
 		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
 		<maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
-		<maven-resource-plugin.version>3.3.0</maven-resource-plugin.version>
+		<maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
 
 		<!-- Test -->
 		<junit-jupiter-engine.version>5.9.1</junit-jupiter-engine.version>
@@ -181,8 +181,8 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resource-plugin</artifactId>
-					<version>${maven-resource-plugin.version}</version>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
