@@ -29,7 +29,7 @@
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
 		<!-- Test -->
-		<groovy.version>3.0.13</groovy.version>
+		<groovy.version>3.0.14</groovy.version>
 	</properties>
 	<prerequisites>
 		<maven>3.6</maven>
