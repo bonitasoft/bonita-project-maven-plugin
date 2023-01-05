@@ -24,7 +24,7 @@
 		<maven-model-builder.version>3.8.6</maven-model-builder.version>
 		<maven-settings.version>3.8.6</maven-settings.version>
 		<maven-settings-builder.version>3.8.7</maven-settings-builder.version>
-		<maven-repository-metadata.version>3.8.6</maven-repository-metadata.version>
+		<maven-repository-metadata.version>3.8.7</maven-repository-metadata.version>
 		<maven-aether-provider.version>3.3.9</maven-aether-provider.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
