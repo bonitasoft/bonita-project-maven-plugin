@@ -33,9 +33,9 @@ ${project.name}
 
   *{{{./create-bdm-module-mojo.html}bonita-project:create-bdm-module}} adds a child 'bdm' maven module to a Bonita Project.
 
-  *{{{./generate-bdm-dao-client.html}bonita-project:generate-bdm-dao-client}} generates dao-client java sources for a given BDM descriptor.
+  *{{{./generate-bdm-dao-client-mojo.html}bonita-project:generate-bdm-dao-client}} generates dao-client java sources for a given BDM descriptor.
 
-  *{{{./generate-bdm-model.html}bonita-project:generate-bdm-model}} generates model java sources for a given BDM descriptor.
+  *{{{./generate-bdm-model-mojo.html}bonita-project:generate-bdm-model}} generates model java sources for a given BDM descriptor.
 
   *{{{./help-mojo.html}bonita-project:help}} Display help information on bonita-project-maven-plugin.
 
