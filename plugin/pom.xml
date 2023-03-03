@@ -21,7 +21,7 @@
 		<maven-core.version>3.8.7</maven-core.version>
 		<maven-artifact.version>3.9.0</maven-artifact.version>
 		<maven-model.version>3.8.6</maven-model.version>
-		<maven-model-builder.version>3.8.6</maven-model-builder.version>
+		<maven-model-builder.version>3.9.0</maven-model-builder.version>
 		<maven-settings.version>3.9.0</maven-settings.version>
 		<maven-settings-builder.version>3.8.7</maven-settings-builder.version>
 		<maven-repository-metadata.version>3.8.7</maven-repository-metadata.version>
