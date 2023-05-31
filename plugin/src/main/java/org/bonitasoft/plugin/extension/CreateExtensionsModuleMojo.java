@@ -12,12 +12,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.bdm.module;
+package org.bonitasoft.plugin.extension;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -29,17 +25,17 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.bonitasoft.plugin.bdm.module.impl.BdmModuleGeneratorImpl;
+import org.bonitasoft.plugin.extension.impl.ExtensionsModuleGeneratorImpl;
 import org.bonitasoft.plugin.module.ModuleGenerationException;
 import org.bonitasoft.plugin.module.ModuleGenerator;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
- * This mojo create a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
+ * This mojo create an extensions module in the current project.
  *
  */
-@Mojo(name = "create-bdm-module", defaultPhase = LifecyclePhase.NONE)
-public class CreateBdmModuleMojo extends AbstractMojo {
+@Mojo(name = "create-extensions-module", defaultPhase = LifecyclePhase.NONE)
+public class CreateExtensionsModuleMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
@@ -53,14 +49,11 @@ public class CreateBdmModuleMojo extends AbstractMojo {
 
     private BuildContext buildContext;
     private ModuleGenerator moduleGenerator;
-    private DefaultBomFactory defaultBomFactory;
 
     @Inject
-    public CreateBdmModuleMojo(BdmModuleGeneratorImpl moduleGenerator, DefaultBomFactory defaultBomProvider,
-            BuildContext buildContext) {
+    public CreateExtensionsModuleMojo(ExtensionsModuleGeneratorImpl moduleGenerator, BuildContext buildContext) {
         this.moduleGenerator = moduleGenerator;
         this.buildContext = buildContext;
-        this.defaultBomFactory = defaultBomProvider;
     }
 
     @Override
@@ -69,22 +62,13 @@ public class CreateBdmModuleMojo extends AbstractMojo {
                 || !Objects.equals(project.getArtifactId(), bonitaProjectId+"-parent")) {
           return;
         }
-        var instant = Instant.now();
-        getLog().info("Creating Business Data Model maven modules...");
+        getLog().info("Creating extensions maven module...");
         try {
-            var modulePath = moduleGenerator.create(bonitaProjectId, project);
-            if(!Files.exists(modulePath.resolve("bom.xml"))){
-                defaultBomFactory.createDefaultBom(project.getGroupId(), modulePath);
-            }
-            buildContext.refresh(modulePath.toFile());
-        } catch (ModuleGenerationException e) {
-            throw new MojoFailureException("Error while generating the Business Data Model maven modules", e);
-        } catch (IOException ioe) {
-            throw new MojoFailureException("Error while generating the default Business Data Model file descriptor", ioe);
+            moduleGenerator.create(bonitaProjectId, project);
+            buildContext.refresh(project.getFile());
+        } catch (ModuleGenerationException ioe) {
+            throw new MojoFailureException("Error while creating the extensions module.", ioe);
         }
-
-        getLog().info(String.format("Business Data Model Maven modules generation completed in %s.",
-                Duration.between(Instant.now(), instant)));
     }
 
 }

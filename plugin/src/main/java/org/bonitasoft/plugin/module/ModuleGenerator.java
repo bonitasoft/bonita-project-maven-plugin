@@ -12,17 +12,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.bdm.module;
+package org.bonitasoft.plugin.module;
 
+import java.nio.file.Path;
 
-public class ModuleGenerationException extends Exception {
+import org.apache.maven.project.MavenProject;
 
-    public ModuleGenerationException(String message) {
-        super(message);
-    }
+public interface ModuleGenerator {
+    
+    String POM_FILE_NAME = "pom.xml";
 
-    public ModuleGenerationException(String message, Throwable cause) {
-       super(message, cause);
-    }
-
+    Path create(String projectId, MavenProject parentProject) throws ModuleGenerationException;
+    
 }

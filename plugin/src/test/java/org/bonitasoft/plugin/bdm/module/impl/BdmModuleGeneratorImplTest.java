@@ -18,7 +18,7 @@ import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
-import org.bonitasoft.plugin.bdm.module.ModuleGenerationException;
+import org.bonitasoft.plugin.module.ModuleGenerationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentMatchers;

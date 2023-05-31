@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 BonitaSoft S.A.
+ * Copyright (C) 2023 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.bdm.module;
+package org.bonitasoft.plugin.extension;
 
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import java.nio.file.Paths;
 
 import org.apache.maven.project.MavenProject;
-import org.bonitasoft.plugin.bdm.module.impl.BdmModuleGeneratorImpl;
+import org.bonitasoft.plugin.extension.impl.ExtensionsModuleGeneratorImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,14 +31,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 @ExtendWith(MockitoExtension.class)
-class CreateBdmModuleMojoTest {
+class CreateExtensionsModuleMojoTest {
 
     @Mock
     private BuildContext context;
     @Mock
-    private BdmModuleGeneratorImpl generator;
-    @Mock
-    private DefaultBomFactory bomFactory;
+    private ExtensionsModuleGeneratorImpl generator;
     
     @BeforeEach
     void setup() throws Exception {
@@ -47,7 +45,7 @@ class CreateBdmModuleMojoTest {
 
     @Test
     void throwErrorWhenProjectDoesNotHavePomPackaging() throws Exception {
-        var mojo = new CreateBdmModuleMojo(generator, bomFactory, context);
+        var mojo = new CreateExtensionsModuleMojo(generator, context);
         mojo.bonitaProjectId = "my-project";
         var project = new MavenProject();
         project.setArtifactId("my-project-parent");
@@ -61,7 +59,7 @@ class CreateBdmModuleMojoTest {
     
     @Test
     void throwErrorWhenProjectDoesNotHaveSameProjectId() throws Exception {
-        var mojo = new CreateBdmModuleMojo(generator, bomFactory, context);
+        var mojo = new CreateExtensionsModuleMojo(generator, context);
         mojo.bonitaProjectId = "my-project";
         var project = new MavenProject();
         project.setArtifactId("another-project-parent");
@@ -72,5 +70,5 @@ class CreateBdmModuleMojoTest {
         
         verify(generator, never()).create("my-project", project);
     }
-        
+    
 }
