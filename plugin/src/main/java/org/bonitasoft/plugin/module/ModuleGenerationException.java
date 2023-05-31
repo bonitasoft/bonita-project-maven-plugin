@@ -12,14 +12,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.bdm.module;
+package org.bonitasoft.plugin.module;
 
-import org.apache.maven.project.MavenProject;
 
-import java.nio.file.Path;
+public class ModuleGenerationException extends Exception {
 
-public interface BdmModuleGenerator {
-    
-    Path create(String projectId, MavenProject parentProject) throws ModuleGenerationException;
-    
+    private static final long serialVersionUID = 1L;
+
+    public ModuleGenerationException(String message) {
+        super(message);
+    }
+
+    public ModuleGenerationException(String message, Throwable cause) {
+       super(message, cause);
+    }
+
 }

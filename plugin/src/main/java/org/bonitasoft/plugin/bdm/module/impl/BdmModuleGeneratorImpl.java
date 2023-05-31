@@ -15,21 +15,19 @@
 package org.bonitasoft.plugin.bdm.module.impl;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
-import org.bonitasoft.plugin.bdm.module.BdmModuleGenerator;
-import org.bonitasoft.plugin.bdm.module.ModuleGenerationException;
+import org.bonitasoft.plugin.module.AbstractModuleGenerator;
+import org.bonitasoft.plugin.module.ModuleGenerationException;
 
 @Named
-public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
+public class BdmModuleGeneratorImpl extends AbstractModuleGenerator {
 
     static final String BDM_PARENT_MODULE = "bdm";
     static final String BDM_PARENT_MODULE_SUFFIX = "-bdm-parent";
@@ -40,13 +38,9 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
     static final String POM_FILE_NAME = "pom.xml";
     static final String BDM_MODEL_ARTIFACT_ID_PLACEHOLDER = "_BDM_MODEL_ARTIFACT_ID_PLACEHOLDER_";
 
-    private ModelReader modelReader;
-    private ModelWriter modelWriter;
-
     @Inject
     public BdmModuleGeneratorImpl(ModelReader modelReader, ModelWriter modelWriter) {
-        this.modelReader = modelReader;
-        this.modelWriter = modelWriter;
+       super(modelReader, modelWriter);
     }
 
     @Override
@@ -85,27 +79,6 @@ public class BdmModuleGeneratorImpl implements BdmModuleGenerator {
                 .orElseThrow();
         dep.setArtifactId(bdmModelArtifactId);
         modelWriter.write(pomFile, null, model);
-    }
-
-    Path createModule(String projectId, Model parent, Path moduleFolder, String templateFileName,
-            String moduleNameSuffix) throws ModuleGenerationException {
-
-        Path modulePom = moduleFolder.resolve(POM_FILE_NAME);
-        modulePom.toFile().getParentFile().mkdirs();
-        try (var is = BdmModuleGeneratorImpl.class.getResourceAsStream(templateFileName);
-                var os = Files.newOutputStream(modulePom)) {
-            var modelTemplate = modelReader.read(is, null);
-            modelTemplate.setArtifactId(projectId + moduleNameSuffix);
-            var parentModel = modelTemplate.getParent();
-            parentModel.setGroupId(parent.getGroupId());
-            parentModel.setArtifactId(parent.getArtifactId());
-            parentModel.setVersion(parent.getVersion());
-            modelWriter.write(os, null, modelTemplate);
-        } catch (IOException e) {
-            throw new ModuleGenerationException(
-                    String.format("Failed to write %s module pom.", moduleFolder.getFileName()), e);
-        }
-        return moduleFolder;
     }
 
 }
