@@ -1,0 +1,47 @@
+{
+  "id" : "customBPMNVisu",
+  "name" : "BPMNVisu",
+  "type" : "widget",
+  "custom" : true,
+  "modelVersion" : "2.4",
+  "previousArtifactVersion" : "2.2",
+  "lastUpdate" : 1685528814783,
+  "description" : "",
+  "template" : "@customBPMNVisu.tpl.html",
+  "controller" : "@customBPMNVisu.ctrl.js",
+  "properties" : [
+    {
+      "label" : "Case IDs",
+      "name" : "caseIds",
+      "help" : "(Optional) Case ids to display, correspond to the different process in the diagram",
+      "type" : "collection",
+      "bond" : "expression"
+    },
+    {
+      "label" : "Process ID",
+      "name" : "processId",
+      "help" : "(Mandatory) Process to render",
+      "type" : "text",
+      "bond" : "expression"
+    }
+  ],
+  "assets" : [
+    {
+      "id" : "47b7fc5d-85a0-4b63-87fe-4c6d98bacbc3",
+      "name" : "bpmn.css",
+      "type" : "css",
+      "order" : 2,
+      "external" : false
+    },
+    {
+      "id" : "405cc8b6-89b5-41af-b456-7fe7c6d41050",
+      "name" : "bpmn-visualization.js",
+      "type" : "js",
+      "order" : 1,
+      "external" : false
+    }
+  ],
+  "requiredModules" : [ ],
+  "webResources" : [ ],
+  "hasHelp" : false
+}

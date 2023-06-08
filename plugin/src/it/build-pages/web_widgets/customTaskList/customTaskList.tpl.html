@@ -1,0 +1,51 @@
+<span ng-if="environment"><identicon name="{{environment.component.id}}" size="30" background-color="[255,255,255, 0]" foreground-color="[51,51,51]"></identicon> {{environment.component.name}}</span>
+<div class="card-container fade-in fade-out">
+    <div class="text-center mt-5" ng-if="ctrl.noPendingTasks()">
+        <h3><span class="fa fa-info-circle"></span> You have no pending tasks {{properties.filter !== "All" ? "for current filtered version" : undefined }}</h3>
+    </div>
+    <div class="card primary-border" ng-repeat="item in items track by item.id">
+        <h5>
+            <span ng-if="item.version " class="label label-danger"> <span class="fa fa-tag"></span> &nbsp;{{item.version}}</span>
+            <span ng-if="item.versionStage" class="label label-info"><em>{{item.versionStage}}</em></span>
+            <span ng-if="item.releaseType" class="label label-info"><em>{{item.releaseType}}</em></span>
+            <span ng-if="item.process" class="label label-default"><em>{{item.process}}</em></span>
+        
+            <a ng-if="item.mdFileLocation" target="_blank" class="pull-right" ng-href="{{ item.mdFileLocation }}" title="Edit me in Github"><i class="black fa fa-github"></i></a>
+       </h5>
+
+       <strong>{{item.displayName}}</strong>
+       <p ng-if="item.displayDescription " class="text-muted"  ng-bind-html="item.displayDescription"></p>
+       <p ng-if="item.content" ng-bind-html="ctrl.mdToHtml(item.content)"></p>
+       <p ng-if="item.executionDate"><i class="fa fa-hourglass-half"></i> Triggered {{timeTo(item.executionDate)}}</p>
+  
+       <div ng-if="item.hasForm"  class="text-right">
+           <a class="btn btn-sm btn-primary" ng-href="{{ctrl.getTaskFormHref(item.id)}}" target="_self">
+           <span class="fa fa-lg fa-external-link pt-xs"></span>
+         </a>
+        </div>
+        <div ng-if="!item.hasForm" class="text-right">
+             <button
+                id="submit"
+                class="btn btn-sm btn-primary no-animate"
+                ng-click="ctrl.submitTask(item)"
+                type="button"
+                ng-if="!item.done && !item.busy && !item.executionDate">
+                <i class="fa fa-check pt-xs"></i>
+             </button>
+             <button
+                id="trigger-event"
+                class="btn btn-sm btn-danger no-animate"
+                ng-click="ctrl.triggerEvent(item)"
+                type="button"
+                ng-if="!item.done && !item.busy && item.executionDate">
+                <i class="fa fa-lg fa-exclamation-circle" aria-hidden="true"></i> Trigger now
+             </button>
+             <div class="no-animate" ng-if="item.busy && !item.done">
+                 <svg class="loading" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45"/>
+                </svg>
+            </div>
+            <i ng-if="!item.busy && item.done" class="fa fa-check-circle-o text-success task-success" aria-hidden="true"></i>
+        </div>
+    </div>
+</div>

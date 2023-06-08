@@ -1,0 +1,450 @@
+{
+  "id" : "TaskFragment",
+  "name" : "TaskFragment",
+  "type" : "fragment",
+  "modelVersion" : "2.4",
+  "previousArtifactVersion" : "2.2",
+  "lastUpdate" : 1685528815273,
+  "rows" : [
+    [
+      {
+        "type" : "component",
+        "dimension" : {
+          "xs" : 12,
+          "sm" : 12,
+          "md" : 12,
+          "lg" : 12
+        },
+        "propertyValues" : {
+          "cssClasses" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "hidden" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "labelHidden" : {
+            "type" : "constant",
+            "value" : true
+          },
+          "label" : {
+            "type" : "interpolation",
+            "value" : "Default label"
+          },
+          "labelPosition" : {
+            "type" : "constant",
+            "value" : "top"
+          },
+          "labelWidth" : {
+            "type" : "constant",
+            "value" : 4
+          },
+          "allowHTML" : {
+            "type" : "constant",
+            "value" : true
+          },
+          "text" : {
+            "type" : "interpolation",
+            "value" : "<h5>\n{{ taskHeaders[0] ?  '<span class=\"label label-danger\"> <span class=\"fa fa-tag\"></span> &nbsp;'+  taskHeaders[0]  +'</span>' : undefined}}  \n{{ taskHeaders[1] ?  '<span class=\"label label-info\"><em>'+ taskHeaders[1] + '</em></span>' : undefined }}\n{{ taskHeaders[2] ? '<span class=\"label label-default\"><em>'+ taskHeaders[2]+'</em></span>' :undefined }} \n{{editInGithubLink}}\n</h5>\n\n<strong> {{task.displayName}}</strong>\n{{task.displayDescription ? '<p class=\"text-muted\">' + task.displayDescription + '</p>' : ''}}\n<p>{{task.executionDate ? timerEventContent : htmlContent}}</p>"
+          },
+          "alignment" : {
+            "type" : "constant",
+            "value" : "left"
+          }
+        },
+        "reference" : "75fb2a8c-b217-498f-901c-1f7b2a814689",
+        "hasValidationError" : false,
+        "id" : "pbText"
+      }
+    ],
+    [
+      {
+        "type" : "component",
+        "dimension" : {
+          "xs" : 12,
+          "sm" : 12,
+          "md" : 12,
+          "lg" : 12
+        },
+        "propertyValues" : {
+          "cssClasses" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "hidden" : {
+            "type" : "expression",
+            "value" : "isDone || !task.hasForm"
+          },
+          "text" : {
+            "type" : "interpolation",
+            "value" : "<span class=\"fa fa-external-link pt-xs\"/>"
+          },
+          "type" : {
+            "type" : "constant",
+            "value" : "task"
+          },
+          "targetUrl" : {
+            "type" : "constant",
+            "value" : "http://"
+          },
+          "pageToken" : {
+            "type" : "constant"
+          },
+          "processName" : {
+            "type" : "constant"
+          },
+          "processVersion" : {
+            "type" : "constant"
+          },
+          "taskId" : {
+            "type" : "expression",
+            "value" : "task.id"
+          },
+          "caseId" : {
+            "type" : "constant"
+          },
+          "target" : {
+            "type" : "constant",
+            "value" : "_self"
+          },
+          "appToken" : {
+            "type" : "constant"
+          },
+          "urlParams" : {
+            "type" : "constant"
+          },
+          "alignment" : {
+            "type" : "constant",
+            "value" : "right"
+          },
+          "buttonStyle" : {
+            "type" : "constant",
+            "value" : "primary"
+          },
+          "allowHTML" : {
+            "type" : "constant",
+            "value" : true
+          }
+        },
+        "reference" : "851f5692-7b5e-497b-8080-2aa06ad06c06",
+        "hasValidationError" : false,
+        "id" : "pbLink"
+      },
+      {
+        "type" : "component",
+        "dimension" : {
+          "xs" : 12,
+          "sm" : 12,
+          "md" : 12,
+          "lg" : 12
+        },
+        "propertyValues" : {
+          "cssClasses" : {
+            "type" : "constant",
+            "value" : "mt-xs"
+          },
+          "hidden" : {
+            "type" : "expression",
+            "value" : "isDone || task.hasForm || task.executionDate"
+          },
+          "disabled" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "label" : {
+            "type" : "interpolation",
+            "value" : "<span class=\"fa fa-check pt-xs\"/>"
+          },
+          "alignment" : {
+            "type" : "constant",
+            "value" : "right"
+          },
+          "buttonStyle" : {
+            "type" : "constant",
+            "value" : "primary"
+          },
+          "action" : {
+            "type" : "constant",
+            "value" : "POST"
+          },
+          "assign" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "url" : {
+            "type" : "interpolation",
+            "value" : "../API/bpm/userTask/{{task.id}}/execution?assign=true"
+          },
+          "responseStatusCode" : {
+            "type" : "variable",
+            "value" : "executedTask"
+          },
+          "dataToSend" : {
+            "type" : "constant"
+          },
+          "dataFromSuccess" : {
+            "type" : "variable",
+            "value" : ""
+          },
+          "closeOnSuccess" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "dataFromError" : {
+            "type" : "variable",
+            "value" : ""
+          },
+          "targetUrlOnSuccess" : {
+            "type" : "interpolation"
+          },
+          "collectionToModify" : {
+            "type" : "variable"
+          },
+          "modalId" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "collectionPosition" : {
+            "type" : "constant",
+            "value" : "Last"
+          },
+          "valueToAdd" : {
+            "type" : "constant"
+          },
+          "removeItem" : {
+            "type" : "variable"
+          },
+          "timeout" : {
+            "type" : "constant",
+            "value" : "2000"
+          }
+        },
+        "reference" : "506cda6d-4840-4baa-bc16-3b0c6e97eb6d",
+        "hasValidationError" : false,
+        "id" : "customButtonWithTimeout"
+      }
+    ],
+    [
+      {
+        "type" : "component",
+        "dimension" : {
+          "xs" : 12,
+          "sm" : 12,
+          "md" : 12,
+          "lg" : 12
+        },
+        "propertyValues" : {
+          "cssClasses" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "hidden" : {
+            "type" : "expression",
+            "value" : "!task.executionDate"
+          },
+          "disabled" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "label" : {
+            "type" : "interpolation",
+            "value" : "<i class=\"fa fa-exclamation-circle\" aria-hidden=\"true\"></i> Trigger now"
+          },
+          "alignment" : {
+            "type" : "constant",
+            "value" : "right"
+          },
+          "buttonStyle" : {
+            "type" : "constant",
+            "value" : "danger"
+          },
+          "action" : {
+            "type" : "constant",
+            "value" : "PUT"
+          },
+          "assign" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "url" : {
+            "type" : "interpolation",
+            "value" : "../API/bpm/timerEventTrigger/{{task.id}}"
+          },
+          "responseStatusCode" : {
+            "type" : "variable",
+            "value" : "executedTask"
+          },
+          "dataToSend" : {
+            "type" : "expression",
+            "value" : "triggerNowPayload"
+          },
+          "dataFromSuccess" : {
+            "type" : "variable",
+            "value" : ""
+          },
+          "closeOnSuccess" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "dataFromError" : {
+            "type" : "variable",
+            "value" : ""
+          },
+          "targetUrlOnSuccess" : {
+            "type" : "interpolation"
+          },
+          "collectionToModify" : {
+            "type" : "variable"
+          },
+          "modalId" : {
+            "type" : "constant",
+            "value" : "update-timer-trigger"
+          },
+          "collectionPosition" : {
+            "type" : "constant",
+            "value" : "Last"
+          },
+          "valueToAdd" : {
+            "type" : "constant"
+          },
+          "removeItem" : {
+            "type" : "variable"
+          },
+          "timeout" : {
+            "type" : "constant",
+            "value" : "5000"
+          }
+        },
+        "reference" : "b06679ab-815e-46a8-a227-83b086e1b3e8",
+        "hasValidationError" : false,
+        "id" : "customButtonWithTimeout"
+      }
+    ]
+  ],
+  "variables" : {
+    "task" : {
+      "type" : "constant",
+      "value" : [
+        ""
+      ],
+      "exposed" : true
+    },
+    "assignToMePayload" : {
+      "type" : "expression",
+      "value" : [
+        "return { assigned_id : $data.session.user_id };"
+      ],
+      "exposed" : false
+    },
+    "isAssignedToMe" : {
+      "type" : "expression",
+      "value" : [
+        "if($data.assignSuccess){",
+        "    return true;",
+        "}",
+        "return $data.task.assigneeId === parseInt($data.session.user_id);"
+      ],
+      "exposed" : false
+    },
+    "session" : {
+      "type" : "constant",
+      "value" : [
+        ""
+      ],
+      "exposed" : true
+    },
+    "context" : {
+      "type" : "url",
+      "value" : [
+        "../API/bpm/case/{{task.rootContainerId}}/context"
+      ],
+      "exposed" : false
+    },
+    "assignSuccess" : {
+      "type" : "constant",
+      "exposed" : false
+    },
+    "isDone" : {
+      "type" : "expression",
+      "value" : [
+        "return $data.task.state === 'completed'"
+      ],
+      "exposed" : false
+    },
+    "executedTask" : {
+      "type" : "constant",
+      "value" : [
+        ""
+      ],
+      "exposed" : true
+    },
+    "htmlContent" : {
+      "type" : "expression",
+      "value" : [
+        "if($data.task.content){",
+        "    return $data.htmlConverter.makeHtml($data.task.content);",
+        "}else{",
+        "    return `<p class=\"text-muted\">No specific description for this task.</p>`",
+        "}"
+      ],
+      "exposed" : false
+    },
+    "htmlConverter" : {
+      "type" : "expression",
+      "value" : [
+        "var converter = new showdown.Converter()",
+        "converter.setOption('emoji',true)",
+        "converter.setOption('openLinksInNewWindow',true)",
+        "converter.setOption('underline', true)",
+        "converter.setFlavor('github');",
+        "return converter;"
+      ],
+      "exposed" : false
+    },
+    "editInGithubLink" : {
+      "type" : "expression",
+      "value" : [
+        "if($data.task.mdFileLocation){",
+        "    return `<a target=\"_blank\" class=\"pull-right\" href=\"${$data.task.mdFileLocation}\" title=\"Edit me in Github\"><i class=\"black fa fa-github\"></i></a>`",
+        "}"
+      ],
+      "exposed" : false
+    },
+    "taskHeaders" : {
+      "type" : "constant",
+      "value" : [
+        ""
+      ],
+      "exposed" : true
+    },
+    "timerEventContent" : {
+      "type" : "expression",
+      "value" : [
+        "function timeTo(date){",
+        "     dayjs.extend(window.dayjs_plugin_relativeTime);",
+        "     return dayjs().to(dayjs(date));",
+        "}",
+        "",
+        "",
+        "if($data.task.executionDate){",
+        "    return '<span class=\"fa fa-hourglass-half\"></span> Triggered ' + timeTo($data.task.executionDate) ",
+        "}"
+      ],
+      "exposed" : false
+    },
+    "triggerNowPayload" : {
+      "type" : "expression",
+      "value" : [
+        "return {",
+        "    executionDate: Date.now()",
+        "}"
+      ],
+      "exposed" : false
+    }
+  },
+  "assets" : [ ],
+  "inactiveAssets" : [ ],
+  "webResources" : [ ],
+  "hasValidationError" : false
+}

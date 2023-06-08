@@ -1,0 +1,123 @@
+{
+  "id" : "customSwitchButton",
+  "name" : "switchButton",
+  "type" : "widget",
+  "custom" : true,
+  "modelVersion" : "2.4",
+  "previousArtifactVersion" : "2.2",
+  "lastUpdate" : 1685528814457,
+  "template" : "@customSwitchButton.tpl.html",
+  "controller" : "@customSwitchButton.ctrl.js",
+  "properties" : [
+    {
+      "label" : "Value",
+      "name" : "value",
+      "type" : "text",
+      "defaultValue" : "This is the initial value",
+      "bond" : "expression"
+    },
+    {
+      "label" : "On label",
+      "name" : "onLabel",
+      "type" : "text",
+      "bond" : "expression"
+    },
+    {
+      "label" : "Off label",
+      "name" : "offLabel",
+      "type" : "text",
+      "bond" : "expression"
+    },
+    {
+      "label" : "Disabled",
+      "name" : "disabled",
+      "type" : "boolean",
+      "defaultValue" : false,
+      "bond" : "expression"
+    },
+    {
+      "label" : "Data sent on switch",
+      "name" : "dataToSend",
+      "type" : "text",
+      "bond" : "expression"
+    },
+    {
+      "label" : "URL to call",
+      "name" : "url",
+      "type" : "text",
+      "bond" : "interpolation"
+    },
+    {
+      "label" : "Action",
+      "name" : "action",
+      "type" : "choice",
+      "defaultValue" : "POST",
+      "choiceValues" : [
+        "GET",
+        "PUT",
+        "POST",
+        "DELETE"
+      ],
+      "bond" : "constant"
+    },
+    {
+      "label" : "HTTP status code",
+      "name" : "responseStatusCode",
+      "type" : "text",
+      "bond" : "variable"
+    },
+    {
+      "label" : "Alignment",
+      "name" : "alignment",
+      "type" : "choice",
+      "defaultValue" : "left",
+      "choiceValues" : [
+        "left",
+        "center",
+        "right"
+      ],
+      "bond" : "constant"
+    },
+    {
+      "label" : "Label hidden",
+      "name" : "labelHidden",
+      "type" : "boolean",
+      "defaultValue" : false,
+      "bond" : "constant"
+    },
+    {
+      "label" : "Label",
+      "name" : "label",
+      "type" : "text",
+      "bond" : "interpolation"
+    },
+    {
+      "label" : "Label width",
+      "name" : "labelWidth",
+      "type" : "integer",
+      "defaultValue" : 4,
+      "bond" : "constant"
+    }
+  ],
+  "assets" : [
+    {
+      "id" : "eaa712f5-22df-4c2a-9c0b-cbc0b63be829",
+      "name" : "angular-bootstrap-toggle.min.js",
+      "type" : "js",
+      "order" : 2,
+      "external" : false
+    },
+    {
+      "id" : "8578b646-ac04-4d50-8f1b-fe427f993323",
+      "name" : "angular-bootstrap-toggle.min.css",
+      "type" : "css",
+      "order" : 1,
+      "external" : false
+    }
+  ],
+  "requiredModules" : [
+    "ui.toggle"
+  ],
+  "webResources" : [ ],
+  "hasHelp" : false
+}

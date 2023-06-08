@@ -1,0 +1,64 @@
+{
+  "id" : "customCalendar",
+  "name" : "Calendar",
+  "type" : "widget",
+  "custom" : true,
+  "modelVersion" : "2.4",
+  "previousArtifactVersion" : "2.2",
+  "lastUpdate" : 1685528815357,
+  "template" : "@customCalendar.tpl.html",
+  "controller" : "@customCalendar.ctrl.js",
+  "properties" : [
+    {
+      "label" : "Start Date",
+      "name" : "startDate",
+      "type" : "text",
+      "bond" : "expression"
+    },
+    {
+      "label" : "End Date",
+      "name" : "endDate",
+      "type" : "text",
+      "bond" : "expression"
+    },
+    {
+      "label" : "Events",
+      "name" : "events",
+      "type" : "text",
+      "bond" : "expression"
+    }
+  ],
+  "assets" : [
+    {
+      "id" : "9b591d0e-48b7-4319-a392-71ccbea004f3",
+      "name" : "js-year-calendar.min.css",
+      "type" : "css",
+      "order" : 1,
+      "external" : false
+    },
+    {
+      "id" : "581e2f22-539f-44e6-a39a-1a77e267c306",
+      "name" : "https://unpkg.com/tippy.js@6",
+      "type" : "js",
+      "order" : 4,
+      "external" : true
+    },
+    {
+      "id" : "d30ad82b-45b3-4d81-a883-54951efcd5a9",
+      "name" : "https://unpkg.com/@popperjs/core@2",
+      "type" : "js",
+      "order" : 3,
+      "external" : true
+    },
+    {
+      "id" : "d1fe97b5-a4e9-455d-a454-5bf0dab33a90",
+      "name" : "js-year-calendar.min.js",
+      "type" : "js",
+      "order" : 2,
+      "external" : false
+    }
+  ],
+  "requiredModules" : [ ],
+  "webResources" : [ ],
+  "hasHelp" : false
+}
