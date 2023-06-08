@@ -10,7 +10,7 @@
 	<packaging>maven-plugin</packaging>
 	<properties>
 		<!-- Dependencies -->
-		<maven-plugin-api.version>3.9.0</maven-plugin-api.version>
+		<maven-plugin-api.version>3.9.2</maven-plugin-api.version>
 		<maven-plugin-annotations.version>3.7.0</maven-plugin-annotations.version>
 		<maven-project.version>2.2.1</maven-project.version>
 		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
