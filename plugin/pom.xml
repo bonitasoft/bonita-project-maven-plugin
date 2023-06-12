@@ -20,7 +20,7 @@
 		<maven-dependency-tree.version>3.2.1</maven-dependency-tree.version>
 		<maven-core.version>3.9.2</maven-core.version>
 		<maven-artifact.version>3.9.2</maven-artifact.version>
-		<maven-model.version>3.9.0</maven-model.version>
+		<maven-model.version>3.9.2</maven-model.version>
 		<maven-model-builder.version>3.9.0</maven-model-builder.version>
 		<maven-settings.version>3.9.2</maven-settings.version>
 		<maven-settings-builder.version>3.9.2</maven-settings-builder.version>
