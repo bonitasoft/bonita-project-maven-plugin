@@ -67,6 +67,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.site.skip>false</maven.site.skip>
+		
 		<jackson.version>2.14.1</jackson.version>
 
 		<!-- Maven plugins -->
@@ -195,9 +197,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>${maven-site-plugin.version}</version>
-					<configuration>
-			           <skip>true</skip>
-					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
@@ -317,6 +316,7 @@
 			<id>release</id>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
+				<maven.site.skip>true</maven.site.skip>
 			</properties>
 			<build>
 				<plugins>
