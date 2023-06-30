@@ -1,4 +1,4 @@
-/**
+/** 
  * Copyright (C) 2021 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,13 @@ import lombok.Data;
 
 @Data
 public class Artifact {
-    
+
     private String groupId;
     private String artifactId;
     private String version;
     private String classifier;
     private String file;
-    
+
     public static Artifact create(String groupId, String artifactId, String version, String classifier, String file) {
         Artifact artifact = new Artifact();
         artifact.setGroupId(groupId);
@@ -36,10 +36,10 @@ public class Artifact {
         artifact.setFile(file);
         return artifact;
     }
-    
+
     @Override
     public String toString() {
         return String.format("%s:%s:%s", groupId, artifactId, version);
     }
-    
+
 }

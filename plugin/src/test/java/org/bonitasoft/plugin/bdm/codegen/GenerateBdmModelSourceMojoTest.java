@@ -1,5 +1,18 @@
-/**
- * 
+/** 
+ * Copyright (C) 2023 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.bonitasoft.plugin.bdm.codegen;
 
@@ -47,7 +60,7 @@ class GenerateBdmModelSourceMojoTest {
     @Test
     void generateBdmModelSourcesInEmptyOutputFolder(@TempDir Path outputFolder) throws Exception {
         Files.delete(outputFolder);
-        
+
         var mojo = new GenerateBdmModelSourceMojo(new BusinessDataModelParserImpl(),
                 new BusinessDataModelGeneratorImpl(), buildContext);
         mojo.bdmModelFile = new File(GenerateBdmModelSourceMojoTest.class.getResource("/bom.xml").getFile());
@@ -57,7 +70,7 @@ class GenerateBdmModelSourceMojoTest {
         mojo.execute();
 
         verify(buildContext).refresh(outputFolder.toFile());
-        
+
         var packageFolder = outputFolder
                 .resolve("com")
                 .resolve("company")
@@ -73,11 +86,11 @@ class GenerateBdmModelSourceMojoTest {
                 .isDirectoryNotContaining(path -> path.getFileName().toString().equals("SupplierDAOImpl.java"))
                 .isDirectoryNotContaining(path -> path.getFileName().toString().equals("RequestDAOImpl.java"));
     }
-    
+
     @Test
     void generateBdmModelSourcesInExistingOutputFolder(@TempDir Path outputFolder) throws Exception {
         Files.delete(outputFolder);
-        
+
         var mojo = new GenerateBdmModelSourceMojo(new BusinessDataModelParserImpl(),
                 new BusinessDataModelGeneratorImpl(), buildContext);
         mojo.bdmModelFile = new File(GenerateBdmModelSourceMojoTest.class.getResource("/bom.xml").getFile());
@@ -100,15 +113,15 @@ class GenerateBdmModelSourceMojoTest {
                 .isDirectoryNotContaining(path -> path.getFileName().toString().equals("QuotationDAOImpl.java"))
                 .isDirectoryNotContaining(path -> path.getFileName().toString().equals("SupplierDAOImpl.java"))
                 .isDirectoryNotContaining(path -> path.getFileName().toString().equals("RequestDAOImpl.java"));
-  
+
         mojo.bdmModelFile = new File(GenerateBdmModelSourceMojoTest.class.getResource("/anotherBom.xml").getFile());
-        
+
         mojo.execute();
-        
+
         assertThat(packageFolder)
-            .isDirectoryContaining(path -> path.getFileName().toString().equals("Employee.java"))
-            .isDirectoryNotContaining(path -> path.getFileName().toString().equals("Quotation.java"));
-            
+                .isDirectoryContaining(path -> path.getFileName().toString().equals("Employee.java"))
+                .isDirectoryNotContaining(path -> path.getFileName().toString().equals("Quotation.java"));
+
     }
 
     @Test
@@ -151,19 +164,19 @@ class GenerateBdmModelSourceMojoTest {
                 () -> mojo.execute(),
                 "Error while parsing the model descriptor");
     }
-    
+
     @Test
     void throwMojoFailureExceptionWhenCodeGenFails(@TempDir Path outputFolder) throws Exception {
-        var generator = mock( BusinessDataModelGenerator.class);
+        var generator = mock(BusinessDataModelGenerator.class);
         var mojo = new GenerateBdmModelSourceMojo(new BusinessDataModelParserImpl(),
                 generator, buildContext);
         File modelFile = new File(GenerateBdmModelSourceMojoTest.class.getResource("/bom.xml").getFile());
         mojo.bdmModelFile = modelFile;
         mojo.outputFolder = outputFolder.toFile();
         mojo.project = new MavenProject();
-        
+
         doThrow(CodeGenerationException.class).when(generator)
-            .generate(Mockito.any(BusinessObjectModel.class), Mockito.eq(outputFolder));
+                .generate(Mockito.any(BusinessObjectModel.class), Mockito.eq(outputFolder));
 
         org.junit.jupiter.api.Assertions.assertThrows(MojoFailureException.class,
                 () -> mojo.execute(),

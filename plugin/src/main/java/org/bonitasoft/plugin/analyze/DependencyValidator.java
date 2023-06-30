@@ -1,4 +1,4 @@
-/**
+/** 
  * Copyright (C) 2021 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,8 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.bonitasoft.plugin.analyze.report.model.Issue;
 
 public interface DependencyValidator {
-    
-    List<Issue> validate(MavenProject project, ProjectBuildingRequest projectBuildingRequest) throws MojoExecutionException;
+
+    List<Issue> validate(MavenProject project, ProjectBuildingRequest projectBuildingRequest)
+            throws MojoExecutionException;
 
 }

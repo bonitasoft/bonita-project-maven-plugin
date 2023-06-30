@@ -1,14 +1,16 @@
-/**
+/** 
  * Copyright (C) 2021 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -51,7 +53,7 @@ class InstallProjectStoreMojoTest {
 
     @Mock
     MavenSession session;
-    
+
     @Mock
     PluginVersionResolver pluginVersionResolver;
 
@@ -81,7 +83,8 @@ class InstallProjectStoreMojoTest {
 
     @Test
     void should_create_an_install_file_execution_request() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.execRequestPopulator = populator;
         mojo.session = session;
         var artifact = new DefaultArtifact("g", "a", "v", null, "jar", null, new DefaultArtifactHandler("jar"));
@@ -96,10 +99,11 @@ class InstallProjectStoreMojoTest {
                 .containsEntry("file", artifactFile.getAbsolutePath())
                 .containsEntry("packaging", "jar");
     }
-    
+
     @Test
     void should_create_an_install_file_execution_request_with_classifier() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.execRequestPopulator = populator;
         mojo.session = session;
         var artifact = new DefaultArtifact("g", "a", "v", null, "jar", "sources", new DefaultArtifactHandler("jar"));
@@ -114,10 +118,11 @@ class InstallProjectStoreMojoTest {
                 .containsEntry("file", artifactFile.getAbsolutePath())
                 .containsEntry("packaging", "jar");
     }
-    
+
     @Test
     void should_create_an_install_file_execution_request_with_pom() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.execRequestPopulator = populator;
         mojo.session = session;
         var artifact = new DefaultArtifact("g", "a", "v", null, "jar", null, new DefaultArtifactHandler("jar"));
@@ -133,10 +138,11 @@ class InstallProjectStoreMojoTest {
                 .containsEntry("file", artifactFile.getAbsolutePath())
                 .containsEntry("packaging", "jar");
     }
-    
+
     @Test
     void should_create_an_install_file_execution_request_populated_with_sessions_setttings() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.execRequestPopulator = populator;
         var settings = new Settings();
         var mirror = new Mirror();
@@ -154,19 +160,20 @@ class InstallProjectStoreMojoTest {
 
         assertThat(request.getMirrors()).extracting("id").contains("test-mirror");
     }
-    
+
     @Test
     void should_use_the_default_install_plugin_version() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.pluginVersionResolver = pluginVersionResolver;
-        mojo.project =  new MavenProject();
+        mojo.project = new MavenProject();
         var result = new PluginVersionResult() {
-            
+
             @Override
             public String getVersion() {
                 return InstallProjectStoreMojo.INITIAL_INSTALL_PLUGIN_VERSION;
             }
-            
+
             @Override
             public ArtifactRepository getRepository() {
                 return null;
@@ -178,19 +185,20 @@ class InstallProjectStoreMojoTest {
 
         assertThat(version).isEqualTo(InstallProjectStoreMojo.DEFAULT_INSTALL_PLUGIN_VERSION);
     }
-    
+
     @Test
     void should_use_the_project_defined_install_plugin_version() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.pluginVersionResolver = pluginVersionResolver;
-        mojo.project =  new MavenProject();
+        mojo.project = new MavenProject();
         var result = new PluginVersionResult() {
-            
+
             @Override
             public String getVersion() {
                 return "3.1.1";
             }
-            
+
             @Override
             public ArtifactRepository getRepository() {
                 return null;
@@ -202,17 +210,18 @@ class InstallProjectStoreMojoTest {
 
         assertThat(version).isEqualTo("3.1.1");
     }
-    
+
     @Test
     void should_throw_MojoExecutionException_when_plugin_version_resolution_fails() throws Exception {
-        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(), new DefaultModelWriter());
+        var mojo = new InstallProjectStoreMojo(projectArtifactFactory, new DefaultModelReader(),
+                new DefaultModelWriter());
         mojo.pluginVersionResolver = pluginVersionResolver;
-        mojo.project =  new MavenProject();
-        when(pluginVersionResolver.resolve(any(PluginVersionRequest.class))).thenThrow(new PluginVersionResolutionException("org.apache.maven.plugins", "maven-install-plugin", "2.4"));
+        mojo.project = new MavenProject();
+        when(pluginVersionResolver.resolve(any(PluginVersionRequest.class))).thenThrow(
+                new PluginVersionResolutionException("org.apache.maven.plugins", "maven-install-plugin", "2.4"));
         mojo.session = session;
-        
+
         assertThrows(MojoExecutionException.class, () -> mojo.computeMavenInstallPluginVersion());
     }
-    
-    
+
 }

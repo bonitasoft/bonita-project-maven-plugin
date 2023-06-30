@@ -1,14 +1,16 @@
-/**
+/** 
  * Copyright (C) 2020 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -71,7 +73,7 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 
 /**
- * This mojo looks for unknown dependencies in the current project 
+ * This mojo looks for unknown dependencies in the current project
  * and look for them in a project local dependency store (.store folder by default).
  * Install missing dependencies found in the local store in the local repository.
  */
@@ -132,9 +134,10 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private ModelReader modelReader;
     private ModelWriter modelWriter;
     private ProjectArtifactFactory artifactFactory;
-   
+
     @Inject
-    public InstallProjectStoreMojo(ProjectArtifactFactory artifactFactory, ModelReader modelReader, ModelWriter modelWriter) {
+    public InstallProjectStoreMojo(ProjectArtifactFactory artifactFactory, ModelReader modelReader,
+            ModelWriter modelWriter) {
         this.artifactFactory = artifactFactory;
         this.modelReader = modelReader;
         this.modelWriter = modelWriter;
@@ -155,7 +158,8 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         }
     }
 
-    private void installFileToLocalRepository(Artifact artifact, File artifactFile, String installPluginVersion) throws MojoExecutionException {
+    private void installFileToLocalRepository(Artifact artifact, File artifactFile, String installPluginVersion)
+            throws MojoExecutionException {
         if (artifact.isSnapshot()) { // Always update SNAPSHOT dependencies
             try {
                 installArtifact(artifact, artifactFile, installPluginVersion);
@@ -193,9 +197,9 @@ public class InstallProjectStoreMojo extends AbstractMojo {
 
     private Set<Artifact> getProjectArtifacts() throws MojoExecutionException {
         try {
-           return artifactFactory.createArtifacts(project);
+            return artifactFactory.createArtifacts(project);
         } catch (InvalidDependencyVersionException e) {
-           throw new MojoExecutionException(e);
+            throw new MojoExecutionException(e);
         }
     }
 
