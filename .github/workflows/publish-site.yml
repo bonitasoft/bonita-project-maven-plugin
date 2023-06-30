@@ -31,7 +31,7 @@ jobs:
       - name: Publish Site 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw -pl plugin -am --batch-mode clean compile site site:stage scm-publish:publish-scm -Dmaven.site.skip=false
+        run: ./mvnw -ntp -pl plugin -am --batch-mode clean compile site site:stage scm-publish:publish-scm -Dmaven.site.skip=false
         
 
             
