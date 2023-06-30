@@ -1,4 +1,4 @@
-/**
+/** 
  * Copyright (C) 2021 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import org.bonitasoft.plugin.analyze.report.model.Implementation;
 public interface ConnectorResolver {
 
     List<Definition> findAllDefinitions(Artifact artifact, IssueCollector issueCollector) throws IOException;
-    
+
     List<Implementation> findAllImplementations(Artifact artifact, IssueCollector issueCollector) throws IOException;
-    
+
 }

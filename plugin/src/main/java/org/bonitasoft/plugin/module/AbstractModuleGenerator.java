@@ -1,4 +1,4 @@
-/**
+/** 
  * Copyright (C) 2023 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ public abstract class AbstractModuleGenerator implements ModuleGenerator {
         this.modelReader = modelReader;
         this.modelWriter = modelWriter;
     }
-    
+
     public Path createModule(String projectId, Model parent, Path moduleFolder, String templateFileName,
             String moduleNameSuffix) throws ModuleGenerationException {
 

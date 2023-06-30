@@ -1,3 +1,19 @@
+/** 
+ * Copyright (C) 2023 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.bonitasoft.plugin.analyze;
 
 import static java.util.Collections.singletonList;
@@ -62,16 +78,17 @@ class AnalyzeBonitaDependencyMojoTest {
 
     @Mock
     ProjectBuildingRequest buildingRequest;
-    
+
     @Mock
     ProjectArtifactFactory artifactFactory;
-    
+
     @Captor
     ArgumentCaptor<List<Artifact>> resolvedArtifacts;
 
     @BeforeEach
     void setUp() throws MojoExecutionException {
-        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser, dependencyValidator, artifactFactory));
+        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser, dependencyValidator,
+                artifactFactory));
         mojo.project = project;
         mojo.setLog(mock(Log.class));
     }
@@ -94,7 +111,6 @@ class AnalyzeBonitaDependencyMojoTest {
         doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
         doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
         when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
-       
 
         // When
         mojo.execute();
@@ -103,7 +119,7 @@ class AnalyzeBonitaDependencyMojoTest {
         verify(artifactAnalyser).analyse(resolvedArtifacts);
         verify(reporter).report(any());
     }
-    
+
     @Test
     void shouldIncludeOnlyRuntimeScopeByDefault() throws Exception {
         // Given
@@ -111,34 +127,34 @@ class AnalyzeBonitaDependencyMojoTest {
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
 
-
         var artifactWithRuntimeScope = new DefaultArtifact("g", "a", "v", "compile", "jar", null,
                 new DefaultArtifactHandler("jar"));
-        artifactWithRuntimeScope.setFile(new File(artifactWithRuntimeScope.getArtifactId() + "-" + artifactWithRuntimeScope.getVersion() + "." + artifactWithRuntimeScope.getType()));
-        
+        artifactWithRuntimeScope.setFile(new File(artifactWithRuntimeScope.getArtifactId() + "-"
+                + artifactWithRuntimeScope.getVersion() + "." + artifactWithRuntimeScope.getType()));
+
         var artifactWithProvidedScope = new DefaultArtifact("g", "b", "v", "provided", "jar", null,
                 new DefaultArtifactHandler("jar"));
-        artifactWithProvidedScope.setFile(new File(artifactWithProvidedScope.getArtifactId() + "-" + artifactWithProvidedScope.getVersion() + "." + artifactWithProvidedScope.getType()));
+        artifactWithProvidedScope.setFile(new File(artifactWithProvidedScope.getArtifactId() + "-"
+                + artifactWithProvidedScope.getVersion() + "." + artifactWithProvidedScope.getType()));
 
-        when(artifactFactory.createArtifacts(project)).thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
+        when(artifactFactory.createArtifacts(project))
+                .thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
         doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
         doReturn(artifactWithRuntimeScope).when(mojo).resolve(buildingRequest, artifactWithRuntimeScope);
         when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
-       
 
         // When
         mojo.execute();
-        
-      
+
         // Then
         verify(artifactAnalyser).analyse(resolvedArtifacts.capture());
         assertThat(resolvedArtifacts.getValue())
-            .hasSize(1)
-            .extracting("scope").containsOnly("compile");
+                .hasSize(1)
+                .extracting("scope").containsOnly("compile");
         verify(mojo, never()).resolve(buildingRequest, artifactWithProvidedScope);
         verify(reporter).report(any());
     }
-    
+
     @Test
     void shouldIncludeCompileScope() throws Exception {
         // Given
@@ -147,40 +163,40 @@ class AnalyzeBonitaDependencyMojoTest {
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
 
-
         var artifactWithRuntimeScope = new DefaultArtifact("g", "a", "v", "compile", "jar", null,
                 new DefaultArtifactHandler("jar"));
-        artifactWithRuntimeScope.setFile(new File(artifactWithRuntimeScope.getArtifactId() + "-" + artifactWithRuntimeScope.getVersion() + "." + artifactWithRuntimeScope.getType()));
-        
+        artifactWithRuntimeScope.setFile(new File(artifactWithRuntimeScope.getArtifactId() + "-"
+                + artifactWithRuntimeScope.getVersion() + "." + artifactWithRuntimeScope.getType()));
+
         var artifactWithProvidedScope = new DefaultArtifact("g", "b", "v", "provided", "jar", null,
                 new DefaultArtifactHandler("jar"));
-        artifactWithProvidedScope.setFile(new File(artifactWithProvidedScope.getArtifactId() + "-" + artifactWithProvidedScope.getVersion() + "." + artifactWithProvidedScope.getType()));
+        artifactWithProvidedScope.setFile(new File(artifactWithProvidedScope.getArtifactId() + "-"
+                + artifactWithProvidedScope.getVersion() + "." + artifactWithProvidedScope.getType()));
 
-        when(artifactFactory.createArtifacts(project)).thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
+        when(artifactFactory.createArtifacts(project))
+                .thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
         doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
         doReturn(artifactWithRuntimeScope).when(mojo).resolve(buildingRequest, artifactWithRuntimeScope);
         doReturn(artifactWithProvidedScope).when(mojo).resolve(buildingRequest, artifactWithProvidedScope);
         when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
-       
 
         // When
         mojo.execute();
-        
-      
+
         // Then
         verify(artifactAnalyser).analyse(resolvedArtifacts.capture());
         assertThat(resolvedArtifacts.getValue())
-            .hasSize(2)
-            .extracting("scope").contains("compile","provided");
+                .hasSize(2)
+                .extracting("scope").contains("compile", "provided");
         verify(reporter).report(any());
     }
-    
+
     @Test
     void sould_run_analysis_with_dep_validation() throws Exception {
         // Given
         mojo = spy(mojo);
-        
-        mojo.validateDeps = true ;
+
+        mojo.validateDeps = true;
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
         when(dependencyValidator.validate(project, buildingRequest)).thenReturn(List.of());
@@ -196,7 +212,6 @@ class AnalyzeBonitaDependencyMojoTest {
         doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
         doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
         when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
-       
 
         // When
         mojo.execute();

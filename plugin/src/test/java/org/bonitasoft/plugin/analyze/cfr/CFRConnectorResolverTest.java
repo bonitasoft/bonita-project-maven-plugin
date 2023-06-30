@@ -1,14 +1,16 @@
-/**
+/** 
  * Copyright (C) 2020 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -185,16 +187,22 @@ class CFRConnectorResolverTest {
         assertEquals(0, implementations.size());
         assertEquals(0, definitions.size());
         assertThat(issueCollector.getIssues())
-            .hasSize(6)
-            .allSatisfy(issue -> assertThat(issue.getType()).isEqualTo(Type.INVALID_DESCRIPTOR_FILE.name()))
-            .allSatisfy(issue -> assertThat(issue.getSeverity()).isEqualTo(Severity.ERROR.name()))
-            .allSatisfy(issue -> assertThat(issue.getContext()).isEqualTo(List.of(artifact.getId())))
-            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("email-invalid-classname.impl declares an unknown 'implementationClassname': org.bonitasoft.connectors.email.EmailConnector"))
-            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("email.impl is not compliant with 'http://www.bonitasoft.org/ns/connector/implementation/6.0' XML schema definition"))
-            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("email.def is not compliant with 'http://www.bonitasoft.org/ns/connector/definition/6.1' XML schema definition"))
-            .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo("somethingElse.def is not compliant with 'http://www.bonitasoft.org/ns/connector/definition/6.1' XML schema definition"))
-            .anySatisfy(issue -> assertThat(issue.getMessage()).startsWith("notXmlContent.def is not a valid XML file:"))
-            .anySatisfy(issue -> assertThat(issue.getMessage()).startsWith("email-with-typo.def is not a valid XML file:"));
+                .hasSize(6)
+                .allSatisfy(issue -> assertThat(issue.getType()).isEqualTo(Type.INVALID_DESCRIPTOR_FILE.name()))
+                .allSatisfy(issue -> assertThat(issue.getSeverity()).isEqualTo(Severity.ERROR.name()))
+                .allSatisfy(issue -> assertThat(issue.getContext()).isEqualTo(List.of(artifact.getId())))
+                .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo(
+                        "email-invalid-classname.impl declares an unknown 'implementationClassname': org.bonitasoft.connectors.email.EmailConnector"))
+                .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo(
+                        "email.impl is not compliant with 'http://www.bonitasoft.org/ns/connector/implementation/6.0' XML schema definition"))
+                .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo(
+                        "email.def is not compliant with 'http://www.bonitasoft.org/ns/connector/definition/6.1' XML schema definition"))
+                .anySatisfy(issue -> assertThat(issue.getMessage()).isEqualTo(
+                        "somethingElse.def is not compliant with 'http://www.bonitasoft.org/ns/connector/definition/6.1' XML schema definition"))
+                .anySatisfy(issue -> assertThat(issue.getMessage())
+                        .startsWith("notXmlContent.def is not a valid XML file:"))
+                .anySatisfy(issue -> assertThat(issue.getMessage())
+                        .startsWith("email-with-typo.def is not a valid XML file:"));
     }
 
     @ParameterizedTest
@@ -211,12 +219,13 @@ class CFRConnectorResolverTest {
         assertEquals(0, implementations.size());
         assertEquals(1, definitions.size());
     }
-    
+
     @Test
     void testCustomConnectorFailingWithProcyon() throws Exception {
         ConnectorResolver connectorTypeResolver = new CFRConnectorResolver();
         artifact.setFile(
-                new File(CFRConnectorResolverTest.class.getResource("/bonita-connector-email-templating-2.5-SNAPSHOT.jar").getFile()));
+                new File(CFRConnectorResolverTest.class
+                        .getResource("/bonita-connector-email-templating-2.5-SNAPSHOT.jar").getFile()));
 
         List<Implementation> implementations = connectorTypeResolver.findAllImplementations(artifact, issueCollector);
         List<Definition> definitions = connectorTypeResolver.findAllDefinitions(artifact, issueCollector);

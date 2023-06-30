@@ -1,4 +1,4 @@
-/**
+/** 
  * Copyright (C) 2021 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -39,32 +39,32 @@ class LogDependencyReporterTest {
         var reporter = new LogDependencyReporter(log);
         var report = new DependencyReport();
         report.addIssue(Issue.create(Type.INCOMPATIBLE_DEPENDENCY, "hello", Severity.WARNING));
-        
+
         reporter.report(report);
-        
+
         verify(log).warn("hello");
     }
-    
+
     @Test
     void shouldLogInfo() throws Exception {
         var reporter = new LogDependencyReporter(log);
         var report = new DependencyReport();
         report.addIssue(Issue.create(Type.INCOMPATIBLE_DEPENDENCY, "hello", Severity.INFO));
-        
+
         reporter.report(report);
-        
+
         verify(log).info("hello");
     }
-    
+
     @Test
     void shouldLogError() throws Exception {
         var reporter = new LogDependencyReporter(log);
         var report = new DependencyReport();
         report.addIssue(Issue.create(Type.INCOMPATIBLE_DEPENDENCY, "hello", Severity.ERROR));
-        
+
         reporter.report(report);
-        
+
         verify(log).error("hello");
     }
-    
+
 }
