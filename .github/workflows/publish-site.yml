@@ -2,7 +2,11 @@ name: Publish Maven Site
 
 on:
   workflow_dispatch:
-
+    inputs:
+      ref:
+        description: 'The branch, tag or SHA to publish.'
+        required: true
+        default: 'master'
 jobs:
   build:
     name: Publish maven site
@@ -10,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.ref }}
         
       - name: Setup Java
         uses: actions/setup-java@v3
