@@ -195,6 +195,9 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>${maven-site-plugin.version}</version>
+					<configuration>
+			           <skip>true</skip>
+					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
@@ -364,6 +367,5 @@
 		<developerConnection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</developerConnection>
 		<connection>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</connection>
 		<url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
-		<tag>0.1.0</tag>
 	</scm>
 </project>
