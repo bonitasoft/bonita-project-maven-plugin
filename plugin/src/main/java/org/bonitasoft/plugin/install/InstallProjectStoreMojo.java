@@ -38,17 +38,23 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
+import org.apache.maven.plugin.version.PluginVersionResult;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -76,12 +82,13 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private static final String VERSION = "version";
     private static final String ARTIFACT_ID = "artifactId";
 
-    private static final String INSTALL_PLUGIN_VERSION = "3.1.0";
+    static final String DEFAULT_INSTALL_PLUGIN_VERSION = "3.1.1";
+    static final String INITIAL_INSTALL_PLUGIN_VERSION = "2.4";
     private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    private MavenProject project;
+    MavenProject project;
 
     /**
      * Project store where dependencies are stored
@@ -93,13 +100,16 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private Maven maven;
 
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
-    protected MavenSession session;
+    MavenSession session;
+
+    @Component
+    MavenExecutionRequestPopulator execRequestPopulator;
 
     @Component
     private ArtifactResolver artifactResolver;
 
     @Component
-    private PluginVersionResolver pluginVersionResolver;
+    PluginVersionResolver pluginVersionResolver;
 
     @Component
     private ProjectBuilder projectBuilder;
@@ -135,19 +145,20 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         if (!projectStore.exists()) {
             return;
         }
+        String installPluginVersion = computeMavenInstallPluginVersion();
         Set<Artifact> projectArtifacts = getProjectArtifacts();
         for (Artifact artifact : projectArtifacts) {
             File artifactFile = findFileInProjectStore(artifact);
             if (artifactFile.exists()) {
-                installFileToLocalRepository(artifact, artifactFile);
+                installFileToLocalRepository(artifact, artifactFile, installPluginVersion);
             }
         }
     }
 
-    private void installFileToLocalRepository(Artifact artifact, File artifactFile) throws MojoExecutionException {
+    private void installFileToLocalRepository(Artifact artifact, File artifactFile, String installPluginVersion) throws MojoExecutionException {
         if (artifact.isSnapshot()) { // Always update SNAPSHOT dependencies
             try {
-                installArtifact(artifact, artifactFile);
+                installArtifact(artifact, artifactFile, installPluginVersion);
             } catch (InstallFileExecutionException e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
@@ -159,12 +170,25 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                 throw new MojoExecutionException(String.format("Failed to resolve artifact %s", artifact), e);
             } catch (ArtifactResolverException e) {
                 try {
-                    installArtifact(artifact, artifactFile);
+                    installArtifact(artifact, artifactFile, installPluginVersion);
                 } catch (InstallFileExecutionException ex) {
                     throw new MojoExecutionException(ex.getMessage(), ex);
                 }
             }
         }
+    }
+
+    String computeMavenInstallPluginVersion() throws MojoExecutionException {
+        String installPluginVersion = DEFAULT_INSTALL_PLUGIN_VERSION;
+        try {
+            installPluginVersion = resolveInstallFilePluginVersion();
+            if (INITIAL_INSTALL_PLUGIN_VERSION.equals(installPluginVersion)) {
+                installPluginVersion = DEFAULT_INSTALL_PLUGIN_VERSION;
+            }
+        } catch (PluginVersionResolutionException e) {
+            throw new MojoExecutionException("Failed to resolve the install plugin version.", e);
+        }
+        return installPluginVersion;
     }
 
     private Set<Artifact> getProjectArtifacts() throws MojoExecutionException {
@@ -175,7 +199,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         }
     }
 
-    private void installArtifact(Artifact artifact, File artifactFile)
+    private void installArtifact(Artifact artifact, File artifactFile, String installPluginVersion)
             throws InstallFileExecutionException {
         File pomFile = null;
         try {
@@ -183,11 +207,11 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                 pomFile = createDummyPomFile(artifact);
             }
             MavenExecutionResult executionResult = maven
-                    .execute(newInstallFileExecutionRequest(artifact, artifactFile, pomFile));
+                    .execute(newInstallFileExecutionRequest(artifact, artifactFile, pomFile, installPluginVersion));
             if (executionResult.hasExceptions()) {
                 throw new InstallFileExecutionException(executionResult.getExceptions());
             }
-        } catch (IOException e) {
+        } catch (IOException | MavenExecutionRequestPopulationException e) {
             throw new InstallFileExecutionException("Failed to create artifact a pom file.", e);
         } finally {
             try {
@@ -313,14 +337,17 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         return String.format("%s-%s.%s", artifact.getArtifactId(), artifact.getVersion(), artifact.getType());
     }
 
-    private MavenExecutionRequest newInstallFileExecutionRequest(Artifact artifact,
+    MavenExecutionRequest newInstallFileExecutionRequest(Artifact artifact,
             File artifactFile,
-            File pomFile) {
+            File pomFile,
+            String installPluginVersion) throws MavenExecutionRequestPopulationException {
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        // Retrieve mirrors, proxies and repositories settings. Removed in Maven 4.
+        execRequestPopulator.populateFromSettings(executionRequest, session.getSettings());
         executionRequest.setGoals(Arrays.asList(String.format("%s:%s:%s:install-file",
                 INSTALL_PLUGIN_GROUP_ID,
                 INSTALL_PLUGIN_ARTIFACT_ID,
-                INSTALL_PLUGIN_VERSION)));
+                installPluginVersion)));
         executionRequest.setLocalRepository(localRepository);
         Properties installFileProperties = new Properties();
         installFileProperties.setProperty(GROUP_ID, artifact.getGroupId());
@@ -336,6 +363,16 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         installFileProperties.setProperty("packaging", artifact.getType());
         executionRequest.setUserProperties(installFileProperties);
         return executionRequest;
+    }
+
+    String resolveInstallFilePluginVersion() throws PluginVersionResolutionException {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId(INSTALL_PLUGIN_GROUP_ID);
+        plugin.setArtifactId(INSTALL_PLUGIN_ARTIFACT_ID);
+        DefaultPluginVersionRequest pluginVersionRequest = new DefaultPluginVersionRequest(plugin, session);
+        pluginVersionRequest.setPom(project.getModel());
+        PluginVersionResult pluginVersionResult = pluginVersionResolver.resolve(pluginVersionRequest);
+        return pluginVersionResult.getVersion();
     }
 
     /*

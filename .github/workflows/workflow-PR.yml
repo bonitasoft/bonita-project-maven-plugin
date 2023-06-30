@@ -2,7 +2,7 @@ name: workflow-pr
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, support/*]
 
 jobs:
 
