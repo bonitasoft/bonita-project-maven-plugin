@@ -2,7 +2,11 @@ name: Publish Maven Site
 
 on:
   workflow_dispatch:
-
+    inputs:
+      ref:
+        description: 'The branch, tag or SHA to publish.'
+        required: true
+        default: 'master'
 jobs:
   build:
     name: Publish maven site
@@ -25,7 +29,7 @@ jobs:
       - name: Publish Site 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw -pl plugin -am --batch-mode clean compile site site:stage scm-publish:publish-scm
+        run: ./mvnw -ntp -pl plugin -am --batch-mode clean compile site site:stage scm-publish:publish-scm
         
 
             

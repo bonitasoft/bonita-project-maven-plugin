@@ -63,10 +63,11 @@
 		<project.scm.id>github</project.scm.id>
 
 		<java.version>11</java.version>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.site.skip>false</maven.site.skip>
+		
 		<jackson.version>2.14.1</jackson.version>
 
 		<!-- Maven plugins -->
@@ -316,6 +317,7 @@
 			<id>release</id>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
+				<maven.site.skip>true</maven.site.skip>
 			</properties>
 			<build>
 				<plugins>
@@ -357,7 +359,7 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 		<site>
-			<id>github-pages</id>
+			<id>github</id>
 			<name>Github Pages</name>
 			<url>scm:git:https://github.com/bonitasoft/bonita-project-maven-plugin.git</url>
 		</site>
