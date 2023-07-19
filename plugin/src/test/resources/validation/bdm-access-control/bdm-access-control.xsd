@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://documentation.bonitasoft.com/bdm-access-control-xml-schema/1.0" xmlns="http://documentation.bonitasoft.com/bdm-access-control-xml-schema/1.0" xmlns:tns="http://documentation.bonitasoft.com/bdm-access-control-xml-schema/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="accessControlModel" type="businessObjectAccessControlModel"/>
+
+  <xs:complexType name="accessRule">
+    <xs:sequence>
+      <xs:element name="condition" type="xs:string"/>
+      <xs:element name="staticProfiles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="profile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="dynamicProfiles" type="xs:string" minOccurs="0"/>
+      <xs:element name="attributes" type="attributesWrapper"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="usingDynamicProfiles" type="xs:boolean" use="required"/>
+    <xs:attribute name="description" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="attributesWrapper">
+    <xs:sequence>
+      <xs:element name="attribute" type="attribute" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="businessObjectQualifiedName" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="attribute">
+    <xs:sequence>
+      <xs:element name="attributes" type="attributesWrapper" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="businessObjectAccessControlModel">
+    <xs:sequence>
+      <xs:element name="businessObjectRule" type="businessObjectRule" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="modelVersion" type="xs:string"/>
+    <xs:attribute name="productVersion" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="businessObjectRule">
+    <xs:sequence>
+      <xs:element name="rule" type="accessRule" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="businessObjectQualifiedName" type="xs:ID" use="required"/>
+  </xs:complexType>
+</xs:schema>
+

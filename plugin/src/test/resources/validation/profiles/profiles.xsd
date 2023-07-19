@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://documentation.bonitasoft.com/profile-xml-schema/1.0" xmlns:tns="http://documentation.bonitasoft.com/profile-xml-schema/1.0" xmlns:profiles="http://documentation.bonitasoft.com/profile-xml-schema/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="profiles" type="tns:profilesNode"/>
+
+  <xs:complexType name="membershipNode">
+    <xs:all>
+      <xs:element name="group" type="xs:string" minOccurs="0"/>
+      <xs:element name="role" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="profileMappingNode">
+    <xs:all>
+      <xs:element name="users" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="groups" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="memberships" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="membership" type="tns:membershipNode" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="roles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="role" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="profileNode">
+    <xs:all>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="profileMapping" type="tns:profileMappingNode" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="isDefault" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="profilesNode">
+    <xs:sequence>
+      <xs:element name="profile" type="tns:profileNode" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

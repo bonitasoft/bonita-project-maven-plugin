@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<accessControlModel xmlns="http://documentation.bonitasoft.com/bdm-access-control-xml-schema/1.0">
+    <businessObjectRule businessObjectQualifiedName="com.company.model.BusinessObject1">
+        <rule name="myRule" usingDynamicProfiles="false">
+            <condition></condition>
+            <staticProfiles>
+                <profile>Administrator</profile>
+                <profile>Process manager</profile>
+                <profile>User</profile>
+            </staticProfiles>
+            <dynamicProfiles></dynamicProfiles>
+            <attributes businessObjectQualifiedName="com.company.model.BusinessObject1">
+                <attribute name="attribute1"/>
+            </attributes>
+        </rule>
+    </businessObjectRule>
+    <businessObjectRule businessObjectQualifiedName="com.company.model.BusinessObject2">
+        <rule name="myRule" usingDynamicProfiles="false">
+            <condition></condition>
+            <staticProfiles>
+                <profile>Process manager</profile>
+            </staticProfiles>
+            <dynamicProfiles></dynamicProfiles>
+            <attributes businessObjectQualifiedName="com.company.model.BusinessObject2">
+                <attribute name="attribute1"/>
+            </attributes>
+        </rule>
+    </businessObjectRule>
+    <businessObjectRule businessObjectQualifiedName="com.company.model.BusinessObject3">
+        <rule name="myRule" usingDynamicProfiles="false">
+            <condition></condition>
+            <staticProfiles>
+                <profile>Administrator</profile>
+            </staticProfiles>
+            <dynamicProfiles></dynamicProfiles>
+            <attributes businessObjectQualifiedName="com.company.model.BusinessObject3">
+                <attribute name="attribute1"/>
+            </attributes>
+        </rule>
+    </businessObjectRule>
+    <businessObjectRule businessObjectQualifiedName="com.company.model.BusinessObject4">
+        <rule name="myRule" usingDynamicProfiles="false">
+            <condition></condition>
+            <staticProfiles>
+                <profile>User</profile>
+            </staticProfiles>
+            <dynamicProfiles></dynamicProfiles>
+            <attributes businessObjectQualifiedName="com.company.model.BusinessObject4">
+                <attribute name="attribute1"/>
+            </attributes>
+        </rule>
+    </businessObjectRule>
+</accessControlModel>

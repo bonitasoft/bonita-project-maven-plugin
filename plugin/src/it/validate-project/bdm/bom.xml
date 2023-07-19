@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<businessObjectModel xmlns="http://documentation.bonitasoft.com/bdm-xml-schema/1.0" modelVersion="1.0" productVersion="8.0.0">
+    <businessObjects>
+        <businessObject qualifiedName="com.bonita.bc.model.BCUser">
+            <description>The user that is used to make modifications in the registered domain</description>
+            <fields>
+                <field type="STRING" length="255" name="username" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="password" nullable="false" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.bonita.bc.model.BonitaDomain">
+            <description>A bonita runtime(platform) installation that can be mono-node or multi-node (cluster)</description>
+            <fields>
+                <field type="STRING" length="255" name="name" nullable="false" collection="false">
+                    <description>The name of the registered domain that is given by the user when he installs a new one in PM</description>
+                </field>
+                <field type="STRING" length="512" name="description" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="url" nullable="false" collection="false">
+                    <description>The place where the domain is located</description>
+                </field>
+                <field type="STRING" length="255" name="authMethod" nullable="false" collection="false"/>
+                <relationField type="COMPOSITION" reference="com.bonita.bc.model.Node" fetchType="LAZY" name="nodes" nullable="true" collection="true">
+                    <description>The list of connected nodes. &#13;
+                        Multi-node means that the domain is configured as a cluster environment that runs multiple Bonita runtimes, and uses a load balancer that redirects to a specific node.&#13;
+                        In oposition, mono-node means that all users that connect will do on a single instance of a Bonita runtime.</description>
+                </relationField>
+                <relationField type="COMPOSITION" reference="com.bonita.bc.model.BCUser" fetchType="LAZY" name="bcUser" nullable="true" collection="false">
+                    <description>The user that is used to do any action on the domain</description>
+                </relationField>
+                <field type="BOOLEAN" length="255" name="enabled" nullable="false" collection="false">
+                    <description>Current status of the domain. It can be disabled automatically in case of error or manually in case the user wants to do maintenance.</description>
+                </field>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="domainNameUnique">
+                    <fieldNames>
+                        <fieldName>name</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+                <uniqueConstraint name="domainUrlUnique">
+                    <fieldNames>
+                        <fieldName>url</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="countDomainsByNameOrUrl" content="SELECT count(b) &#10;FROM BonitaDomain b &#10;WHERE LOWER(b.name) = LOWER(:name) or LOWER(b.url) = LOWER(:url)" returnType="java.lang.Long">
+                    <queryParameters>
+                        <queryParameter name="name" className="java.lang.String"/>
+                        <queryParameter name="url" className="java.lang.String"/>
+                    </queryParameters>
+                </query>
+                <query name="findByNameOrUrl" content="SELECT b &#10;FROM BonitaDomain b &#10;WHERE :s is NULL OR (LOWER(b.name) LIKE LOWER(cast(concat('%',:s,'%') as string)) or LOWER(b.url) LIKE LOWER(cast(concat('%',:s,'%') as string)))&#10;" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="s" className="java.lang.String"/>
+                    </queryParameters>
+                </query>
+                <query name="countForFindByNameOrUrl" content="SELECT COUNT(b) &#10;FROM BonitaDomain b &#10;WHERE :s is NULL OR (LOWER(b.name) LIKE LOWER(cast(concat('%',:s,'%') as string)) or LOWER(b.url) LIKE LOWER(cast(concat('%',:s,'%') as string)))" returnType="java.lang.Long">
+                    <queryParameters>
+                        <queryParameter name="s" className="java.lang.String"/>
+                    </queryParameters>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.bonita.bc.model.DomainConfig">
+            <description>Stores a Json file that will be shown on the Config Page.</description>
+            <fields>
+                <field type="LONG" length="255" name="domainId" nullable="false" collection="false">
+                    <description>The domain associated to this config.</description>
+                </field>
+                <field type="LONG" length="255" name="retrievalTime" nullable="true" collection="false">
+                    <description>Retrieval Time when we requested this configuration from the agent.</description>
+                </field>
+                <field type="TEXT" length="255" name="content" nullable="true" collection="false">
+                    <description>The configuration json file that holds the domain config.</description>
+                </field>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uDomainConfig">
+                    <fieldNames>
+                        <fieldName>domainId</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.bonita.bc.model.DomainStatus">
+            <description>The archived and current availability status of the domain.
+
+            </description>
+            <fields>
+                <field type="LONG" length="255" name="domainId" nullable="false" collection="false">
+                    <description>The domain associated to this status</description>
+                </field>
+                <field type="INTEGER" length="255" name="status" nullable="true" collection="false">
+                    <description>The status which is associated to the domain
+                        The http rest status_code is store on this columns</description>
+                </field>
+                <field type="INTEGER" length="255" name="clusterSize" nullable="true" collection="false">
+                    <description>The number of the active cluster nodes.
+                        0 means that the runtime is not in cluster mode.</description>
+                </field>
+                <field type="LONG" length="255" name="startDate" nullable="true" collection="false">
+                    <description>The start of status availability tracing </description>
+                </field>
+                <field type="LONG" length="255" name="endDate" nullable="true" collection="false">
+                    <description>The end of the availability tracing</description>
+                </field>
+                <field type="LONG" length="255" name="lastPing" nullable="true" collection="false">
+                    <description>Since the state update will be done asynchronously, this saves the last time the domain has been checked for availability</description>
+                </field>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uLastPing">
+                    <fieldNames>
+                        <fieldName>lastPing</fieldName>
+                        <fieldName>domainId</fieldName>
+                        <fieldName>status</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="findByDomainIdOrderByLastPing" content="SELECT d&#13;&#10;FROM DomainStatus d&#13;&#10;WHERE d.domainId = :domainId&#13;&#10;ORDER BY d.lastPing DESC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="domainId" className="java.lang.Long"/>
+                    </queryParameters>
+                </query>
+                <query name="findLastStatus" content="SELECT d&#13;&#10;FROM DomainStatus d &#13;&#10;INNER JOIN BonitaDomain bd ON d.domainId = bd.persistenceId AND (:s is NULL OR (LOWER(bd.name) LIKE LOWER(cast(concat('%',:s,'%') as string)) or LOWER(bd.url) LIKE LOWER(cast(concat('%',:s,'%') as string))))&#13;&#10;WHERE d.lastPing = (SELECT MAX(d1.lastPing) FROM DomainStatus d1 WHERE d1.domainId = d.domainId)" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="s" className="java.lang.String"/>
+                    </queryParameters>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.bonita.bc.model.Node">
+            <description>A single instance of Bonita runtime</description>
+            <fields>
+                <field type="STRING" length="255" name="ip" nullable="false" collection="false">
+                    <description>The location of the Bonita runtime on the server. &#13;
+                        Example: A domain that contains 3 nodes might have them on 192.168.0.2, 192.168.0.3 and 192.168.0.4</description>
+                </field>
+                <field type="STRING" length="255" name="name" nullable="true" collection="false">
+                    <description>The name of the Bonita runtime. This is auto-generated</description>
+                </field>
+                <field type="STRING" length="255" name="url" nullable="true" collection="false">
+                    <description>URL of the Bonita runtime:
+protocol, port and root path are the default ones. If it does not connect, the url is entered by the user from the monitoring page.</description>
+                </field>
+                <field type="BOOLEAN" length="255" name="enabled" nullable="false" collection="false">
+                    <description>true if the node is enabled from the domain point of view (i.e. is part of the platformAPI response)</description>
+                </field>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.bonita.bc.model.Worker">
+            <description>The user that will be used to do dirty work on the registered domain (like creation/deletion of the domain). It's information is encrypted and will be deleted at the end of the processes.</description>
+            <fields>
+                <field type="STRING" length="255" name="username" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="password" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="cookies" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="apiToken" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+    </businessObjects>
+</businessObjectModel>

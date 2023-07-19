@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application layout="custompage_bcLayout" profile="userBc" theme="custompage_themeBonita" state="ACTIVATED" version="1.0.2-SNAPSHOT" homePage="home" token="bonitaCentral">
+        <displayName>Bonita Central</displayName>
+        <applicationPages>
+            <applicationPage customPage="custompage_ApplicationDetailsPage" token="application-details"/>
+            <applicationPage customPage="custompage_ConfigurationPage" token="configuration"/>
+            <applicationPage customPage="custompage_PageUnderConstruction" token="under-construction"/>
+            <applicationPage customPage="custompage_MonitoringPage" token="monitoring"/>
+            <applicationPage customPage="custompage_BCHomePage" token="home"/>
+            <applicationPage customPage="custompage_adminUserListBonitaCentral" token="admin-user-list"/>
+        </applicationPages>
+        <applicationMenus>
+            <applicationMenu applicationPage="home">
+                <displayName>Home</displayName>
+            </applicationMenu>
+        </applicationMenus>
+    </application>
+</applications>
