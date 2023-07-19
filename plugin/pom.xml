@@ -40,7 +40,7 @@
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
     <!-- Test -->
-    <groovy.version>3.0.17</groovy.version>
+    <groovy.version>3.0.18</groovy.version>
   </properties>
   <dependencyManagement>
     <dependencies>
