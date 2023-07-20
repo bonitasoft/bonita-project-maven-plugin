@@ -96,7 +96,6 @@ class AnalyzeBonitaDependencyMojoTest {
     @Test
     void should_run_analysis_without_validation() throws Exception {
         // Given
-        mojo = spy(mojo);
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
 
@@ -123,7 +122,6 @@ class AnalyzeBonitaDependencyMojoTest {
     @Test
     void shouldIncludeOnlyRuntimeScopeByDefault() throws Exception {
         // Given
-        mojo = spy(mojo);
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
 
@@ -158,7 +156,6 @@ class AnalyzeBonitaDependencyMojoTest {
     @Test
     void shouldIncludeCompileScope() throws Exception {
         // Given
-        mojo = spy(mojo);
         mojo.includeScope = "compile";
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
@@ -194,8 +191,6 @@ class AnalyzeBonitaDependencyMojoTest {
     @Test
     void sould_run_analysis_with_dep_validation() throws Exception {
         // Given
-        mojo = spy(mojo);
-
         mojo.validateDeps = true;
 
         when(mojo.getReporters()).thenReturn(singletonList(reporter));
