@@ -110,7 +110,7 @@
     <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-    <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
+    <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
     <spotless-maven-plugin.version>2.38.0</spotless-maven-plugin.version>
     <!-- Test -->
     <junit-jupiter-engine.version>5.9.3</junit-jupiter-engine.version>
