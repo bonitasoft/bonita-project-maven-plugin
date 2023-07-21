@@ -115,7 +115,7 @@
     <!-- Test -->
     <junit-jupiter-engine.version>5.9.3</junit-jupiter-engine.version>
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
-    <maven-invoker-plugin.version>3.5.1</maven-invoker-plugin.version>
+    <maven-invoker-plugin.version>3.6.0</maven-invoker-plugin.version>
     <mockito-junit-jupiter.version>5.4.0</mockito-junit-jupiter.version>
     <assertj-core.version>3.24.2</assertj-core.version>
     <logback-classic.version>1.2.11</logback-classic.version>
