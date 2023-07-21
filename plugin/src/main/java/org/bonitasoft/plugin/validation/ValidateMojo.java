@@ -105,6 +105,11 @@ public class ValidateMojo extends AbstractMojo {
             }
 
             // TODO uid validation
+            // org.bonitasoft.web.designer.repository.exception.JsonReadException if page source is not valid.
+            // Migration are applied on source on each page "get" on UID builder code. Source can be modified by the build process at this point  (migrated)!
+            // We could use this page "get" operation to kind of validate that UID resources are valid/compatible.
+            // See org.bonitasoft.web.designer.AngularJsArtifactBuilder in bonita-ui-designer-artifact-builder project.
+
         } catch (ValidationException e) {
             throw new MojoFailureException("Project validation failed with the following error: " + e.getMessage(), e);
         }
