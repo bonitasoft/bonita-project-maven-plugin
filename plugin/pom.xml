@@ -33,7 +33,7 @@
     <maven-artifact.version>3.9.3</maven-artifact.version>
     <maven-model.version>3.9.3</maven-model.version>
     <maven-model-builder.version>3.9.3</maven-model-builder.version>
-    <maven-settings.version>3.9.2</maven-settings.version>
+    <maven-settings.version>3.9.3</maven-settings.version>
     <maven-settings-builder.version>3.9.3</maven-settings-builder.version>
     <maven-repository-metadata.version>3.9.3</maven-repository-metadata.version>
     <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
