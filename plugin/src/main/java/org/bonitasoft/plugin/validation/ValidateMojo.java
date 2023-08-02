@@ -88,21 +88,11 @@ public class ValidateMojo extends AbstractMojo {
             executeXmlValidation(bdmXsdPath, bdmSourceDir, BDM_SOURCE_FILE_REGEX);
 
             log.info("Executing XML validation on BDM Access Control");
-            // FIXME remove this try-catch after extracting BDM Access Control model from bonita-common-sp
-            try {
-                executeXmlValidation(bdmAccessControlXsdPath, bdmAccessControlSourceDir,
-                        BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
-            } catch (ValidationErrorException e) {
-                log.warn(bdmAccessControlXsdPath + " is not available in the classpath", e);
-            }
+            executeXmlValidation(bdmAccessControlXsdPath, bdmAccessControlSourceDir,
+                    BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
 
             log.info("Executing XML validation on Organizations");
-            // FIXME remove this try-catch after extracting Organization model from bonita-process-engine
-            try {
-                executeXmlValidation(organizationXsdPath, organizationSourceDir, ORGANIZATION_SOURCE_FILE_REGEX);
-            } catch (ValidationErrorException e) {
-                log.warn(organizationXsdPath + " is not available in the classpath", e);
-            }
+            executeXmlValidation(organizationXsdPath, organizationSourceDir, ORGANIZATION_SOURCE_FILE_REGEX);
 
             // TODO uid validation
             // org.bonitasoft.web.designer.repository.exception.JsonReadException if page source is not valid.
