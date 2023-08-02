@@ -1,0 +1,55 @@
+
+
+        .bpmn-activity-info > rect {
+            fill: blue !important;
+            fill-opacity: 30% !important;
+            stroke: blue;
+        }
+        
+        .bpmn-activity-success > rect {
+            fill: #c6d4b2 !important;
+            stroke: #758263;
+            color: #758263;
+        }
+        
+        .bpmn-activity-completed > rect {
+            stroke: #666666;
+            fill: #d9d9d9;
+            color: #666666;
+        }
+        
+        .bpmn-activity-error > rect {
+            fill: red !important;
+            fill-opacity: 20% !important;
+            stroke: red;
+        }
+
+        .bpmn-gateway-warning > path:nth-child(1) {
+            fill: yellow !important;
+            fill-opacity: 30% !important;
+            stroke: orange;
+            stroke-width: 4px;
+        }
+
+        /* edge arrow */
+        .bpmn-edge-path-highlight > path:nth-child(3) {
+            fill: var(--color-highlight);
+        }
+        /* edge arrow */
+        .bpmn-edge-path-highlight > path:nth-child(3),
+        /* edge line */
+        .bpmn-edge-path-highlight > path:nth-child(2),
+        /* activity */
+        .bpmn-shape-path-highlight > rect,
+        /* gateway */
+        .bpmn-shape-path-highlight > path:nth-child(1),
+        /* event */
+        .bpmn-shape-path-highlight > ellipse {
+            filter: blur(1.5px); /* only work on Firefox */
+            stroke: var(--color-highlight);
+            stroke-width: 7px;
+        }
+        .bpmn-activity-in-progress > rect {
+            fill: var(--color-highlight) !important;
+            fill-opacity: 40% !important;
+        }

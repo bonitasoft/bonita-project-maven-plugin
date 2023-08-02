@@ -1,0 +1,13 @@
+<div class="text-{{ properties.alignment }}">
+    <button
+        ng-class="'btn btn-' + properties.buttonStyle"
+        ng-click="ctrl.action()"
+        type="button"
+        ng-if="!ctrl.busy"
+        ng-disabled="properties.disabled || ctrl.busy" 
+        ng-bind-html="properties.label | uiTranslate">
+    </button>
+    <svg class="loading" ng-if="ctrl.busy" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45"/>
+    </svg>
+</div>

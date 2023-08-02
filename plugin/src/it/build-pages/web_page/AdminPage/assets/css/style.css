@@ -1,0 +1,100 @@
+/* Add margin bottom and top to each widgets */
+.component {
+    margin-bottom: 3px;
+    margin-top: 3px;
+}
+
+/* Set cursor to pointer on table with selectable rows */
+.table-hover tr {
+    cursor: pointer;
+}
+
+/* Set a red border to invalid input fields in forms */
+input[type='text'].ng-invalid.ng-dirty, input[type='email'].ng-invalid.ng-dirty,
+input[type='number'].ng-invalid.ng-dirty, input[type='password'].ng-invalid.ng-dirty {
+  border-color: #C00;
+  border-width: 1px;
+}
+
+/* Add a red star after required inputs */
+.control-label--required:after {
+  content: " *";
+  color: #C00;
+}
+.btn-invalid{
+    border-color: #C00;
+    border-width: 1px;
+}
+
+.bonita-modal{
+    overflow-y: auto;
+}
+
+.modal-open .datepicker,
+.modal-open .timepicker {
+    z-index: 9999;
+}
+
+
+.card {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2);
+  border-right-width: 0px;
+  border-right-style: solid;
+  border-left-width: 4px;
+  border-left-style: solid;
+  padding: .3em .8em .8em .8em;
+  margin: .5em auto 1em auto ;
+  background-color: #fff;
+  border-color: #033c73;
+}
+
+.card-container {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.2);
+}
+
+.mr-1{
+    margin-right: .5em;
+}
+
+.mt-1{
+    margin-top: .5em;
+}
+.ml-1{
+    margin-left: .5em;
+}
+.mb-1{
+    margin-bottom: .5em;
+}
+.m-2{
+    margin: .5em;
+}
+
+.p-2{
+    padding: .5em;
+}
+
+.note-warning{
+    background: #fff6bd;
+    border-left: 3px solid #a89620;
+}
+
+.note-warning p {
+    color: #a89620;
+    padding: .5em 0;
+    margin: 0;
+}
+
+.alert {
+    margin-bottom: 10px;
+}
+
+p {
+    margin : 8px 0 0 0;
+}

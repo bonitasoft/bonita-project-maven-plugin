@@ -1,0 +1,24 @@
+{
+  "id" : "customSpinner",
+  "name" : "Spinner",
+  "type" : "widget",
+  "custom" : true,
+  "modelVersion" : "2.4",
+  "previousArtifactVersion" : "2.2",
+  "lastUpdate" : 1685528815464,
+  "template" : "@customSpinner.tpl.html",
+  "controller" : "@customSpinner.ctrl.js",
+  "properties" : [ ],
+  "assets" : [
+    {
+      "id" : "a399e13c-990c-49b1-bf8b-ae2bc3e55a0b",
+      "name" : "spinner.css",
+      "type" : "css",
+      "order" : 1,
+      "external" : false
+    }
+  ],
+  "requiredModules" : [ ],
+  "webResources" : [ ],
+  "hasHelp" : false
+}

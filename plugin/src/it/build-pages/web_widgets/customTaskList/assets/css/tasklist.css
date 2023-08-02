@@ -1,0 +1,107 @@
+.card {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2);
+  border-right-width: 0px;
+  border-right-style: solid;
+  border-left-width: 4px;
+  border-left-style: solid;
+  padding: .3em .8em .8em .8em;
+  margin: .5em auto 1em auto ;
+  background-color: #fff;
+}
+
+.card-container {
+  margin: auto 1em auto 1em;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.2);
+}
+
+.no-animate {
+   -webkit-transition: none !important;
+   transition: none !important;
+}
+
+/* The starting CSS styles for the enter animation */
+.fade-in .ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
+}
+
+.fade-in .ng-enter.ng-enter-active {
+  opacity:1;
+}
+
+.fade-in .ng-enter-stagger {
+  transition-delay: 0.2s;
+}
+
+.fade-out .ng-leave {
+  transition:0.5s linear all;
+  opacity:1;
+}
+
+.fade-out .ng-leave.ng-leave-active {
+  opacity:0;
+}
+
+.task-success {
+    padding-right: 8px;
+    font-size: 27px;
+}
+
+.loading {
+  animation: 2s linear infinite svg-animation;
+  max-width: 20px;
+  margin-right: 8px;
+  margin-top: 3px;
+}
+
+
+@keyframes svg-animation {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg)
+  }
+}
+
+
+circle {
+  animation: 1.4s ease-in-out infinite both circle-animation;
+  display: block;
+  fill: transparent;
+  stroke: #2c3e50;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 280;
+  stroke-width: 10px;
+  transform-origin: 50% 50%;
+}
+
+
+@keyframes circle-animation {
+  0%,
+  25% {
+    stroke-dashoffset: 280;
+    transform: rotate(0);
+  }
+  
+  50%,
+  75% {
+    stroke-dashoffset: 75;
+    transform: rotate(45deg);
+  }
+  
+  100% {
+    stroke-dashoffset: 280;
+    transform: rotate(360deg);
+  }
+}
+
+.mt-5 {
+    margin-top: 5em;
+}

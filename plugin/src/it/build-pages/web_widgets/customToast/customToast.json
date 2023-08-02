@@ -1,0 +1,54 @@
+{
+  "id" : "customToast",
+  "name" : "toast",
+  "type" : "widget",
+  "custom" : true,
+  "modelVersion" : "2.4",
+  "previousArtifactVersion" : "2.2",
+  "lastUpdate" : 1685528814778,
+  "template" : "@customToast.tpl.html",
+  "controller" : "@customToast.ctrl.js",
+  "properties" : [
+    {
+      "label" : "Toasts to display",
+      "name" : "toastsToDisplay",
+      "help" : "Add a new object to this array that has a \"message\" property",
+      "type" : "text",
+      "bond" : "variable"
+    },
+    {
+      "label" : "Display time (ms)",
+      "name" : "displayTime",
+      "help" : "",
+      "type" : "integer",
+      "defaultValue" : 5000,
+      "bond" : "expression"
+    }
+  ],
+  "assets" : [
+    {
+      "id" : "42bf3670-d745-41d9-a8fe-1c4de816c1a2",
+      "name" : "toastr.min.css",
+      "type" : "css",
+      "order" : 1,
+      "external" : false
+    },
+    {
+      "id" : "ed6edf75-47d8-4508-b2d2-6784ae285eb0",
+      "name" : "jquery.min.js",
+      "type" : "js",
+      "order" : 2,
+      "external" : false
+    },
+    {
+      "id" : "4560d140-019c-413c-a775-c3bbe0985b9b",
+      "name" : "toastr.min.js",
+      "type" : "js",
+      "order" : 3,
+      "external" : false
+    }
+  ],
+  "requiredModules" : [ ],
+  "webResources" : [ ],
+  "hasHelp" : false
+}

@@ -12,10 +12,6 @@
   <prerequisites>
     <maven>3.6</maven>
   </prerequisites>
-  <scm>
-    <tag>HEAD</tag>
-    <url>https://github.com/bonitasoft/bonita-project-maven-plugin</url>
-  </scm>
   <properties>
     <eclipse.formatter.file>${project.parent.basedir}/formatter.xml</eclipse.formatter.file>
     <eclipse.importorder.file>${project.parent.basedir}/eclipse.importorder</eclipse.importorder.file>
@@ -39,6 +35,8 @@
     <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
+    <bonita-ui-designer-artifact-builder.version>1.0.0-SNAPSHOT</bonita-ui-designer-artifact-builder.version>
+    <file-management.version>3.1.0</file-management.version>
     <!-- Test -->
     <groovy.version>3.0.18</groovy.version>
   </properties>
@@ -98,9 +96,20 @@
         <version>${maven-aether-provider.version}</version>
         <scope>provided</scope>
       </dependency>
+      <dependency>
+        <groupId>org.bonitasoft.web</groupId>
+        <artifactId>ui-designer-artifact-builder-dependencies</artifactId>
+        <version>${bonita-ui-designer-artifact-builder.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
+    <dependency>
+      <groupId>org.bonitasoft.web</groupId>
+      <artifactId>ui-designer-artifact-builder</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>bonita-project-report-model</artifactId>
@@ -109,8 +118,15 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>file-management</artifactId>
+      <version>${file-management.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -165,6 +181,10 @@
           <groupId>org.springframework</groupId>
           <artifactId>spring-context</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.jboss.logging</groupId>
+          <artifactId>jboss-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- Test -->
@@ -186,6 +206,11 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
