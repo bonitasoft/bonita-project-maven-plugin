@@ -16,8 +16,6 @@
  */
 package org.bonitasoft.plugin.build.page.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -30,9 +28,7 @@ import java.util.Arrays;
 import org.bonitasoft.plugin.build.page.BuildPageException;
 import org.bonitasoft.plugin.build.page.UidArtifactBuilder;
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.ArtifactBuilderFactory;
 import org.bonitasoft.web.designer.JsonHandlerFactory;
-import org.bonitasoft.web.designer.config.UiDesignerProperties;
 import org.bonitasoft.web.designer.controller.export.ExportException;
 import org.bonitasoft.web.designer.model.JsonHandler;
 import org.bonitasoft.web.designer.model.JsonViewPersistence;
@@ -47,19 +43,14 @@ public class UidArtifactBuilderImpl implements UidArtifactBuilder {
 
     private JsonHandler jsonHandler = new JsonHandlerFactory().create();
     private ArtifactBuilder artifactBuilder;
-    private Path outputDirectory;
-    private UiDesignerProperties uiDesignerProperties;
 
-    public UidArtifactBuilderImpl(UiDesignerProperties uiDesignerProperties,
-            Path outputDirectory) {
-        this.uiDesignerProperties = requireNonNull(uiDesignerProperties);
-        this.outputDirectory = requireNonNull(outputDirectory);
+    public UidArtifactBuilderImpl(ArtifactBuilder artifactBuilder) {
+        this.artifactBuilder = artifactBuilder;
     }
 
     @Override
-    public void buildPages(String[] includedPages) throws BuildPageException {
-        var pageFolder = uiDesignerProperties.getWorkspace().getPages().getDir();
-        var visitor = new PageVisitorImpl(pageFolder, includedPages);
+    public void buildPages(Path pageFolder, String[] includedPages, Path outputDirectory) throws BuildPageException {
+        var visitor = new PageVisitorImpl(pageFolder, includedPages, outputDirectory);
         try {
             Files.walkFileTree(pageFolder, visitor);
             if (visitor.getError() != null) {
@@ -77,17 +68,10 @@ public class UidArtifactBuilderImpl implements UidArtifactBuilder {
         }
         try {
             LOGGER.info("Building page {}...", id);
-            return getArtifactBuilder().buildPage(id);
+            return artifactBuilder.buildPage(id);
         } catch (IOException | ExportException | ModelException e) {
             throw new BuildPageException(e);
         }
-    }
-
-    ArtifactBuilder getArtifactBuilder() {
-        if (artifactBuilder == null) {
-            artifactBuilder = new ArtifactBuilderFactory(uiDesignerProperties).create();
-        }
-        return artifactBuilder;
     }
 
     class PageVisitorImpl implements FileVisitor<Path> {
@@ -95,10 +79,12 @@ public class UidArtifactBuilderImpl implements UidArtifactBuilder {
         private Path pageFolder;
         private Throwable error;
         private String[] includedPages;
+        private Path outputDirectory;
 
-        public PageVisitorImpl(Path pageFolder, String[] includedPages) {
+        public PageVisitorImpl(Path pageFolder, String[] includedPages, Path outputDirectory) {
             this.pageFolder = pageFolder;
             this.includedPages = includedPages;
+            this.outputDirectory = outputDirectory;
         }
 
         public Throwable getError() {
@@ -129,7 +115,7 @@ public class UidArtifactBuilderImpl implements UidArtifactBuilder {
                     var type = page.getType();
                     if ("page".equals(type) || "layout".equals(type)) {
                         LOGGER.info("Building {} {}...", type, page.getName());
-                        var content = getArtifactBuilder().build(page);
+                        var content = artifactBuilder.build(page);
                         var fileName = String.format("%s_%s.zip", page.getType(), page.getName());
                         LOGGER.info("Writing {} in {}", fileName, outputDirectory);
                         Files.write(outputDirectory.resolve(fileName), content, StandardOpenOption.CREATE);

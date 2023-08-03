@@ -37,6 +37,7 @@
     <bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
     <bonita-ui-designer-artifact-builder.version>1.0.0-SNAPSHOT</bonita-ui-designer-artifact-builder.version>
     <file-management.version>3.1.0</file-management.version>
+    <bonita2bar.version>8.0.0-SNAPSHOT</bonita2bar.version>
     <!-- Test -->
     <groovy.version>3.0.18</groovy.version>
   </properties>
@@ -109,6 +110,11 @@
     <dependency>
       <groupId>org.bonitasoft.web</groupId>
       <artifactId>ui-designer-artifact-builder</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.bpm</groupId>
+      <artifactId>org.bonitasoft.bonita2bar</artifactId>
+      <version>${bonita2bar.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

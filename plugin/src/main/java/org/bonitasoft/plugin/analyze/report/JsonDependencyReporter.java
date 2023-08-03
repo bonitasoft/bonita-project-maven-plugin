@@ -21,18 +21,11 @@ import java.io.IOException;
 
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class JsonDependencyReporter implements DependencyReporter {
 
-    private final ObjectMapper mapper = new ObjectMapper()
-            .findAndRegisterModules()
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .setSerializationInclusion(Include.NON_NULL)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private final ObjectMapper mapper = DependencyReporter.objectMapper();
 
     private final File outputFile;
 

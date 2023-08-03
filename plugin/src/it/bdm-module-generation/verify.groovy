@@ -11,3 +11,6 @@ assert bdmClientDao.exists() : 'procurement-example-bdm-dao-client-1.0.0-SNAPSHO
 
 File bdmClientDaoSources = new File( basedir, 'bdm/dao-client/target/procurement-example-bdm-dao-client-1.0.0-SNAPSHOT-sources.jar');
 assert bdmClientDaoSources.exists() : 'procurement-example-bdm-dao-client-1.0.0-SNAPSHOT-sources.jar'
+
+File appPom = new File( basedir, 'app/pom.xml');
+assert appPom.text.contains("<artifactId>procurement-example-bdm-model</artifactId>")

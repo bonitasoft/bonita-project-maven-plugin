@@ -16,12 +16,23 @@
  */
 package org.bonitasoft.plugin.build.page;
 
-import java.nio.file.Path;
+import org.bonitasoft.plugin.build.page.impl.UidArtifactBuilderImpl;
+import org.bonitasoft.web.designer.ArtifactBuilderFactory;
+import org.bonitasoft.web.designer.config.UiDesignerProperties;
 
-public interface UidArtifactBuilder {
+public class UidArtifactBuilderFactory {
 
-    void buildPages(Path pageFolder, String[] includedPages, Path outputDirectory) throws BuildPageException;
+    private static UidArtifactBuilder builder;
 
-    byte[] buildPage(String id) throws BuildPageException;
+    private UidArtifactBuilderFactory() {
+        // private constructor
+    }
+
+    public static synchronized UidArtifactBuilder create(UiDesignerProperties uidWorkspaceProperties) {
+        if (builder == null) {
+            builder = new UidArtifactBuilderImpl(new ArtifactBuilderFactory(uidWorkspaceProperties).create());
+        }
+        return builder;
+    }
 
 }
