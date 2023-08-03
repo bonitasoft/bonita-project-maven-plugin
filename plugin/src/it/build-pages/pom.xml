@@ -24,7 +24,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>build-page</goal>
+							<goal>uid-page</goal>
 						</goals>
 					</execution>
 				</executions>

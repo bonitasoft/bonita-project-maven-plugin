@@ -14,5 +14,16 @@
         </execute>
       </action>
     </pluginExecution>
+    <pluginExecution>
+     	<pluginExecutionFilter>
+        <goals>
+          <goal>business-archive</goal>
+          <goal>uid-page</goal>
+        </goals>
+      </pluginExecutionFilter>
+       <action>
+        <ignore/>
+      </action>
+    </pluginExecution>
   </pluginExecutions>
 </lifecycleMappingMetadata>

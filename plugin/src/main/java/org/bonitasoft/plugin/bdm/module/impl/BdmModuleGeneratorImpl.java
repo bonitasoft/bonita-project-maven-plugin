@@ -17,11 +17,15 @@
 package org.bonitasoft.plugin.bdm.module.impl;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
@@ -39,6 +43,7 @@ public class BdmModuleGeneratorImpl extends AbstractModuleGenerator {
     static final String DAO_CLIENT_MODULE_NAME_SUFFIX = "-bdm-dao-client";
     static final String POM_FILE_NAME = "pom.xml";
     static final String BDM_MODEL_ARTIFACT_ID_PLACEHOLDER = "_BDM_MODEL_ARTIFACT_ID_PLACEHOLDER_";
+    static final String APP_MODULE = "app";
 
     @Inject
     public BdmModuleGeneratorImpl(ModelReader modelReader, ModelWriter modelWriter) {
@@ -65,6 +70,21 @@ public class BdmModuleGeneratorImpl extends AbstractModuleGenerator {
                 parentProjectModel.getModules().add(BDM_PARENT_MODULE);
             }
             modelWriter.write(parentProject.getFile(), null, parentProjectModel);
+
+            var appPom = parentProject.getBasedir().toPath().resolve(APP_MODULE).resolve(POM_FILE_NAME);
+            if (Files.exists(appPom)) {
+                var appModel = modelReader.read(appPom.toFile(), null);
+                if (appModel.getDependencies().stream()
+                        .noneMatch(d -> Objects.equals(d.getArtifactId(), projectId + MODEL_MODULE_NAME_SUFFIX))) {
+                    var bdmModelDependency = new Dependency();
+                    bdmModelDependency.setGroupId("${project.groupId}");
+                    bdmModelDependency.setArtifactId(projectId + MODEL_MODULE_NAME_SUFFIX);
+                    bdmModelDependency.setVersion("${project.version}");
+                    bdmModelDependency.setScope(Artifact.SCOPE_PROVIDED);
+                    appModel.getDependencies().add(bdmModelDependency);
+                    modelWriter.write(appPom.toFile(), null, appModel);
+                }
+            }
         } catch (IOException e) {
             throw new ModuleGenerationException("Failed to add bdm module to parent pom.", e);
         }
