@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,16 +33,15 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
 import org.bonitasoft.bonita2bar.BuildBarException;
-import org.bonitasoft.bonita2bar.BuildResult;
 import org.bonitasoft.bonita2bar.ClasspathResolver;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
 import org.bonitasoft.bonita2bar.SourcePathProvider;
-import org.bonitasoft.bonita2bar.configuration.model.ParametersConfiguration;
 import org.bonitasoft.bonita2bar.form.FormBuilder;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
@@ -65,7 +65,13 @@ public class BuildBarMojo extends AbstractBuildMojo {
      * The configuration environment. Default to Local.
      */
     @Parameter(defaultValue = "Local", property = "bonita.environment")
-    private String environment;
+    String environment;
+
+    /**
+     * The name of the Bonita configuration file name
+     */
+    @Parameter(defaultValue = "${project.artifactId}-${project.version}-${bonita.environment}.bconf", property = "bonita.configurationFile")
+    String configurationFileName;
 
     /**
      * Whether task and process instantiation form mapping is required at build time or not.
@@ -124,13 +130,10 @@ public class BuildBarMojo extends AbstractBuildMojo {
                 .workingDirectory(tmpFolder)
                 .build());
 
-        var paramsConfig = new ParametersConfiguration();
-        var result = new BuildResult(environment, paramsConfig, tmpFolder);
         for (var pool : processRegistry.getProcesses()) {
             try {
                 var buildResult = barBuilder.build(pool, environment);
                 buildResult.writeBusinessArchivesTo(outputFolder.resolve("processes"));
-                result.add(buildResult);
                 getLog().info("");
             } catch (BuildBarException | IOException e) {
                 throw new MojoFailureException(
@@ -139,10 +142,19 @@ public class BuildBarMojo extends AbstractBuildMojo {
         }
         try {
             getLog().info("Building Bonita Configuration archive...");
-            result.writeBonitaConfigurationTo(outputFolder.resolve(configurationFileName()));
+            var aggregatedResult = barBuilder.getBuildResult();
+            aggregatedResult.writeBonitaConfigurationTo(outputFolder.resolve(getConfigurationFileName(project)));
         } catch (IOException e) {
             throw new MojoExecutionException(e);
         }
+    }
+
+    String getConfigurationFileName(MavenProject project) {
+        if (Objects.equals(configurationFileName, String.format("%s-%s-${bonita.environment}.bconf",
+                project.getArtifactId(), project.getVersion()))) {
+            return String.format("%s-%s-%s.bconf", project.getArtifactId(), project.getVersion(), environment);
+        }
+        return configurationFileName;
     }
 
     DependencyReport getDependencyReport(File reportFile) throws MojoExecutionException {
@@ -166,15 +178,13 @@ public class BuildBarMojo extends AbstractBuildMojo {
                 .collect(Collectors.toList());
     }
 
-    private String configurationFileName() {
-        return String.format("%s-%s-%s.bconf",
-                project.getArtifactId(),
-                project.getVersion(), environment);
-    }
-
     private List<String> getClasspath() throws MojoExecutionException {
         try {
-            return project.getCompileClasspathElements();
+            return Stream
+                    .concat(project.getCompileClasspathElements().stream(),
+                            project.getRuntimeClasspathElements().stream())
+                    .distinct()
+                    .collect(Collectors.toList());
         } catch (DependencyResolutionRequiredException e) {
             throw new MojoExecutionException(e);
         }
