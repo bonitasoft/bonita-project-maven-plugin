@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.validation;
+package org.bonitasoft.plugin.validation.xml;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +29,10 @@ import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+
+import org.bonitasoft.plugin.validation.ValidationErrorException;
+import org.bonitasoft.plugin.validation.ValidationException;
+import org.bonitasoft.plugin.validation.ValidationTask;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,19 +45,19 @@ public class XmlValidationTask implements ValidationTask {
     private static final String DEFAULT_SOURCE_FILE_REGEX = "^.*\\.xml$";
 
     private final URL xsdUrl;
-    private final Path projectSourceDir;
+    private final Path artifactsSourceDir;
     private final String sourceFileRegex;
     private final Validator validator;
 
-    public XmlValidationTask(URL xsdUrl, Path projectSourceDir, String sourceFileRegex) {
+    public XmlValidationTask(URL xsdUrl, Path artifactsSourceDir, String sourceFileRegex) {
         this.xsdUrl = xsdUrl;
-        this.projectSourceDir = projectSourceDir;
-        this.sourceFileRegex = sourceFileRegex;
+        this.artifactsSourceDir = artifactsSourceDir;
+        this.sourceFileRegex = sourceFileRegex == null ? DEFAULT_SOURCE_FILE_REGEX : sourceFileRegex;
         validator = initValidator();
     }
 
-    public XmlValidationTask(URL xsdUrl, Path projectSourceDir) {
-        this(xsdUrl, projectSourceDir, DEFAULT_SOURCE_FILE_REGEX);
+    public XmlValidationTask(URL xsdUrl, Path artifactsSourceDir) {
+        this(xsdUrl, artifactsSourceDir, DEFAULT_SOURCE_FILE_REGEX);
     }
 
     @Override
@@ -83,19 +86,16 @@ public class XmlValidationTask implements ValidationTask {
     }
 
     protected List<File> getSourceFiles() {
-        if (Files.exists(projectSourceDir) && Files.isDirectory(projectSourceDir)) {
-            try (Stream<Path> sourcePaths = Files.list(projectSourceDir)) {
-                var sourceFiles = sourcePaths
-                        .filter(path -> Files.isRegularFile(path)
-                                && path.getFileName().toString().matches(sourceFileRegex))
-                        .map(Path::toFile).collect(Collectors.toList());
-                log.debug("Found [{}] source files in directory [{}]", sourceFiles.size(), projectSourceDir);
-                return sourceFiles;
-            } catch (IOException e) {
-                throw new ValidationErrorException("Failed to list files in directory " + projectSourceDir, e);
-            }
+        try (Stream<Path> sourcePaths = Files.list(artifactsSourceDir)) {
+            var sourceFiles = sourcePaths
+                    .filter(path -> Files.isRegularFile(path)
+                            && path.getFileName().toString().matches(sourceFileRegex))
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+            log.debug("Found [{}] source files in directory [{}]", sourceFiles.size(), artifactsSourceDir);
+            return sourceFiles;
+        } catch (IOException e) {
+            throw new ValidationErrorException("Failed to list files in directory " + artifactsSourceDir, e);
         }
-        log.debug("Project source directory [{}] does not exist or is not a directory", projectSourceDir);
-        return Collections.emptyList();
     }
 }

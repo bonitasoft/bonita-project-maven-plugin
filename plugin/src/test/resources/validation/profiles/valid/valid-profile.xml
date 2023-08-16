@@ -5,13 +5,10 @@
         <profileMapping>
             <users/>
             <groups/>
-            <memberships>
-                <membership>
-                    <group>/bonitaCentral</group>
-                    <role>supervisor</role>
-                </membership>
-            </memberships>
-            <roles/>
+            <memberships/>
+            <roles>
+                <role>member</role>
+            </roles>
         </profileMapping>
     </profile>
     <profile name="Administrator" isDefault="true">
@@ -19,13 +16,10 @@
         <profileMapping>
             <users/>
             <groups/>
-            <memberships>
-                <membership>
-                    <group>/bonitaCentral</group>
-                    <role>supervisor</role>
-                </membership>
-            </memberships>
-            <roles/>
+            <memberships/>
+            <roles>
+                <role>member</role>
+            </roles>
         </profileMapping>
     </profile>
     <profile name="Process manager" isDefault="true">
@@ -33,13 +27,10 @@
         <profileMapping>
             <users/>
             <groups/>
-            <memberships>
-                <membership>
-                    <group>/bonitaCentral</group>
-                    <role>supervisor</role>
-                </membership>
-            </memberships>
-            <roles/>
+            <memberships/>
+            <roles>
+                <role>member</role>
+            </roles>
         </profileMapping>
     </profile>
 </profiles:profiles>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.bonitasoft.bc</groupId>
-    <artifactId>bonita-central-parent</artifactId>
-	  <version>1.0.2-SNAPSHOT</version>
+    <groupId>org.bonitasoft.test</groupId>
+    <artifactId>my-project-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>bonita-central-bdm-parent</artifactId>
-  <name>bc :: bdm-parent</name>
+  <artifactId>my-project-bdm-parent</artifactId>
   <packaging>pom</packaging>
   <modules>
     <module>model</module>

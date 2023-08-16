@@ -14,48 +14,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.validation;
+package org.bonitasoft.plugin.validation.xml;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URL;
 import java.nio.file.Paths;
 
+import org.bonitasoft.plugin.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 
-class ApplicationValidationTaskTest {
+class ProfileValidationTaskTest {
 
-    private static final String TEST_RESOURCES_APPLICATIONS_DIR = "src/test/resources/validation/applications";
+    private static final String TEST_RESOURCES_PROFILES_DIR = "src/test/resources/validation/profiles";
 
-    private final URL xsdUrl = ApplicationValidationTaskTest.class
-            .getResource("/validation/applications/application.xsd");
+    private final URL xsdUrl = ProfileValidationTaskTest.class.getResource("/validation/profiles/profiles.xsd");
 
     @Test
-    void should_validate_valid_application() {
+    void should_validate_valid_profile() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_APPLICATIONS_DIR, "valid"));
+                Paths.get(TEST_RESOURCES_PROFILES_DIR, "valid"));
 
         // then
+        assertThat(validationTask.getSourceFiles()).hasSize(1);
         assertThatCode(validationTask::validate).doesNotThrowAnyException();
     }
 
     @Test
-    void should_not_validate_invalid_application() {
+    void should_not_validate_invalid_profile() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_APPLICATIONS_DIR, "invalid"));
+                Paths.get(TEST_RESOURCES_PROFILES_DIR, "invalid"));
 
         // then
-        assertThatExceptionOfType(ValidationException.class).isThrownBy(validationTask::validate)
-                .withMessage("File 'invalid-application.xml' is not valid");
+        assertThatExceptionOfType(ValidationException.class)
+                .isThrownBy(validationTask::validate)
+                .withMessage("File 'invalid-profile.xml' is not valid");
     }
 
     @Test
-    void should_validate_multiple_applications() {
+    void should_validate_multiple_profiles() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_APPLICATIONS_DIR, "multiple-apps"));
+                Paths.get(TEST_RESOURCES_PROFILES_DIR, "multiple-profiles"));
 
         // then
         assertThat(validationTask.getSourceFiles()).hasSize(2);

@@ -1,43 +1,49 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.bonitasoft</groupId>
-    <artifactId>my-project</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-
-    <properties>
-        <bonita.runtime.version>8.0.0</bonita.runtime.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.bonitasoft.test</groupId>
+  <artifactId>my-project-parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>app</module>
+  </modules>
+  <properties>
+    <maven.compiler.release>11</maven.compiler.release>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <bonita-project-maven-plugin.version>@project.version@</bonita-project-maven-plugin.version>
+    <bonita.runtime.version>8.0.0</bonita.runtime.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.bonitasoft.runtime</groupId>
+        <artifactId>bonita-runtime-bom</artifactId>
+        <version>${bonita.runtime.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.bonitasoft.maven</groupId>
+          <artifactId>bonita-project-maven-plugin</artifactId>
+          <version>${bonita-project-maven-plugin.version}</version>
+          <dependencies>
             <dependency>
-                <groupId>org.bonitasoft.runtime</groupId>
-                <artifactId>bonita-runtime-bom</artifactId>
-                <version>${bonita.runtime.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+              <groupId>org.bonitasoft.engine.data</groupId>
+              <artifactId>bonita-business-data-generator</artifactId>
+              <version>${bonita.runtime.version}</version>
             </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.bonitasoft.maven</groupId>
-                    <artifactId>bonita-project-maven-plugin</artifactId>
-                    <version>@project.version@</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.bonitasoft.engine.data</groupId>
-                            <artifactId>bonita-business-data-generator</artifactId>
-                            <version>${bonita.runtime.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

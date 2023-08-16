@@ -1,0 +1,51 @@
+{
+  "id" : "customAlert",
+  "name" : "alert",
+  "type" : "widget",
+  "custom" : true,
+  "modelVersion" : "2.5",
+  "previousArtifactVersion" : "2.3",
+  "lastUpdate" : 1692622944483,
+  "description" : "Customizable Bootstrap alert",
+  "template" : "@customAlert.tpl.html",
+  "controller" : "@customAlert.ctrl.js",
+  "properties" : [
+    {
+      "label" : "Message",
+      "name" : "message",
+      "type" : "text",
+      "bond" : "variable"
+    },
+    {
+      "label" : "Alert style",
+      "name" : "style",
+      "type" : "choice",
+      "defaultValue" : "alert-danger",
+      "choiceValues" : [
+        "alert-success",
+        "alert-info",
+        "alert-warning",
+        "alert-danger"
+      ],
+      "bond" : "expression"
+    },
+    {
+      "label" : "Is dismissible",
+      "name" : "isDismissible",
+      "type" : "boolean",
+      "defaultValue" : true,
+      "bond" : "expression"
+    },
+    {
+      "label" : "Label",
+      "name" : "label",
+      "type" : "text",
+      "defaultValue" : "Error:",
+      "bond" : "interpolation"
+    }
+  ],
+  "assets" : [ ],
+  "requiredModules" : [ ],
+  "webResources" : [ ],
+  "hasHelp" : false
+}

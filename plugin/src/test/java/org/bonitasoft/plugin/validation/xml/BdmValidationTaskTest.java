@@ -14,52 +14,54 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.validation;
+package org.bonitasoft.plugin.validation.xml;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URL;
 import java.nio.file.Paths;
 
+import org.bonitasoft.plugin.validation.ValidateMojo;
+import org.bonitasoft.plugin.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 
-class BdmAccessControlValidationTaskTest {
+class BdmValidationTaskTest {
 
-    private static final String TEST_RESOURCES_BDM_ACCESS_CONTROL_DIR = "src/test/resources/validation/bdm-access-control";
+    private static final String TEST_RESOURCES_BDM_DIR = "src/test/resources/validation/bdm";
 
-    private final URL xsdUrl = BdmAccessControlValidationTaskTest.class
-            .getResource("/validation/bdm-access-control/bdm-access-control.xsd");
+    private final URL xsdUrl = BdmValidationTaskTest.class.getResource("/validation/bdm/bom.xsd");
 
     @Test
-    void should_validate_valid_bdm_access_control() {
+    void should_validate_valid_bdm() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_BDM_ACCESS_CONTROL_DIR, "valid"),
-                ValidateMojo.BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
+                Paths.get(TEST_RESOURCES_BDM_DIR, "valid"),
+                ValidateMojo.BDM_SOURCE_FILE_REGEX);
 
         // then
+        assertThat(validationTask.getSourceFiles()).hasSize(1);
         assertThatCode(validationTask::validate).doesNotThrowAnyException();
     }
 
     @Test
-    void should_not_validate_invalid_bdm_access_control() {
+    void should_not_validate_invalid_bdm() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_BDM_ACCESS_CONTROL_DIR, "invalid"),
-                ValidateMojo.BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
+                Paths.get(TEST_RESOURCES_BDM_DIR, "invalid"),
+                ValidateMojo.BDM_SOURCE_FILE_REGEX);
 
         // then
-        assertThatExceptionOfType(ValidationException.class).isThrownBy(validationTask::validate)
-                .withMessage("File 'bdm_access_control.xml' is not valid");
+        assertThatExceptionOfType(ValidationException.class)
+                .isThrownBy(validationTask::validate)
+                .withMessage("File 'bom.xml' is not valid");
     }
 
     @Test
-    void should_not_find_incorrect_bdm_access_control_source_file() {
+    void should_not_find_incorrect_bdm_source_file() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_BDM_ACCESS_CONTROL_DIR, "incorrect-name"),
-                ValidateMojo.BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
+                Paths.get(TEST_RESOURCES_BDM_DIR, "incorrect-name"),
+                ValidateMojo.BDM_SOURCE_FILE_REGEX);
 
         // then
         assertThat(validationTask.getSourceFiles()).isEmpty();
@@ -67,11 +69,11 @@ class BdmAccessControlValidationTaskTest {
     }
 
     @Test
-    void should_find_only_one_bdm_access_control_source_file() {
+    void should_find_only_one_bdm_source_file() {
         // given
         XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_BDM_ACCESS_CONTROL_DIR, "multiple-files"),
-                ValidateMojo.BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
+                Paths.get(TEST_RESOURCES_BDM_DIR, "multiple-files"),
+                ValidateMojo.BDM_SOURCE_FILE_REGEX);
 
         // then
         assertThat(validationTask.getSourceFiles()).hasSize(1);

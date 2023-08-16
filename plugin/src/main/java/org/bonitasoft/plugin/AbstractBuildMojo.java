@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.build;
+package org.bonitasoft.plugin;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -40,6 +40,8 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
     private static final String WIDGETS_FOLDER_NAME = "widgetsFolderName";
     protected static final String PAGES_FOLDER_NAME = "pagesFolderName";
     protected static final String WORKSPACE_PATH = "workspacePath";
+    protected static final String APP_FOLDER_NAME = "app";
+    protected static final String BDM_FOLDER_NAME = "bdm";
 
     @Parameter(defaultValue = "${project}", required = false, readonly = true)
     protected MavenProject project;
@@ -59,6 +61,66 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${project.build.directory}", property = "outputDirectory", required = true, readonly = false)
     protected File outputDirectory;
+
+    /**
+     * Path to the XSD schema for Applications
+     */
+    @Parameter(property = "application.xsdPath", defaultValue = "/application.xsd")
+    protected String applicationXsdPath;
+
+    /**
+     * Path to the folder where Application sources are located
+     */
+    @Parameter(property = "application.sourceDir", defaultValue = "applications/")
+    protected String applicationSourceDir;
+
+    /**
+     * Path to the XSD schema for Profiles
+     */
+    @Parameter(property = "profile.xsdPath", defaultValue = "/profiles.xsd")
+    protected String profileXsdPath;
+
+    /**
+     * Path to the folder where Profiles sources are located
+     */
+    @Parameter(property = "profile.sourceDir", defaultValue = "profiles/")
+    protected String profileSourceDir;
+
+    /**
+     * Path to the XSD schema for BDM
+     */
+    @Parameter(property = "bdm.xsdPath", defaultValue = "/bom.xsd")
+    protected String bdmXsdPath;
+
+    /**
+     * Path to the folder where BDM sources are located
+     */
+    @Parameter(property = "bdm.sourceDir", defaultValue = "./")
+    protected String bdmSourceDir;
+
+    /**
+     * Path to the XSD schema for BDM Access Control
+     */
+    @Parameter(property = "bdmAccessControl.xsdPath", defaultValue = "/bdm-access-control.xsd")
+    protected String bdmAccessControlXsdPath;
+
+    /**
+     * Path to the folder where BDM Access Control sources are located
+     */
+    @Parameter(property = "bdmAccessControl.sourceDir", defaultValue = "./")
+    protected String bdmAccessControlSourceDir;
+
+    /**
+     * Path to the XSD schema for Organizations
+     */
+    @Parameter(property = "organization.xsdPath", defaultValue = "/organization.xsd")
+    protected String organizationXsdPath;
+
+    /**
+     * Path to the folder where Organizations sources are located
+     */
+    @Parameter(property = "organization.sourceDir", defaultValue = "organizations/")
+    protected String organizationSourceDir;
 
     protected Map<String, String> uidWorkspace() {
         if (uidWorkspace == null) {

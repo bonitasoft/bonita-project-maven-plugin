@@ -14,14 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.validation;
+package org.bonitasoft.plugin.validation.xml;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.net.URL;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.bonitasoft.plugin.validation.ValidationErrorException;
 import org.junit.jupiter.api.Test;
 
 class XmlValidationTaskTest {
@@ -63,14 +65,16 @@ class XmlValidationTaskTest {
     }
 
     @Test
-    void should_ignore_non_existing_source_dir() {
+    void should_throw_exception_if_non_existing_source_dir() {
         // given
         URL xsdUrl = XmlValidationTask.class.getResource("/validation/empty-xsd.xsd");
-        XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
-                Paths.get(TEST_RESOURCES_VALIDATION_DIR, "not-exist"));
+        Path directory = Paths.get(TEST_RESOURCES_VALIDATION_DIR, "not-exist");
+        XmlValidationTask validationTask = new XmlValidationTask(xsdUrl, directory);
 
         // then
-        assertThat(validationTask.getSourceFiles()).isEmpty();
-        assertThatCode(validationTask::validate).doesNotThrowAnyException();
+        assertThatExceptionOfType(ValidationErrorException.class)
+                .isThrownBy(validationTask::getSourceFiles)
+                .withMessage("Failed to list files in directory " + directory)
+                .withCauseInstanceOf(NoSuchFileException.class);
     }
 }
