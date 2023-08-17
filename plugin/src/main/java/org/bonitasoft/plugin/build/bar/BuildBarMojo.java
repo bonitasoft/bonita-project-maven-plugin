@@ -74,16 +74,16 @@ public class BuildBarMojo extends AbstractBuildMojo {
     String configurationFileName;
 
     /**
-     * Whether task and process instantiation form mapping is required at build time or not.
-     * Only Enterprise edition may update the form mapping at runtime.
+     * Whether task and process instantiation form mapping is required at build time
+     * or not. Only Enterprise edition may update the form mapping at runtime.
      * Default to false
      */
     @Parameter(defaultValue = "false", property = "bonita.allowEmptyFormMapping")
     private boolean allowEmptyFormMapping;
 
     /**
-     * Whether process diagram files should try to migrate their content if needed or not.
-     * Default to false
+     * Whether process diagram files should try to migrate their content if needed
+     * or not. Default to false
      */
     @Parameter(defaultValue = "false", property = "bonita.migrateIfNeeded")
     private boolean migrateIfNeeded;
@@ -120,14 +120,11 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     "Process migration is enabled. If a process is in an older model version than expected, a migration will be attempted.");
         }
         var tmpFolder = outputFolder.resolve("workdir");
-        var barBuilder = BarBuilderFactory.create(BuildConfig.builder()
-                .processRegistry(processRegistry)
-                .dependencyReport(getDependencyReport(reportFile))
-                .allowEmptyFormMapping(allowEmptyFormMapping)
+        var barBuilder = BarBuilderFactory.create(BuildConfig.builder().processRegistry(processRegistry)
+                .dependencyReport(getDependencyReport(reportFile)).allowEmptyFormMapping(allowEmptyFormMapping)
                 .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
                 .classpathResolver(ClasspathResolver.of(getClasspath()))
-                .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
-                .workingDirectory(tmpFolder)
+                .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder))).workingDirectory(tmpFolder)
                 .build());
 
         for (var pool : processRegistry.getProcesses()) {
@@ -141,17 +138,19 @@ public class BuildBarMojo extends AbstractBuildMojo {
             }
         }
         try {
-            getLog().info("Building Bonita Configuration archive...");
             var aggregatedResult = barBuilder.getBuildResult();
-            aggregatedResult.writeBonitaConfigurationTo(outputFolder.resolve(getConfigurationFileName(project)));
+            if (aggregatedResult != null && !aggregatedResult.getConfigurations().isEmpty()) {
+                getLog().info("Building Bonita Configuration archive...");
+                aggregatedResult.writeBonitaConfigurationTo(outputFolder.resolve(getConfigurationFileName(project)));
+            }
         } catch (IOException e) {
             throw new MojoExecutionException(e);
         }
     }
 
     String getConfigurationFileName(MavenProject project) {
-        if (Objects.equals(configurationFileName, String.format("%s-%s-${bonita.environment}.bconf",
-                project.getArtifactId(), project.getVersion()))) {
+        if (Objects.equals(configurationFileName,
+                String.format("%s-%s-${bonita.environment}.bconf", project.getArtifactId(), project.getVersion()))) {
             return String.format("%s-%s-%s.bconf", project.getArtifactId(), project.getVersion(), environment);
         }
         return configurationFileName;
@@ -174,17 +173,13 @@ public class BuildBarMojo extends AbstractBuildMojo {
         procFileSet.setIncludes(Arrays.asList(getIncludes()));
         procFileSet.setExcludes(Arrays.asList(getExcludes()));
         return Stream.of(fileSetManager.getIncludedFiles(procFileSet))
-                .map(procFile -> project.getBasedir().toPath().resolve(procFile))
-                .collect(Collectors.toList());
+                .map(procFile -> project.getBasedir().toPath().resolve(procFile)).collect(Collectors.toList());
     }
 
     private List<String> getClasspath() throws MojoExecutionException {
         try {
-            return Stream
-                    .concat(project.getCompileClasspathElements().stream(),
-                            project.getRuntimeClasspathElements().stream())
-                    .distinct()
-                    .collect(Collectors.toList());
+            return Stream.concat(project.getCompileClasspathElements().stream(),
+                    project.getRuntimeClasspathElements().stream()).distinct().collect(Collectors.toList());
         } catch (DependencyResolutionRequiredException e) {
             throw new MojoExecutionException(e);
         }
