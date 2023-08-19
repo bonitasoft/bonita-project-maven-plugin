@@ -20,8 +20,10 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -33,7 +35,6 @@ import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -44,6 +45,7 @@ import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterExceptio
 import org.apache.maven.shared.artifact.filter.collection.FilterArtifacts;
 import org.apache.maven.shared.artifact.filter.collection.ScopeFilter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
@@ -53,26 +55,24 @@ import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * This mojo runs an analysis on the current project dependencies to detect Bonita specific extensions.
+ * This mojo runs an analysis on the current project dependencies to detect
+ * Bonita specific extensions.
  */
-@Mojo(name = "analyze", defaultPhase = LifecyclePhase.NONE)
+@Mojo(name = "analyze", aggregator = true)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     protected final ArtifactResolver artifactResolver;
 
-    protected final ArtifactAnalyser artifactAnalyser;
+    protected final ArtifactAnalyzerFactory artifactAnalyzerFactory;
 
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     protected MavenSession session;
 
-    /**
-     * Local Repository.
-     */
-    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
-    protected ArtifactRepository localRepository;
-
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
+
+    @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
+    protected List<MavenProject> reactorProjects;
 
     /**
      * Remote repositories which will be searched for artifacts.
@@ -97,14 +97,19 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     private ProjectArtifactFactory artifactFactory;
 
     /**
-     * Scope threshold to include. An empty string indicates include all dependencies. Default value is runtime.<br>
-     * The scope threshold value being interpreted is the scope as
-     * Maven filters for creating a classpath, not as specified in the pom. In summary:
+     * Scope threshold to include. An empty string indicates include all
+     * dependencies. Default value is runtime.<br>
+     * The scope threshold value being interpreted is the scope as Maven filters for
+     * creating a classpath, not as specified in the pom. In summary:
      * <ul>
-     * <li><code>runtime</code> include scope gives runtime and compile dependencies,</li>
-     * <li><code>compile</code> include scope gives compile, provided, and system dependencies,</li>
-     * <li><code>test</code> include scope gives all dependencies (equivalent to default),</li>
-     * <li><code>provided</code> include scope just gives provided dependencies,</li>
+     * <li><code>runtime</code> include scope gives runtime and compile
+     * dependencies,</li>
+     * <li><code>compile</code> include scope gives compile, provided, and system
+     * dependencies,</li>
+     * <li><code>test</code> include scope gives all dependencies (equivalent to
+     * default),</li>
+     * <li><code>provided</code> include scope just gives provided
+     * dependencies,</li>
      * <li><code>system</code> include scope just gives system dependencies.</li>
      * </ul>
      *
@@ -114,16 +119,20 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     protected String includeScope = "runtime";
 
     /**
-     * Scope threshold to exclude, if no value is defined for include.
-     * An empty string indicates no dependencies (default).<br>
-     * The scope threshold value being interpreted is the scope as
-     * Maven filters for creating a classpath, not as specified in the pom. In summary:
+     * Scope threshold to exclude, if no value is defined for include. An empty
+     * string indicates no dependencies (default).<br>
+     * The scope threshold value being interpreted is the scope as Maven filters for
+     * creating a classpath, not as specified in the pom. In summary:
      * <ul>
-     * <li><code>runtime</code> exclude scope excludes runtime and compile dependencies,</li>
-     * <li><code>compile</code> exclude scope excludes compile, provided, and system dependencies,</li>
-     * <li><code>test</code> exclude scope excludes all dependencies, then not really a legitimate option: it will
-     * fail, you probably meant to configure includeScope = compile</li>
-     * <li><code>provided</code> exclude scope just excludes provided dependencies,</li>
+     * <li><code>runtime</code> exclude scope excludes runtime and compile
+     * dependencies,</li>
+     * <li><code>compile</code> exclude scope excludes compile, provided, and system
+     * dependencies,</li>
+     * <li><code>test</code> exclude scope excludes all dependencies, then not
+     * really a legitimate option: it will fail, you probably meant to configure
+     * includeScope = compile</li>
+     * <li><code>provided</code> exclude scope just excludes provided
+     * dependencies,</li>
      * <li><code>system</code> exclude scope just excludes system dependencies.</li>
      * </ul>
      *
@@ -134,37 +143,50 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     @Inject
     public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver,
-            ArtifactAnalyser artifactAnalyser,
-            DependencyValidator dependencyValidator,
-            ProjectArtifactFactory artifactFactory) {
+            ArtifactAnalyzerFactory artifactAnalyzerFactory,
+            DependencyValidator dependencyValidator, ProjectArtifactFactory artifactFactory) {
         this.artifactResolver = artifactResolver;
-        this.artifactAnalyser = artifactAnalyser;
+        this.artifactAnalyzerFactory = artifactAnalyzerFactory;
         this.dependencyValidator = dependencyValidator;
         this.artifactFactory = artifactFactory;
     }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        ProjectBuildingRequest buildingRequest = newProjectBuildingRequest();
+        var appModuleProject = findAppModuleProject();
+
+        ProjectBuildingRequest buildingRequest = newProjectBuildingRequest(appModuleProject);
         List<Artifact> resolvedArtifacts;
         try {
-            resolvedArtifacts = resolveArtifacts(getProjectArtifacts(), buildingRequest);
+            resolvedArtifacts = resolveArtifacts(getProjectArtifacts(appModuleProject), buildingRequest);
         } catch (MojoExecutionException | ArtifactFilterException e) {
             throw new MojoExecutionException(e);
         }
-        DependencyReport dependencyReport = artifactAnalyser.analyse(resolvedArtifacts);
+        var artifactAnalyzer = artifactAnalyzerFactory
+                .create(session.getRepositorySession().getLocalRepositoryManager(), reactorProjects);
+        DependencyReport dependencyReport = artifactAnalyzer.analyze(resolvedArtifacts);
 
         if (validateDeps) {
-            dependencyValidator.validate(project, buildingRequest).stream()
-                    .forEach(dependencyReport::addIssue);
+            dependencyValidator.validate(project, buildingRequest).stream().forEach(dependencyReport::addIssue);
         }
 
+        if (outputFile != null) {
+            var buildFolder = appModuleProject.getBuild().getDirectory();
+            outputFile = Paths.get(buildFolder).resolve(outputFile.getName()).toFile();
+        }
         getReporters().forEach(reporter -> reporter.report(dependencyReport));
     }
 
-    private Set<Artifact> getProjectArtifacts() throws MojoExecutionException {
+    MavenProject findAppModuleProject() throws MojoExecutionException {
+        return reactorProjects.size() == 1 ? project
+                : reactorProjects.stream().filter(p -> p.getBasedir().getName().equals("app")).findFirst().orElseThrow(
+                        () -> new MojoExecutionException(String.format("Application module not found in %s",
+                                project.getBasedir().toPath().resolve("app"))));
+    }
+
+    private Set<Artifact> getProjectArtifacts(MavenProject appModuleProject) throws MojoExecutionException {
         try {
-            return artifactFactory.createArtifacts(project);
+            return artifactFactory.createArtifacts(appModuleProject);
         } catch (InvalidDependencyVersionException e) {
             throw new MojoExecutionException(e);
         }
@@ -184,9 +206,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         var filter = new FilterArtifacts();
         filter.addFilter(new ScopeFilter(cleanToBeTokenizedString(this.includeScope),
                 cleanToBeTokenizedString(this.excludeScope)));
-        return filter.filter(artifacts).stream()
-                .map(artifact -> resolve(buildingRequest, artifact))
-                .collect(toList());
+        return filter.filter(artifacts).stream().map(artifact -> resolve(buildingRequest, artifact)).collect(toList());
     }
 
     Artifact resolve(ProjectBuildingRequest buildingRequest, Artifact artifact) {
@@ -198,19 +218,37 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
                 throw new MojoExecutionException(format("Failed to resolve artifact %s", artifact));
             }
             return resolvedArtifact;
+        } catch (ArtifactResolverException are) {
+            var moduleProject = reactorProjects.stream()
+                    .filter(p -> matchesCoordinates(artifact, p))
+                    .findFirst()
+                    .orElseThrow(() -> new AnalysisResultReportException(
+                            format("Failed to analyze artifact %s", artifact), are));
+            // Handle child modules specific case
+            // Artifact might not be installed in local repository yet
+            artifact.setFile(moduleProject.getBasedir());
+            return artifact;
         } catch (Exception e) {
             throw new AnalysisResultReportException(format("Failed to analyze artifact %s", artifact), e);
         }
     }
 
+    private boolean matchesCoordinates(Artifact artifact, MavenProject p) {
+        Artifact projectArtifact = p.getArtifact();
+        return Objects.equals(projectArtifact.getGroupId(), artifact.getGroupId())
+                && Objects.equals(projectArtifact.getArtifactId(), artifact.getArtifactId())
+                && Objects.equals(projectArtifact.getBaseVersion(), artifact.getBaseVersion());
+    }
+
     /*
-     * @return Returns a new ProjectBuildingRequest populated from the current session and the current project remote
-     * repositories, used to resolve artifacts.
+     * @return Returns a new ProjectBuildingRequest populated from the current
+     * session and the current project remote repositories, used to resolve
+     * artifacts.
      */
-    ProjectBuildingRequest newProjectBuildingRequest() {
+    ProjectBuildingRequest newProjectBuildingRequest(MavenProject appModuleProject) {
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
         buildingRequest.setRemoteRepositories(remoteRepositories);
-        buildingRequest.setProject(project);
+        buildingRequest.setProject(appModuleProject);
         return buildingRequest;
     }
 

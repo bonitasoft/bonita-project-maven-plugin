@@ -21,12 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.plugin.test.TestFiles.getResourceAsFile;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,26 +44,31 @@ import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.bonitasoft.plugin.analyze.report.model.Issue;
 import org.bonitasoft.plugin.analyze.report.model.Issue.Severity;
 import org.bonitasoft.plugin.analyze.report.model.Issue.Type;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultArtifactAnalyserTest {
+class DefaultArtifactAnalyzerTest {
 
     @InjectMocks
-    DefaultArtifactAnalyser analyser;
+    DefaultArtifactAnalyzer analyzer;
 
     @Mock
     CFRConnectorResolver connectorResolver;
 
     @Mock
     IssueCollector issueCollector;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    LocalRepositoryManager localRepositoryManager;
 
     @BeforeEach
     void setup() throws Exception {
@@ -80,7 +83,7 @@ class DefaultArtifactAnalyserTest {
         artifact.setFile(getResourceAsFile("/bonita-connector-email-1.3.0.jar"));
 
         // When
-        var dependencyReport = analyser.analyse(List.of(artifact));
+        var dependencyReport = analyzer.analyze(List.of(artifact));
 
         // Then
         assertThat(dependencyReport).isNotNull();
@@ -99,7 +102,7 @@ class DefaultArtifactAnalyserTest {
                         "email.def")));
 
         // When
-        var dependencyReport = analyser.analyse(List.of(artifact));
+        var dependencyReport = analyzer.analyze(List.of(artifact));
 
         // Then
         assertThat(dependencyReport).isNotNull();
@@ -124,7 +127,7 @@ class DefaultArtifactAnalyserTest {
         lenient().when(impl.getDefinitionVersion()).thenReturn(defVersion);
 
         // When
-        final boolean match = analyser.hasMatchingImplementation(def, singletonList(impl));
+        final boolean match = analyzer.hasMatchingImplementation(def, singletonList(impl));
 
         // Then
         assertThat(match).isTrue();
@@ -144,7 +147,7 @@ class DefaultArtifactAnalyserTest {
         lenient().when(impl.getDefinitionVersion()).thenReturn("anotherVersion");
 
         // When
-        final boolean match = analyser.hasMatchingImplementation(def, singletonList(impl));
+        final boolean match = analyzer.hasMatchingImplementation(def, singletonList(impl));
 
         // Then
         assertThat(match).isFalse();
@@ -165,7 +168,7 @@ class DefaultArtifactAnalyserTest {
         lenient().when(impl.getDefinitionVersion()).thenReturn(defVersion);
 
         // When
-        final boolean match = analyser.hasMatchingImplementation(def, singletonList(impl));
+        final boolean match = analyzer.hasMatchingImplementation(def, singletonList(impl));
 
         // Then
         assertThat(match).isFalse();
@@ -186,7 +189,7 @@ class DefaultArtifactAnalyserTest {
         lenient().when(impl.getDefinitionVersion()).thenReturn("anotherVersion");
 
         // When
-        final boolean match = analyser.hasMatchingImplementation(def, singletonList(impl));
+        final boolean match = analyzer.hasMatchingImplementation(def, singletonList(impl));
 
         // Then
         assertThat(match).isFalse();
@@ -196,16 +199,19 @@ class DefaultArtifactAnalyserTest {
     @ValueSource(strings = { "page", "form", "theme", "apiExtension" })
     void should_detect_custom_page_type(String customPageType) throws IOException {
         // Given
-        DefaultArtifactAnalyser spy = spy(analyser);
+        DefaultArtifactAnalyzer spy = spy(analyzer);
         Properties properties = new Properties();
         properties.setProperty("contentType", customPageType);
-        doReturn(properties).when(spy).readPageProperties(any());
         final Artifact artifact = mock(Artifact.class);
-        when(artifact.getFile()).thenReturn(new File("/somewhere-over-the-rain.bow"));
+        var file = new File("/somewhere-over-the-rain.bow");
         final DependencyReport dependencyReport = mock(DependencyReport.class);
+        lenient().when(localRepositoryManager.getPathForLocalArtifact(any()))
+                .thenReturn(file.getAbsolutePath());
+        lenient().when(localRepositoryManager.getRepository().getBasedir())
+                .thenReturn(new File(""));
 
         // When
-        spy.analyseCustomPageArtifact(artifact, dependencyReport);
+        spy.analyzeCustomPageArtifact(artifact, properties, dependencyReport);
 
         // Then
         switch (CustomPageType.valueOf(customPageType.toUpperCase())) {
@@ -227,7 +233,7 @@ class DefaultArtifactAnalyserTest {
     }
 
     @Test
-    void should_read_customPage_properties() throws Exception {
+    void should_read_customPage_properties_in_archive() throws Exception {
         // Given
         File file = getResourceAsFile("/my-rest-api-0.0.1-SNAPSHOT.zip");
 
@@ -235,7 +241,7 @@ class DefaultArtifactAnalyserTest {
         expectedProperties.load(getClass().getResourceAsStream("/page.properties"));
 
         // When
-        final Properties properties = analyser.readPageProperties(file);
+        final Properties properties = analyzer.readPagePropertiesInArchive(file);
 
         // Then
         assertThat(properties).isEqualTo(expectedProperties);
@@ -246,7 +252,7 @@ class DefaultArtifactAnalyserTest {
         // Given
         File file = getResourceAsFile("/my-rest-api-0.0.1-SNAPSHOT.zip");
         // When
-        final boolean found = analyser.hasCustomPageDescriptor(file);
+        final boolean found = analyzer.hasCustomPageDescriptor(file);
         // Then
         assertThat(found).isTrue();
     }
@@ -256,7 +262,7 @@ class DefaultArtifactAnalyserTest {
         // Given
         File file = getResourceAsFile("/bonita-actorfilter-single-user-1.0.0.jar");
         // When
-        final boolean found = analyser.hasCustomPageDescriptor(file);
+        final boolean found = analyzer.hasCustomPageDescriptor(file);
         // Then
         assertThat(found).isFalse();
     }
@@ -266,7 +272,7 @@ class DefaultArtifactAnalyserTest {
         // Given
         File file = getResourceAsFile("/bonita-connector-email-1.3.0.jar");
         // When
-        final boolean found = analyser.hasConnectorDescriptor(file);
+        final boolean found = analyzer.hasConnectorDescriptor(file);
         // Then
         assertThat(found).isTrue();
     }
@@ -276,7 +282,7 @@ class DefaultArtifactAnalyserTest {
         // Given
         File file = getResourceAsFile("/my-rest-api-0.0.1-SNAPSHOT.zip");
         // When
-        final boolean found = analyser.hasConnectorDescriptor(file);
+        final boolean found = analyzer.hasConnectorDescriptor(file);
         // Then
         assertThat(found).isFalse();
     }

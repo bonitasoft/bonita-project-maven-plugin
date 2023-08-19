@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.company.example</groupId>
+    <artifactId>procurement-example-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>procurement-example</artifactId>
+  <name>procurement-example</name>
+  
+  <dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.connectors</groupId>
+			<artifactId>bonita-connector-email</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.connectors</groupId>
+			<artifactId>bonita-connector-database</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.actorfilter</groupId>
+			<artifactId>bonita-actorfilter-single-user</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>my-rest-api</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+		</dependency>
+			<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>my-theme</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+		</dependency>
+	</dependencies>
+
+</project>
