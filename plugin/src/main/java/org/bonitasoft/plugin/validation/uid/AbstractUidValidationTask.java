@@ -19,7 +19,6 @@ package org.bonitasoft.plugin.validation.uid;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +27,7 @@ import org.bonitasoft.plugin.validation.ValidationErrorException;
 import org.bonitasoft.plugin.validation.ValidationException;
 import org.bonitasoft.plugin.validation.ValidationTask;
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.controller.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.MigrationStatusReport;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,22 +68,17 @@ public abstract class AbstractUidValidationTask implements ValidationTask {
     protected abstract MigrationStatusReport getArtifactStatus(String artifactId);
 
     protected List<String> getUidArtifacts() {
-        if (Files.exists(artifactsSourceDir) && Files.isDirectory(artifactsSourceDir)) {
-            try (Stream<Path> sourcePaths = Files.list(artifactsSourceDir)) {
-                var sourceFiles = sourcePaths
-                        .filter(AbstractUidValidationTask::isUidArtifact)
-                        .map(Path::getFileName)
-                        .map(Path::toString)
-                        .collect(Collectors.toList());
-                log.debug("Found [{}] UID artifacts in directory [{}]", sourceFiles.size(), artifactsSourceDir);
-                return sourceFiles;
-            } catch (IOException e) {
-                throw new ValidationErrorException("Failed to list UID artifacts in directory " + artifactsSourceDir,
-                        e);
-            }
+        try (Stream<Path> sourcePaths = Files.list(artifactsSourceDir)) {
+            var sourceFiles = sourcePaths
+                    .filter(AbstractUidValidationTask::isUidArtifact)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
+            log.debug("Found [{}] UID artifacts in directory [{}]", sourceFiles.size(), artifactsSourceDir);
+            return sourceFiles;
+        } catch (IOException e) {
+            throw new ValidationErrorException("Failed to list UID artifacts in directory " + artifactsSourceDir, e);
         }
-        log.debug("Artifacts source directory [{}] does not exist or is not a directory", artifactsSourceDir);
-        return Collections.emptyList();
     }
 
     /**

@@ -121,6 +121,14 @@
       <artifactId>ui-designer-artifact-builder</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.bonitasoft.web</groupId>
+      <artifactId>ui-designer-artifact-builder-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.web</groupId>
+      <artifactId>ui-designer-artifact-builder-model</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.bonitasoft.bpm</groupId>
       <artifactId>org.bonitasoft.bonita2bar</artifactId>
       <version>${bonita2bar.version}</version>

@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 
 import org.bonitasoft.plugin.validation.ValidationException;
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.controller.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.MigrationStatusReport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

@@ -19,7 +19,7 @@ package org.bonitasoft.plugin.validation.uid;
 import java.nio.file.Path;
 
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.controller.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.MigrationStatusReport;
 
 /**
  * Class used to check that UID fragments are valid.
