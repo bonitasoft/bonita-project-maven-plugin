@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
-public interface ArtifactAnalyser {
+public interface ArtifactAnalyzer {
 
-    DependencyReport analyse(List<Artifact> artifacts);
+    DependencyReport analyze(List<Artifact> artifacts);
 }

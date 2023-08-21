@@ -35,7 +35,9 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
+import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -44,9 +46,11 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -65,7 +69,10 @@ class AnalyzeBonitaDependencyMojoTest {
     MavenProject project;
 
     @Mock
-    ArtifactAnalyser artifactAnalyser;
+    ArtifactAnalyzer artifactAnalyzer;
+
+    @Mock
+    ArtifactAnalyzerFactory artifactAnalyzerFactory;
 
     @Mock
     DependencyGraphBuilder dependencyGraphBuilder;
@@ -85,11 +92,24 @@ class AnalyzeBonitaDependencyMojoTest {
     @Captor
     ArgumentCaptor<List<Artifact>> resolvedArtifacts;
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    MavenSession session;
+
+    @Mock
+    LocalRepositoryManager localRepositoryManager;
+
     @BeforeEach
     void setUp() throws MojoExecutionException {
-        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyser, dependencyValidator,
+        mojo = spy(new AnalyzeBonitaDependencyMojo(artifactResolver, artifactAnalyzerFactory, dependencyValidator,
                 artifactFactory));
+        when(artifactAnalyzerFactory.create(any(), any())).thenReturn(artifactAnalyzer);
+        when(session.getRepositorySession().getLocalRepositoryManager()).thenReturn(localRepositoryManager);
+        Build build = new Build();
+        build.setDirectory(new File("").getAbsolutePath());
+        project.setBuild(build);
         mojo.project = project;
+        mojo.session = session;
+        mojo.reactorProjects = List.of(project);
         mojo.setLog(mock(Log.class));
     }
 
@@ -107,15 +127,15 @@ class AnalyzeBonitaDependencyMojoTest {
         resolvedArtifacts.add(artifact);
 
         when(artifactFactory.createArtifacts(project)).thenReturn(new HashSet<>());
-        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest(project);
         doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
-        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+        when(artifactAnalyzer.analyze(any())).thenReturn(new DependencyReport());
 
         // When
         mojo.execute();
 
         // Then
-        verify(artifactAnalyser).analyse(resolvedArtifacts);
+        verify(artifactAnalyzer).analyze(resolvedArtifacts);
         verify(reporter).report(any());
     }
 
@@ -137,15 +157,15 @@ class AnalyzeBonitaDependencyMojoTest {
 
         when(artifactFactory.createArtifacts(project))
                 .thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
-        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest(project);
         doReturn(artifactWithRuntimeScope).when(mojo).resolve(buildingRequest, artifactWithRuntimeScope);
-        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+        when(artifactAnalyzer.analyze(any())).thenReturn(new DependencyReport());
 
         // When
         mojo.execute();
 
         // Then
-        verify(artifactAnalyser).analyse(resolvedArtifacts.capture());
+        verify(artifactAnalyzer).analyze(resolvedArtifacts.capture());
         assertThat(resolvedArtifacts.getValue())
                 .hasSize(1)
                 .extracting("scope").containsOnly("compile");
@@ -172,16 +192,16 @@ class AnalyzeBonitaDependencyMojoTest {
 
         when(artifactFactory.createArtifacts(project))
                 .thenReturn(Set.of(artifactWithProvidedScope, artifactWithRuntimeScope));
-        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest(project);
         doReturn(artifactWithRuntimeScope).when(mojo).resolve(buildingRequest, artifactWithRuntimeScope);
         doReturn(artifactWithProvidedScope).when(mojo).resolve(buildingRequest, artifactWithProvidedScope);
-        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+        when(artifactAnalyzer.analyze(any())).thenReturn(new DependencyReport());
 
         // When
         mojo.execute();
 
         // Then
-        verify(artifactAnalyser).analyse(resolvedArtifacts.capture());
+        verify(artifactAnalyzer).analyze(resolvedArtifacts.capture());
         assertThat(resolvedArtifacts.getValue())
                 .hasSize(2)
                 .extracting("scope").contains("compile", "provided");
@@ -204,15 +224,15 @@ class AnalyzeBonitaDependencyMojoTest {
         resolvedArtifacts.add(artifact);
 
         when(artifactFactory.createArtifacts(project)).thenReturn(new HashSet<>());
-        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest();
+        doReturn(buildingRequest).when(mojo).newProjectBuildingRequest(project);
         doReturn(resolvedArtifacts).when(mojo).resolveArtifacts(any(), Mockito.eq(buildingRequest));
-        when(artifactAnalyser.analyse(any())).thenReturn(new DependencyReport());
+        when(artifactAnalyzer.analyze(any())).thenReturn(new DependencyReport());
 
         // When
         mojo.execute();
 
         // Then
-        verify(artifactAnalyser).analyse(resolvedArtifacts);
+        verify(artifactAnalyzer).analyze(resolvedArtifacts);
         verify(dependencyValidator).validate(project, buildingRequest);
         verify(reporter).report(any());
     }
