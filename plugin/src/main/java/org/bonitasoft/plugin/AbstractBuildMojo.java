@@ -34,6 +34,8 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
         // Disable hibernate validator log output from build log
         System.setProperty("org.jboss.logging.provider", "slf4j");
         System.setProperty("org.slf4j.simpleLogger.log.org.hibernate", "off");
+        System.setProperty("org.slf4j.simpleLogger.log.org.bonitasoft.web.designer.migration", "warn");
+        System.setProperty("org.slf4j.simpleLogger.log.org.bonitasoft.web.designer.service", "warn");
     }
 
     private static final String FRAGMENTS_FOLDER_NAME = "fragmentsFolderName";
