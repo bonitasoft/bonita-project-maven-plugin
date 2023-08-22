@@ -19,13 +19,28 @@ package org.bonitasoft.plugin.build.bar;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class BuildBarMojoTest {
+
+    @Mock
+    private MavenProjectHelper projectHelper;
+
+    private BuildBarMojo mojo;
+
+    @BeforeEach
+    void createMojo() throws Exception {
+        mojo = new BuildBarMojo(projectHelper);
+    }
 
     @Test
     void defaultConfigurationFileName() throws Exception {
-        var mojo = new BuildBarMojo();
         var project = new MavenProject();
         project.setArtifactId("hello");
         project.setVersion("1.0.0");
@@ -37,7 +52,6 @@ class BuildBarMojoTest {
 
     @Test
     void customConfigurationFileName() throws Exception {
-        var mojo = new BuildBarMojo();
         var project = new MavenProject();
         project.setArtifactId("hello");
         project.setVersion("1.0.0");

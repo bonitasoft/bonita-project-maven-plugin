@@ -25,6 +25,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -34,6 +36,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
@@ -100,6 +103,16 @@ public class BuildBarMojo extends AbstractBuildMojo {
     @Parameter(property = "proc.excludes")
     private String[] excludes;
 
+    /**
+     * Maven ProjectHelper.
+     */
+    private MavenProjectHelper projectHelper;
+
+    @Inject
+    public BuildBarMojo(MavenProjectHelper projectHelper) {
+        this.projectHelper = projectHelper;
+    }
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Path outputFolder = outputDirectory.toPath();
@@ -141,7 +154,9 @@ public class BuildBarMojo extends AbstractBuildMojo {
             var aggregatedResult = barBuilder.getBuildResult();
             if (aggregatedResult != null && !aggregatedResult.getConfigurations().isEmpty()) {
                 getLog().info("Building Bonita Configuration archive...");
-                aggregatedResult.writeBonitaConfigurationTo(outputFolder.resolve(getConfigurationFileName(project)));
+                var bonitaConfigurationFile = outputFolder.resolve(getConfigurationFileName(project));
+                aggregatedResult.writeBonitaConfigurationTo(bonitaConfigurationFile);
+                projectHelper.attachArtifact(project, "bconf", environment, bonitaConfigurationFile.toFile());
             }
         } catch (IOException e) {
             throw new MojoExecutionException(e);
