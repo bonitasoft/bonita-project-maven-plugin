@@ -18,6 +18,7 @@ package org.bonitasoft.plugin.build.bar;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -156,7 +157,9 @@ public class BuildBarMojo extends AbstractBuildMojo {
                 getLog().info("Building Bonita Configuration archive...");
                 var bonitaConfigurationFile = outputFolder.resolve(getConfigurationFileName(project));
                 aggregatedResult.writeBonitaConfigurationTo(bonitaConfigurationFile);
-                projectHelper.attachArtifact(project, "bconf", environment, bonitaConfigurationFile.toFile());
+                if (Files.exists(bonitaConfigurationFile)) {
+                    projectHelper.attachArtifact(project, "bconf", environment, bonitaConfigurationFile.toFile());
+                }
             }
         } catch (IOException e) {
             throw new MojoExecutionException(e);
