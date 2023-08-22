@@ -17,6 +17,7 @@
     <pluginExecution>
      	<pluginExecutionFilter>
         <goals>
+		  <goal>application-properties</goal>
           <goal>business-archive</goal>
           <goal>uid-page</goal>
         </goals>
