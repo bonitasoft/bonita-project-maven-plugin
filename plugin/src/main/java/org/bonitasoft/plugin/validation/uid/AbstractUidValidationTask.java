@@ -86,6 +86,7 @@ public abstract class AbstractUidValidationTask implements ValidationTask {
                     .filter(AbstractUidValidationTask::isUidArtifact)
                     .map(Path::getFileName)
                     .map(Path::toString)
+                    .sorted()
                     .collect(Collectors.toList());
             log.debug("Found [{}] UID artifacts in directory [{}] for task {}", sourceFiles.size(), artifactsSourceDir,
                     getTaskName());

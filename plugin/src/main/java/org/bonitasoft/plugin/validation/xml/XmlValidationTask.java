@@ -111,6 +111,7 @@ public class XmlValidationTask implements ValidationTask {
             var sourceFiles = sourcePaths
                     .filter(path -> Files.isRegularFile(path) && path.getFileName().toString().matches(sourceFileRegex))
                     .map(Path::toFile)
+                    .sorted()
                     .collect(Collectors.toList());
             log.debug("Found [{}] source files in directory [{}] matching regex [{}] for task [{}]", sourceFiles.size(),
                     artifactsSourceDir, sourceFileRegex, taskName);
