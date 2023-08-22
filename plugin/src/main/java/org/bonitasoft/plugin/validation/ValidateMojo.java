@@ -16,6 +16,8 @@
  */
 package org.bonitasoft.plugin.validation;
 
+import java.net.URL;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -55,20 +57,32 @@ public class ValidateMojo extends AbstractBuildMojo {
     public static final String BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX = "^bdm_access_control.xml$";
     public static final String ORGANIZATION_SOURCE_FILE_REGEX = "^.*\\.organization$";
 
+    private static final URL APPLICATION_XSD_URL = ValidateMojo.class.getResource("/application.xsd");
+    private static final URL PROFILE_XSD_URL = ValidateMojo.class.getResource("/profiles.xsd");
+    private static final URL ORGANIZATION_XSD_URL = ValidateMojo.class.getResource("/organization.xsd");
+    private static final URL BDM_XSD_URL = ValidateMojo.class.getResource("/bom.xsd");
+    private static final URL BDM_ACCESS_CONTROL_XSD_URL = ValidateMojo.class.getResource("/bdm-access-control.xsd");
+
+    private static final String APPLICATION_SOURCE_DIR = "applications/";
+    private static final String PROFILE_SOURCE_DIR = "profiles/";
+    private static final String ORGANIZATION_SOURCE_DIR = "organizations/";
+    private static final String BDM_SOURCE_DIR = "./";
+    private static final String BDM_ACCESS_CONTROL_SOURCE_DIR = "./";
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            executeXmlValidation("XML validation on Applications", applicationXsdPath, applicationSourceDir);
+            executeXmlValidation("XML validation on Applications", APPLICATION_XSD_URL, APPLICATION_SOURCE_DIR);
 
-            executeXmlValidation("XML validation on Profiles", profileXsdPath, profileSourceDir);
+            executeXmlValidation("XML validation on Profiles", PROFILE_XSD_URL, PROFILE_SOURCE_DIR);
 
-            executeXmlValidation("XML validation on Organizations", organizationXsdPath, organizationSourceDir,
+            executeXmlValidation("XML validation on Organizations", ORGANIZATION_XSD_URL, ORGANIZATION_SOURCE_DIR,
                     ORGANIZATION_SOURCE_FILE_REGEX);
 
-            executeXmlValidation("XML validation on BDM", bdmXsdPath, bdmSourceDir, BDM_SOURCE_FILE_REGEX);
+            executeXmlValidation("XML validation on BDM", BDM_XSD_URL, BDM_SOURCE_DIR, BDM_SOURCE_FILE_REGEX);
 
-            executeXmlValidation("XML validation on BDM Access Control", bdmAccessControlXsdPath,
-                    bdmAccessControlSourceDir, BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
+            executeXmlValidation("XML validation on BDM Access Control", BDM_ACCESS_CONTROL_XSD_URL,
+                    BDM_ACCESS_CONTROL_SOURCE_DIR, BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
 
             executeUidValidation();
         } catch (ValidationException e) {
@@ -80,28 +94,28 @@ public class ValidateMojo extends AbstractBuildMojo {
      * Call {@link XmlValidationTask#validate()} with given arguments.
      *
      * @param taskName name of the validation task
-     * @param xsdPath path to the XSD schema
+     * @param xsdUrl URL of the XSD schema
      * @param artifactsSourceDir path to the directory containing XML source files to validate
      * @throws ValidationException if validation criteria are not met
      */
-    private void executeXmlValidation(String taskName, String xsdPath, String artifactsSourceDir)
+    private void executeXmlValidation(String taskName, URL xsdUrl, String artifactsSourceDir)
             throws ValidationException {
-        executeXmlValidation(taskName, xsdPath, artifactsSourceDir, null);
+        executeXmlValidation(taskName, xsdUrl, artifactsSourceDir, null);
     }
 
     /**
      * Call {@link XmlValidationTask#validate()} with given arguments.
      *
      * @param taskName name of the validation task
-     * @param xsdPath path to the XSD schema
+     * @param xsdUrl URL of the XSD schema
      * @param artifactsSourceDir path to the directory containing XML source files to validate
      * @param sourceFileRegex regex used to filter source files
      * @throws ValidationException if validation criteria are not met
      */
-    private void executeXmlValidation(String taskName, String xsdPath, String artifactsSourceDir,
+    private void executeXmlValidation(String taskName, URL xsdUrl, String artifactsSourceDir,
             String sourceFileRegex) throws ValidationException {
-        new XmlValidationTask(taskName, ValidateMojo.class.getResource(xsdPath),
-                project.getBasedir().toPath().resolve(artifactsSourceDir), sourceFileRegex).validate();
+        new XmlValidationTask(taskName, xsdUrl, project.getBasedir().toPath().resolve(artifactsSourceDir),
+                sourceFileRegex).validate();
     }
 
     /**
