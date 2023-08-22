@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.build;
+package org.bonitasoft.plugin;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -34,12 +34,15 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
         // Disable hibernate validator log output from build log
         System.setProperty("org.jboss.logging.provider", "slf4j");
         System.setProperty("org.slf4j.simpleLogger.log.org.hibernate", "off");
+        System.setProperty("org.slf4j.simpleLogger.log.org.bonitasoft.web.designer.migration", "warn");
+        System.setProperty("org.slf4j.simpleLogger.log.org.bonitasoft.web.designer.service", "warn");
     }
 
     private static final String FRAGMENTS_FOLDER_NAME = "fragmentsFolderName";
     private static final String WIDGETS_FOLDER_NAME = "widgetsFolderName";
     protected static final String PAGES_FOLDER_NAME = "pagesFolderName";
     protected static final String WORKSPACE_PATH = "workspacePath";
+    protected static final String APP_FOLDER_NAME = "app";
 
     @Parameter(defaultValue = "${project}", required = false, readonly = true)
     protected MavenProject project;

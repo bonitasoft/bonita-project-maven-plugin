@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://documentation.bonitasoft.com/organization-xml-schema/1.1" xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema/1.1" xmlns:tns="http://documentation.bonitasoft.com/organization-xml-schema/1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Organization" type="tns:organization"/>
+
+  <xs:complexType name="exportedContactInfo">
+    <xs:all>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="phoneNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="mobileNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="faxNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="building" type="xs:string" minOccurs="0"/>
+      <xs:element name="room" type="xs:string" minOccurs="0"/>
+      <xs:element name="address" type="xs:string" minOccurs="0"/>
+      <xs:element name="zipCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="city" type="xs:string" minOccurs="0"/>
+      <xs:element name="state" type="xs:string" minOccurs="0"/>
+      <xs:element name="country" type="xs:string" minOccurs="0"/>
+      <xs:element name="website" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="exportedCustomUserInfoDefinition">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exportedCustomUserInfoValue">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exportedGroup">
+    <xs:sequence>
+      <xs:element name="displayName" type="xs:string" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="iconName" type="xs:string" minOccurs="0"/>
+      <xs:element name="iconPath" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="parentPath" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="exportedRole">
+    <xs:sequence>
+      <xs:element name="displayName" type="xs:string" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="iconName" type="xs:string" minOccurs="0"/>
+      <xs:element name="iconPath" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="exportedUser">
+    <xs:all>
+      <xs:element name="password" type="tns:exportedUserPassword" minOccurs="0"/>
+      <xs:element name="firstName" type="xs:string" minOccurs="0"/>
+      <xs:element name="lastName" type="xs:string" minOccurs="0"/>
+      <xs:element name="iconName" type="xs:string" minOccurs="0"/>
+      <xs:element name="iconPath" type="xs:string" minOccurs="0"/>
+      <xs:element name="title" type="xs:string" minOccurs="0"/>
+      <xs:element name="jobTitle" type="xs:string" minOccurs="0"/>
+      <xs:element name="manager" type="xs:string" minOccurs="0"/>
+      <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
+      <xs:element name="personalData" type="tns:exportedContactInfo" minOccurs="0"/>
+      <xs:element name="professionalData" type="tns:exportedContactInfo" minOccurs="0"/>
+      <xs:element name="customUserInfoValues" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="customUserInfoValue" type="tns:exportedCustomUserInfoValue" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="metaDatas" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="metaData" type="tns:metaData" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="userName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="exportedUserPassword">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="encrypted" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="metaData">
+    <xs:sequence/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="value" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="exportedUserMembership">
+    <xs:sequence>
+      <xs:element name="userName" type="xs:string" minOccurs="0"/>
+      <xs:element name="roleName" type="xs:string" minOccurs="0"/>
+      <xs:element name="groupName" type="xs:string" minOccurs="0"/>
+      <xs:element name="groupParentPath" type="xs:string" minOccurs="0"/>
+      <xs:element name="assignedBy" type="xs:string" minOccurs="0"/>
+      <xs:element name="assignedDate" type="xs:long" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="organization">
+    <xs:sequence>
+      <xs:element name="customUserInfoDefinitions" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="customUserInfoDefinition" type="tns:exportedCustomUserInfoDefinition" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="users" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="user" type="tns:exportedUser" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="roles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="role" type="tns:exportedRole" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="groups" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="group" type="tns:exportedGroup" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="memberships" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="membership" type="tns:exportedUserMembership" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

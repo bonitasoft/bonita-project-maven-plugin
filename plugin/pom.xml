@@ -17,6 +17,7 @@
     <eclipse.importorder.file>${project.parent.basedir}/eclipse.importorder</eclipse.importorder.file>
     <header.file>${project.parent.basedir}/header.txt</header.file>
     <!-- Dependencies -->
+    <bonita-artifacts-model.version>1.0.0-SNAPSHOT</bonita-artifacts-model.version>
     <maven-plugin-api.version>3.9.4</maven-plugin-api.version>
     <maven-plugin-annotations.version>3.9.0</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
@@ -44,6 +45,13 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.bonitasoft.engine</groupId>
+        <artifactId>bonita-artifacts-model-dependencies</artifactId>
+        <version>${bonita-artifacts-model.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
@@ -113,6 +121,14 @@
       <artifactId>ui-designer-artifact-builder</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.bonitasoft.web</groupId>
+      <artifactId>ui-designer-artifact-builder-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.web</groupId>
+      <artifactId>ui-designer-artifact-builder-model</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.bonitasoft.bpm</groupId>
       <artifactId>org.bonitasoft.bonita2bar</artifactId>
       <version>${bonita2bar.version}</version>
@@ -170,6 +186,35 @@
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-build-api</artifactId>
       <version>${plexus-build-api.version}</version>
+    </dependency>
+    <!-- Bonita Artifacts Model dependencies -->
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-business-archive</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-form-mapping-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-process-definition-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-business-object-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-bdm-access-control-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-profile-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-organization-model</artifactId>
     </dependency>
     <!-- Contains bdm code generator  -->
     <dependency>
@@ -229,6 +274,11 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

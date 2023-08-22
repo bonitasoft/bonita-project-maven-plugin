@@ -27,7 +27,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
-import org.bonitasoft.plugin.build.AbstractBuildMojo;
+import org.bonitasoft.plugin.AbstractBuildMojo;
 
 /**
  * This mojo builds UI designer pages from sources.

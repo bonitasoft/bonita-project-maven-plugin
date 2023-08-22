@@ -88,6 +88,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.site.skip>false</maven.site.skip>
     <jackson.version>2.15.2</jackson.version>
+    <lombok.version>1.18.28</lombok.version>
     <!-- Spotless resources location -->
     <eclipse.formatter.file>${project.basedir}/formatter.xml</eclipse.formatter.file>
     <eclipse.importorder.file>${project.basedir}/eclipse.importorder</eclipse.importorder.file>
@@ -160,6 +161,11 @@
         <artifactId>logback-classic</artifactId>
         <version>${logback-classic.version}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application token="ticketing" version="1.0" profile="Administrator" homePage="main" state="ACTIVATED" layout="custompage_VerticalCSCLayoutV10" theme="custompage_customerservicetheme">
+        <displayName>Ticketing Management</displayName>
+        <applicationPages>
+            <applicationPage customPage="custompage_reporterDetails" token="reporterDetails"/>
+            <applicationPage customPage="custompage_displayFormPage" token="displayForm"/>
+            <applicationPage customPage="custompage_mainTicketing" token="main"/>
+            <applicationPage customPage="custompage_caseLocation" token="location"/>
+            <applicationPage customPage="custompage_reporterList" token="reporterList"/>
+            <applicationPage customPage="custompage_tasklist" token="tasklist"/>
+        </applicationPages>
+        <applicationMenus>
+            <applicationMenu applicationPage="main">
+                <displayName>Tickets</displayName>
+            </applicationMenu>
+            <applicationMenu applicationPage="location">
+                <displayName>Locations</displayName>
+            </applicationMenu>
+            <applicationMenu applicationPage="reporterList">
+                <displayName>Reporters</displayName>
+            </applicationMenu>
+            <applicationMenu applicationPage="tasklist">
+                <displayName>Tasks</displayName>
+            </applicationMenu>
+        </applicationMenus>
+    </application>
+</applications>

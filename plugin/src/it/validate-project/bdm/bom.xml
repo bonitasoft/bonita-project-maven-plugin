@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<businessObjectModel xmlns="http://documentation.bonitasoft.com/bdm-xml-schema/1.0" modelVersion="1.0" productVersion="7.12.2">
+    <businessObjects>
+        <businessObject qualifiedName="com.company.admin.mail.MailTemplate">
+            <fields>
+                <field type="STRING" length="255" name="mailType" nullable="false" collection="false"/>
+                <field type="TEXT" length="255" name="template" nullable="false" collection="false"/>
+                <field type="TEXT" length="255" name="subject" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="locale" nullable="true" collection="false">
+                    <description>en,fr,es</description>
+                </field>
+                <field type="LOCALDATETIME" length="255" name="lastUpdateDate" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="provided" nullable="true" collection="false">
+                    <description>protect factory settings from deletion</description>
+                </field>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="mailTemplateUK1">
+                    <fieldNames>
+                        <fieldName>mailType</fieldName>
+                        <fieldName>locale</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.ticketing.Messages">
+            <fields>
+                <field type="STRING" length="255" name="message" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="sender" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="toGroup" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="messageTimestamp" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.ticketing.Reporter">
+            <fields>
+                <field type="STRING" length="255" name="firstName" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="lastName" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="twitterId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="crmContactId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="bonitaUsername" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="bonitaUserId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="bonitaPassword" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="BonitaUserId">
+                    <fieldNames>
+                        <fieldName>bonitaUserId</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.ticketing.SatisfactionIndex">
+            <fields>
+                <field type="LONG" length="255" name="supportCaseId" nullable="true" collection="false"/>
+                <field type="INTEGER" length="255" name="score" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="resolutionDate" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.ticketing.SupportCase">
+            <fields>
+                <field type="STRING" length="255" name="title" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="description" nullable="false" collection="false"/>
+                <field type="STRING" length="64" name="category" nullable="true" collection="false"/>
+                <field type="STRING" length="64" name="severity" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="reporterId" nullable="true" collection="false"/>
+                <field type="STRING" length="64" name="source" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="externalCaseId" nullable="true" collection="false"/>
+                <field type="DOUBLE" length="255" name="latitude" nullable="true" collection="false"/>
+                <field type="DOUBLE" length="255" name="longitude" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="city" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="status" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="onsiteVisitDate" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="fieldTechnicianId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="crmCaseId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="attachmentUrl" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="createdDate" nullable="false" collection="false"/>
+                <field type="LONG" length="255" name="processId" nullable="false" collection="false"/>
+                <relationField type="COMPOSITION" reference="com.company.ticketing.Messages" fetchType="EAGER" name="internalMessages" nullable="true" collection="true"/>
+                <field type="BOOLEAN" length="255" name="onsiteVisit" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="advancedSupport" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="toKnowledgeBase" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="caseId">
+                    <fieldNames>
+                        <fieldName>processId</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="getLastSupportCaseOrderedByTwitterId" content="SELECT s &#13;&#10;FROM SupportCase s &#13;&#10;order by s.externalCaseId desc" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getNonRejectedSupportCases" content="SELECT s &#13;&#10;FROM SupportCase s&#13;&#10;where s.status != 'Rejected' &#13;&#10;order by createdDate desc" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getClosedSupportCases" content="SELECT s &#13;&#10;FROM SupportCase s&#13;&#10;where s.status = 'Closed'&#13;&#10;order by createdDate desc" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getNonRejectedAndClosed" content="SELECT s &#13;&#10;FROM SupportCase s&#13;&#10;where s.status = 'Rejected' AND s.status = 'Closed' &#13;&#10;order by createdDate desc" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.OBDEmployee">
+            <fields>
+                <field type="LONG" length="255" name="id" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="personId" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="bonitaUserId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="workspaceLocation" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="jobPosition" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="department" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="hiringManager" nullable="false" collection="false"/>
+                <field type="INTEGER" length="255" name="fixedSalary" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="startDate" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="firstPaymentDate" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="positionId" nullable="true" collection="false"/>
+                <field type="INTEGER" length="255" name="variableSalary" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="homeOffice" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="contractType" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="benefits" nullable="true" collection="true"/>
+                <field type="BOOLEAN" length="255" name="isWorkspaceNeeded" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="onBoardingComplete" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="workspaceComments" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="loginId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="workEmail" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="status" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries>
+                <query name="getEmployees" content="SELECT e &#10;FROM OBDEmployee e&#13;&#10;ORDER by e.id&#10;&#10;" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getHomeOfficeData" content="Select e.homeOffice, Count(*) &#13;&#10;From OBDEmployee e &#13;&#10;Group by e.homeOffice &#13;&#10;Order by e.homeOffice" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="countNonCompleted" content="SELECT COUNT(o)&#13;&#10;FROM OBDEmployee o &#13;&#10;WHERE o.status &lt;&gt; 'Completed'&#13;&#10;" returnType="java.lang.Long">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.OBDITLineItem">
+            <fields>
+                <field type="STRING" length="255" name="reqt" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="licKey" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.OBDITLineItem1">
+            <fields>
+                <field type="STRING" length="255" name="reqt" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="assetId" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.OBDITReqts">
+            <fields>
+                <relationField type="COMPOSITION" reference="com.company.hr.OBDITLineItem1" fetchType="EAGER" name="hwReqts" nullable="true" collection="true"/>
+                <relationField type="COMPOSITION" reference="com.company.hr.OBDITLineItem" fetchType="EAGER" name="swReqts" nullable="true" collection="true"/>
+                <field type="STRING" length="255" name="hwComments" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="swComments" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.OBDPerson">
+            <fields>
+                <field type="LONG" length="255" name="id" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="firstName" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="lastName" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="address" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="city" nullable="true" collection="false"/>
+                <field type="INTEGER" length="255" name="zipCode" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="phone" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="workPhone" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="gender" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="dateOfBirth" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="professionalMail" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries>
+                <query name="getPersonData" content="SELECT o &#10;FROM OBDPerson o &#13;&#10;ORDER by o.id&#10;" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.VacationAvailable">
+            <description>Number of days that are available to each employee.</description>
+            <fields>
+                <field type="LONG" length="255" name="bonitaBPMId" nullable="false" collection="false"/>
+                <field type="INTEGER" length="255" name="daysAvailableCounter" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="firstname" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="lastname" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="managerUserId" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="UNIQUE_BONITA_BPM_ID">
+                    <fieldNames>
+                        <fieldName>bonitaBPMId</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="withVacances" content="SELECT v&#13;&#10;FROM VacationAvailable v&#13;&#10;WHERE v.daysAvailableCounter &lt; 25&#13;&#10;ORDER BY v.persistenceId" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.hr.VacationRequest">
+            <description>An employee vacation request.
+                Possible status are: pending, approved, refused and cancelled.</description>
+            <fields>
+                <field type="LONG" length="255" name="requesterBonitaBPMId" nullable="false" collection="false"/>
+                <field type="LONG" length="255" name="reviewerBonitaBPMId" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="startDate" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="returnDate" nullable="false" collection="false"/>
+                <field type="INTEGER" length="255" name="numberOfDays" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="status" nullable="false" collection="false"/>
+                <field type="STRING" length="512" name="comments" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="googleCalendarEventId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="requesterEmail" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries>
+                <query name="findCancellableByEmployeeId" content="SELECT l &#10;FROM VacationRequest l &#10;WHERE l.requesterBonitaBPMId = :requesterBonitaBPMId&#10;AND l.startDate &gt; :startDate&#10;AND l.status IN('pending', 'approved')&#10;ORDER BY l.startDate ASC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="requesterBonitaBPMId" className="java.lang.Long"/>
+                        <queryParameter name="startDate" className="java.time.LocalDate">
+                            <description>date is a string in database, use yyyy-mm-dd format</description>
+                        </queryParameter>
+                    </queryParameters>
+                </query>
+                <query name="findCancellableByReviewer" content="SELECT l &#13;&#10;FROM VacationRequest l &#13;&#10;WHERE l.reviewerBonitaBPMId = :reviewerBonitaBPMId&#13;&#10;AND l.startDate &lt;=  :startDate&#13;&#10;AND l.returnDate &gt;=  :startDate&#13;&#10;AND l.status IN('pending', 'approved')&#13;&#10;ORDER BY l.startDate ASC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="reviewerBonitaBPMId" className="java.lang.Long"/>
+                        <queryParameter name="startDate" className="java.time.LocalDate"/>
+                    </queryParameters>
+                </query>
+                <query name="findCancelRequest" content="SELECT l &#13;&#10;FROM VacationRequest l &#13;&#10;WHERE l.status IN('Cancel pending...')&#13;&#10;ORDER BY l.startDate ASC" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.BankAccountDetails">
+            <description>Provider's bank account details</description>
+            <fields>
+                <field type="INTEGER" length="255" name="pkid" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="filePath" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idCreator" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateCreation" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idEditor" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateEdit" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="bankName" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="accountNumber" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="bankSwift" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="accountName" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniquePKID">
+                    <fieldNames>
+                        <fieldName>pkid</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.Contact">
+            <description>Provider's contact description</description>
+            <fields>
+                <field type="INTEGER" length="255" name="pkid" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="fonction" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="title" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="surname" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="firstname" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="contactType" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="phone" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="mobile" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.Contract">
+            <description>Provider's contracts</description>
+            <fields>
+                <field type="INTEGER" length="255" name="pkid" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="filePath" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idCreator" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateCreation" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idEditor" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateEdit" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="contractName" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="contractDate" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="contractAmount" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniquePKID">
+                    <fieldNames>
+                        <fieldName>pkid</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.Invoice">
+            <description></description>
+            <fields>
+                <field type="STRING" length="10" name="invoiceId" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="firstName" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="lastName" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="customerName" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="department" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="status" nullable="false" collection="false"/>
+                <field type="DOUBLE" length="255" name="invoiceAmount" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="invoiceDate" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="invoiceDeadlineDate" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="invoicePriority" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="processInstanceId" nullable="false" collection="false"/>
+                <field type="LONG" length="255" name="initiatorID" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniqueConstraint">
+                    <fieldNames>
+                        <fieldName>processInstanceId</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="getCountInvoiceId" content="SELECT COUNT(*)&#13;&#10;FROM Invoice&#13;&#10;" returnType="java.lang.Long">
+                    <queryParameters/>
+                </query>
+                <query name="getClosedInvoice" content="SELECT i&#13;&#10;FROM Invoice i&#13;&#10;where i.status LIKE '%Closed%'&#13;&#10;order by processInstanceId desc&#13;&#10;" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getGreaterThan5k" content="SELECT i&#13;&#10;FROM Invoice i&#13;&#10;WHERE i.invoiceAmount &gt;= 5000&#13;&#10;ORDER BY invoiceDate ASC" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getLowerThan5k" content="SELECT i&#13;&#10;FROM Invoice i&#13;&#10;WHERE i.invoiceAmount &lt;= 5000&#13;&#10;ORDER BY invoiceDate ASC" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getOpenInvoices" content="SELECT inv&#13;&#10;FROM Invoice inv&#13;&#10;where inv.status = 'Level 1 Approved'&#13;&#10;OR inv.status = 'In Progress'&#13;&#10;OR inv.status = 'Level 1 Approval'&#13;&#10;OR inv.status = 'Level 2 Approval'&#13;&#10;OR inv.status = 'Level 2 Approved'&#13;&#10;order by processInstanceId desc&#13;&#10;" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+                <query name="getExpiredInvoices" content="SELECT i &#13;&#10;FROM Invoice i &#13;&#10;WHERE i.invoiceDeadlineDate &lt; to_CHAR(CURRENT_DATE, 'YYYY-MM-DD')&#13;&#10;ORDER BY i.persistenceId ASC" returnType="java.util.List">
+                    <description>Search for Invoices with expired deadlines</description>
+                    <queryParameters/>
+                </query>
+                <query name="getExpiringInvoices" content="SELECT i &#13;&#10;FROM Invoice i &#13;&#10;WHERE i.invoiceDeadlineDate &lt; :date&#13;&#10;ORDER BY i.persistenceId ASC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="date" className="java.time.LocalDate"/>
+                    </queryParameters>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.InvoiceDeadlines">
+            <fields>
+                <field type="STRING" length="255" name="priority" nullable="false" collection="false"/>
+                <field type="INTEGER" length="255" name="validationDelay" nullable="false" collection="false">
+                    <description>validation delay counted in calendar days</description>
+                </field>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="priorityUC">
+                    <fieldNames>
+                        <fieldName>priority</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.Provider">
+            <fields>
+                <field type="LONG" length="255" name="pkid" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="name" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="alias" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="provType" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="provPriority" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="address1" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="address2" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="city" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="country" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="telephone" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="fax" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="currency" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="isExtranetAllowed" nullable="true" collection="false"/>
+                <field type="INTEGER" length="255" name="paymentDelay" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="loginExtranet" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="auxAccount" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="analyticAccount" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="isActive" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idCreator" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateCreation" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idAccountEdit" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateAcountEdit" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="idProdEditor" nullable="true" collection="false"/>
+                <field type="LOCALDATETIME" length="255" name="dateProdEdit" nullable="true" collection="false"/>
+                <relationField type="COMPOSITION" reference="com.company.invoices.BankAccountDetails" fetchType="EAGER" name="bankAccountDetails" nullable="true" collection="false"/>
+                <relationField type="COMPOSITION" reference="com.company.invoices.Contact" fetchType="EAGER" name="contact" nullable="true" collection="true"/>
+                <relationField type="COMPOSITION" reference="com.company.invoices.Contract" fetchType="EAGER" name="contract" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="accCheck" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="itCheck" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniquePKID">
+                    <fieldNames>
+                        <fieldName>pkid</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="autocompSearch" content="SELECT p &#10;FROM Provider p &#10;WHERE concat(p.name , ' - ', p.city ,' ', p.country) =  :qParam&#10;ORDER BY p.persistenceId ASC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="qParam" className="java.lang.String"/>
+                    </queryParameters>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.Quotation">
+            <description>Quotation sent to suppliers based on a request</description>
+            <fields>
+                <relationField type="AGGREGATION" reference="com.company.invoices.Provider" fetchType="EAGER" name="supplier" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="status" nullable="false" collection="false"/>
+                <field type="BOOLEAN" length="255" name="hasSupplierAccepted" nullable="true" collection="false"/>
+                <field type="DOUBLE" length="255" name="proposedPrice" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="comments" nullable="true" collection="false"/>
+                <relationField type="AGGREGATION" reference="com.company.invoices.Request" fetchType="EAGER" name="request" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries>
+                <query name="findFromRequest" content="SELECT q &#13;&#10;FROM Quotation q &#13;&#10;WHERE q.request.persistenceId = :id" returnType="com.company.invoices.Quotation">
+                    <queryParameters>
+                        <queryParameter name="id" className="java.lang.Long"/>
+                    </queryParameters>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.invoices.Request">
+            <description>Procurement request</description>
+            <fields>
+                <field type="LONG" length="255" name="caseId" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="summary" nullable="true" collection="false"/>
+                <field type="STRING" length="512" name="description" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="creationDate" nullable="false" collection="false"/>
+                <field type="LONG" length="255" name="createdBy" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="status" nullable="false" collection="false"/>
+                <field type="LOCALDATE" length="255" name="completionDate" nullable="true" collection="false"/>
+                <relationField type="AGGREGATION" reference="com.company.invoices.Provider" fetchType="EAGER" name="selectedSupplier" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="caseId">
+                    <fieldNames>
+                        <fieldName>caseId</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.email.Email">
+            <fields>
+                <field type="LONG" length="255" name="messageNumber" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="subject" nullable="true" collection="false"/>
+                <field type="OFFSETDATETIME" length="255" name="sendDate" nullable="true" collection="false">
+                    <description>
+                    </description>
+                </field>
+                <field type="OFFSETDATETIME" length="255" name="receivedDate" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="true" collection="false">
+                    <description>email address</description>
+                </field>
+                <field type="STRING" length="255" name="name" nullable="true" collection="false">
+                    <description>full name </description>
+                </field>
+                <field type="TEXT" length="255" name="body" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="plainContent" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="htmlContent" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="htmlContentSanitized" nullable="true" collection="false">
+                    <description>based on OWASP sanitizer</description>
+                </field>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.Address">
+            <fields>
+                <field type="STRING" length="50" name="address" nullable="false" collection="false"/>
+                <field type="STRING" length="50" name="address2" nullable="true" collection="false"/>
+                <field type="STRING" length="10" name="postalCode" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="city" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="country" nullable="false" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries>
+                <query name="query" content="SELECT a &#10;FROM Address a &#10;WHERE a.address = :address&#10;AND a.address2 = :address2&#10;AND a.postalCode = :postalCode&#10;AND a.city = :city&#10;AND a.country = :country&#10;ORDER BY a.persistenceId ASC" returnType="com.company.model.Address">
+                    <description>dbdbd</description>
+                    <queryParameters>
+                        <queryParameter name="address" className="java.lang.String"/>
+                        <queryParameter name="address2" className="java.lang.String"/>
+                        <queryParameter name="postalCode" className="java.lang.String"/>
+                        <queryParameter name="city" className="java.lang.String"/>
+                        <queryParameter name="country" className="java.lang.String"/>
+                    </queryParameters>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.Bill">
+            <fields>
+                <field type="OFFSETDATETIME" length="255" name="billDate" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="amount" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="content" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="billStatus" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.Customer">
+            <fields>
+                <field type="STRING" length="255" name="name" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="firstName" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="lastName" nullable="true" collection="false"/>
+                <relationField type="COMPOSITION" reference="com.company.model.Address" fetchType="EAGER" name="address" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="id" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="licence" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="email" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="phone" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="dob" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="gender" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="paymentMethod" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="paymentsolvency" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="insurance" nullable="true" collection="false"/>
+                <relationField type="AGGREGATION" reference="com.company.model.Vehicle" fetchType="EAGER" name="vehicles" nullable="true" collection="true"/>
+                <field type="TEXT" length="255" name="status" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="caseId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="kycScore" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="countries" nullable="true" collection="true"/>
+                <field type="LONG" length="255" name="userId" nullable="true" collection="false"/>
+                <relationField type="AGGREGATION" reference="com.company.parameters.Countries" fetchType="EAGER" name="contractCountries" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="globalStatus" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="salesForceAccountId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="salesForceContactId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="salesForceAccountName" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="digisignStatus" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniqueConstraint">
+                    <fieldNames>
+                        <fieldName>name</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="query" content="SELECT c &#10;FROM Customer c ORDER BY c.persistenceId DESC" returnType="com.company.model.Customer">
+                    <queryParameters/>
+                </query>
+                <query name="countForQuery" content="SELECT count(c) &#10;FROM Customer c &#10;" returnType="com.company.model.Customer">
+                    <queryParameters/>
+                </query>
+                <query name="previousCustomers" content="SELECT c &#10;FROM Customer c &#10;WHERE c.persistenceId != :persistenceId&#10;ORDER BY c.name ASC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="persistenceId" className="java.lang.Long"/>
+                    </queryParameters>
+                </query>
+                <query name="registredCustomers" content="SELECT c &#10;FROM Customer c &#10;WHERE  c.userId &gt; 0&#10;ORDER BY c.persistenceId ASC" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.Damage">
+            <fields>
+                <relationField type="AGGREGATION" reference="com.company.model.Customer" fetchType="EAGER" name="customer" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="caseId" nullable="true" collection="false"/>
+                <relationField type="AGGREGATION" reference="com.company.model.Vehicle" fetchType="EAGER" name="vehicle" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="responsible" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="counterParty" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="damageType" nullable="true" collection="false"/>
+                <relationField type="COMPOSITION" reference="com.company.model.Location" fetchType="EAGER" name="location" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="status" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="accepted" nullable="true" collection="false"/>
+                <relationField type="AGGREGATION" reference="com.company.model.Customer" fetchType="EAGER" name="lastCustomers" nullable="true" collection="true"/>
+                <relationField type="COMPOSITION" reference="com.company.model.Bill" fetchType="EAGER" name="bill" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="agentId" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="damageSeverity" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="damageDescription" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.DamageType">
+            <fields>
+                <field type="STRING" length="255" name="name" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="description" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="severity" nullable="true" collection="false"/>
+                <field type="INTEGER" length="255" name="template" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniqueConstraint">
+                    <fieldNames>
+                        <fieldName>name</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="template" content="SELECT d &#10;FROM DamageType d &#10;WHERE d.template = 1&#10;ORDER BY name ASC" returnType="java.util.List">
+                    <queryParameters/>
+                </query>
+            </queries>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.FileInfos">
+            <fields>
+                <field type="STRING" length="255" name="refContrat" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="numFournisseur" nullable="false" collection="false"/>
+                <field type="STRING" length="255" name="montant" nullable="true" collection="false"/>
+                <field type="BOOLEAN" length="255" name="validDirection" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="currency" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="hash" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.Location">
+            <fields>
+                <field type="STRING" length="255" name="latitude" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="longitude" nullable="true" collection="false"/>
+                <field type="TEXT" length="255" name="location" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="reservationStatus" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="country" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints/>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.Vehicle">
+            <fields>
+                <field type="STRING" length="255" name="vin" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="licencePlate" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="brand" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="model" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="type" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="color" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="deliveryDate" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="inFleetDate" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="outFleetDate" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="uniqueConstraint">
+                    <fieldNames>
+                        <fieldName>vin</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.parameters.Countries">
+            <fields>
+                <field type="STRING" length="255" name="country" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="ruleVersion" nullable="true" collection="false"/>
+                <field type="LOCALDATE" length="255" name="lastModified" nullable="true" collection="false"/>
+                <field type="LONG" length="255" name="userModified" nullable="true" collection="false"/>
+                <field type="STRING" length="255" name="iso3166" nullable="true" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="country">
+                    <fieldNames>
+                        <fieldName>country</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+            <indexes/>
+        </businessObject>
+    </businessObjects>
+</businessObjectModel>

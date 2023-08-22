@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<profiles:profiles xmlns:profiles="http://documentation.bonitasoft.com/profile-xml-schema/1.0">
+    <invalid-profile name="Invalid Profile" isDefault="true">
+        <description>This is an invalid profile.</description>
+    </invalid-profile>
+</profiles:profiles>
