@@ -19,8 +19,6 @@ package org.bonitasoft.plugin.validation.xml;
 import static org.assertj.core.api.Assertions.*;
 
 import java.net.URL;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.bonitasoft.plugin.validation.ValidationErrorException;
@@ -34,22 +32,24 @@ class XmlValidationTaskTest {
     void should_throw_exception_if_non_existing_xsd() {
         // given
         URL xsdUrl = XmlValidationTask.class.getResource("foo.bar");
+        XmlValidationTask validationTask = new XmlValidationTask(xsdUrl, null);
 
         // then
         assertThatExceptionOfType(ValidationErrorException.class)
-                .isThrownBy(() -> new XmlValidationTask(xsdUrl, null))
-                .withMessage("Failed to parse XSD with URL null");
+                .isThrownBy(validationTask::initValidator)
+                .withMessage("[" + XmlValidationTask.DEFAULT_TASK_NAME + "] Failed to parse XSD with URL null");
     }
 
     @Test
     void should_throw_exception_if_invalid_xsd() {
         // given
         URL xsdUrl = XmlValidationTask.class.getResource("/validation/invalid-xsd.xsd");
+        XmlValidationTask validationTask = new XmlValidationTask(xsdUrl, null);
 
         // then
         assertThatExceptionOfType(ValidationErrorException.class)
-                .isThrownBy(() -> new XmlValidationTask(xsdUrl, null))
-                .withMessage("Failed to parse XSD with URL " + xsdUrl);
+                .isThrownBy(validationTask::initValidator)
+                .withMessage("[" + XmlValidationTask.DEFAULT_TASK_NAME + "] Failed to parse XSD with URL " + xsdUrl);
     }
 
     @Test
@@ -65,16 +65,14 @@ class XmlValidationTaskTest {
     }
 
     @Test
-    void should_throw_exception_if_non_existing_source_dir() {
+    void should_ignore_non_existing_source_dir() {
         // given
         URL xsdUrl = XmlValidationTask.class.getResource("/validation/empty-xsd.xsd");
-        Path directory = Paths.get(TEST_RESOURCES_VALIDATION_DIR, "not-exist");
-        XmlValidationTask validationTask = new XmlValidationTask(xsdUrl, directory);
+        XmlValidationTask validationTask = new XmlValidationTask(xsdUrl,
+                Paths.get(TEST_RESOURCES_VALIDATION_DIR, "not-exist"));
 
         // then
-        assertThatExceptionOfType(ValidationErrorException.class)
-                .isThrownBy(validationTask::getSourceFiles)
-                .withMessage("Failed to list files in directory " + directory)
-                .withCauseInstanceOf(NoSuchFileException.class);
+        assertThat(validationTask.getSourceFiles()).isEmpty();
+        assertThatCode(validationTask::validate).doesNotThrowAnyException();
     }
 }

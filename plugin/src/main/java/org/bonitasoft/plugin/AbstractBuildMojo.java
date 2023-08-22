@@ -41,7 +41,6 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
     protected static final String PAGES_FOLDER_NAME = "pagesFolderName";
     protected static final String WORKSPACE_PATH = "workspacePath";
     protected static final String APP_FOLDER_NAME = "app";
-    protected static final String BDM_FOLDER_NAME = "bdm";
 
     @Parameter(defaultValue = "${project}", required = false, readonly = true)
     protected MavenProject project;

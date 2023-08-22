@@ -31,6 +31,11 @@ public class FragmentUidValidationTask extends AbstractUidValidationTask {
     }
 
     @Override
+    protected String getTaskName() {
+        return "UID Fragments validation";
+    }
+
+    @Override
     protected MigrationStatusReport getArtifactStatus(String artifactId) {
         return artifactBuilder.getFragmentStatus(artifactId);
     }

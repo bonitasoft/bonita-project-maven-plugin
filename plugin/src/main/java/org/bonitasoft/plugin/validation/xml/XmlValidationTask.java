@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,27 +43,43 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class XmlValidationTask implements ValidationTask {
 
+    protected static final String DEFAULT_TASK_NAME = "XML Validation Task";
     private static final String DEFAULT_SOURCE_FILE_REGEX = "^.*\\.xml$";
 
+    private final String taskName;
     private final URL xsdUrl;
     private final Path artifactsSourceDir;
     private final String sourceFileRegex;
-    private final Validator validator;
 
-    public XmlValidationTask(URL xsdUrl, Path artifactsSourceDir, String sourceFileRegex) {
+    public XmlValidationTask(String taskName, URL xsdUrl, Path artifactsSourceDir, String sourceFileRegex) {
+        this.taskName = taskName;
         this.xsdUrl = xsdUrl;
         this.artifactsSourceDir = artifactsSourceDir;
         this.sourceFileRegex = sourceFileRegex == null ? DEFAULT_SOURCE_FILE_REGEX : sourceFileRegex;
-        validator = initValidator();
+    }
+
+    public XmlValidationTask(String taskName, URL xsdUrl, Path artifactsSourceDir) {
+        this(taskName, xsdUrl, artifactsSourceDir, DEFAULT_SOURCE_FILE_REGEX);
+    }
+
+    public XmlValidationTask(URL xsdUrl, Path artifactsSourceDir, String sourceFileRegex) {
+        this(DEFAULT_TASK_NAME, xsdUrl, artifactsSourceDir, sourceFileRegex);
     }
 
     public XmlValidationTask(URL xsdUrl, Path artifactsSourceDir) {
-        this(xsdUrl, artifactsSourceDir, DEFAULT_SOURCE_FILE_REGEX);
+        this(DEFAULT_TASK_NAME, xsdUrl, artifactsSourceDir);
     }
 
     @Override
     public void validate() throws ValidationException {
-        for (File file : getSourceFiles()) {
+        List<File> sourceFiles = getSourceFiles();
+        if (sourceFiles.isEmpty()) {
+            // nothing to validate
+            return;
+        }
+        log.info("Executing {}", taskName);
+        Validator validator = initValidator();
+        for (File file : sourceFiles) {
             try {
                 log.debug("Executing validation on file [{}]", file.getName());
                 validator.validate(new StreamSource(file));
@@ -73,7 +90,7 @@ public class XmlValidationTask implements ValidationTask {
         }
     }
 
-    private Validator initValidator() {
+    protected Validator initValidator() throws ValidationErrorException {
         log.debug("Initializing schema validator [{}]", xsdUrl);
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -81,21 +98,26 @@ public class XmlValidationTask implements ValidationTask {
             sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             return sf.newSchema(xsdUrl).newValidator();
         } catch (Exception e) {
-            throw new ValidationErrorException("Failed to parse XSD with URL " + xsdUrl, e);
+            throw new ValidationErrorException("[" + taskName + "] Failed to parse XSD with URL " + xsdUrl, e);
         }
     }
 
-    protected List<File> getSourceFiles() {
+    protected List<File> getSourceFiles() throws ValidationErrorException {
+        if (!Files.exists(artifactsSourceDir) || !Files.isDirectory(artifactsSourceDir)) {
+            log.debug("Artifacts source directory [{}] does not exist or is not a directory", artifactsSourceDir);
+            return Collections.emptyList();
+        }
         try (Stream<Path> sourcePaths = Files.list(artifactsSourceDir)) {
             var sourceFiles = sourcePaths
-                    .filter(path -> Files.isRegularFile(path)
-                            && path.getFileName().toString().matches(sourceFileRegex))
+                    .filter(path -> Files.isRegularFile(path) && path.getFileName().toString().matches(sourceFileRegex))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
-            log.debug("Found [{}] source files in directory [{}]", sourceFiles.size(), artifactsSourceDir);
+            log.debug("Found [{}] source files in directory [{}] matching regex [{}] for task [{}]", sourceFiles.size(),
+                    artifactsSourceDir, sourceFileRegex, taskName);
             return sourceFiles;
         } catch (IOException e) {
-            throw new ValidationErrorException("Failed to list files in directory " + artifactsSourceDir, e);
+            throw new ValidationErrorException(
+                    "[" + taskName + "] Failed to list files in directory " + artifactsSourceDir, e);
         }
     }
 }

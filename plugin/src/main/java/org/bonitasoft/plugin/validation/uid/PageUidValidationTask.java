@@ -31,6 +31,11 @@ public class PageUidValidationTask extends AbstractUidValidationTask {
     }
 
     @Override
+    protected String getTaskName() {
+        return "UID Pages validation";
+    }
+
+    @Override
     protected MigrationStatusReport getArtifactStatus(String artifactId) {
         return artifactBuilder.getPageStatus(artifactId);
     }

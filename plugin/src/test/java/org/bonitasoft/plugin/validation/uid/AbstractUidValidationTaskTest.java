@@ -17,13 +17,10 @@
 package org.bonitasoft.plugin.validation.uid;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.bonitasoft.plugin.validation.ValidationErrorException;
 import org.bonitasoft.web.designer.ArtifactBuilder;
 import org.bonitasoft.web.designer.model.MigrationStatusReport;
 import org.junit.jupiter.api.Test;
@@ -94,16 +91,8 @@ class AbstractUidValidationTaskTest {
     }
 
     @Test
-    void should_throw_exception_if_non_existing_uid_artifacts_directory() {
-        // given
-        Path artifactsSourceDir = Paths.get(TEST_RESOURCES_UID_DIR, "non-existing-directory");
-        AbstractUidValidationTask validationTask = new TestUidValidationTask(artifactBuilder, artifactsSourceDir);
-
-        // then
-        assertThatExceptionOfType(ValidationErrorException.class)
-                .isThrownBy(validationTask::getUidArtifacts)
-                .withMessage("Failed to list UID artifacts in directory " + artifactsSourceDir)
-                .withCauseInstanceOf(NoSuchFileException.class);
+    void should_get_no_uid_artifact_with_non_existing_directory() {
+        assertGetUidArtifactsHasExpectedSize(0, "non-existing-directory");
     }
 
     private void assertUidArtifactIsFalse(String... directories) {
@@ -127,6 +116,11 @@ class AbstractUidValidationTaskTest {
 
         public TestUidValidationTask(ArtifactBuilder artifactBuilder, Path artifactsSourceDir) {
             super(artifactBuilder, artifactsSourceDir);
+        }
+
+        @Override
+        protected String getTaskName() {
+            return "Test UID Validation Task";
         }
 
         @Override

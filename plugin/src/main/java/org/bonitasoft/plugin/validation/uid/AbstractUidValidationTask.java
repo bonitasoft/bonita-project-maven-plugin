@@ -19,6 +19,7 @@ package org.bonitasoft.plugin.validation.uid;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,7 +57,13 @@ public abstract class AbstractUidValidationTask implements ValidationTask {
 
     @Override
     public void validate() throws ValidationException {
-        for (String uidArtifact : getUidArtifacts()) {
+        List<String> uidArtifacts = getUidArtifacts();
+        if (uidArtifacts.isEmpty()) {
+            // nothing to validate
+            return;
+        }
+        log.info("Executing {}", getTaskName());
+        for (String uidArtifact : uidArtifacts) {
             log.debug("Executing validation on UID artifact [{}]", uidArtifact);
             if (!getArtifactStatus(uidArtifact).isCompatible()) {
                 throw new ValidationException("UID artifact '" + uidArtifact + "' is not valid");
@@ -65,19 +72,27 @@ public abstract class AbstractUidValidationTask implements ValidationTask {
         }
     }
 
+    protected abstract String getTaskName();
+
     protected abstract MigrationStatusReport getArtifactStatus(String artifactId);
 
     protected List<String> getUidArtifacts() {
+        if (!Files.exists(artifactsSourceDir) || !Files.isDirectory(artifactsSourceDir)) {
+            log.debug("Artifacts source directory [{}] does not exist or is not a directory", artifactsSourceDir);
+            return Collections.emptyList();
+        }
         try (Stream<Path> sourcePaths = Files.list(artifactsSourceDir)) {
             var sourceFiles = sourcePaths
                     .filter(AbstractUidValidationTask::isUidArtifact)
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .collect(Collectors.toList());
-            log.debug("Found [{}] UID artifacts in directory [{}]", sourceFiles.size(), artifactsSourceDir);
+            log.debug("Found [{}] UID artifacts in directory [{}] for task {}", sourceFiles.size(), artifactsSourceDir,
+                    getTaskName());
             return sourceFiles;
         } catch (IOException e) {
-            throw new ValidationErrorException("Failed to list UID artifacts in directory " + artifactsSourceDir, e);
+            throw new ValidationErrorException(
+                    "[" + getTaskName() + "] Failed to list UID artifacts in directory " + artifactsSourceDir, e);
         }
     }
 

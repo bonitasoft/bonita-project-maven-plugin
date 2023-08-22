@@ -31,6 +31,11 @@ public class WidgetUidValidationTask extends AbstractUidValidationTask {
     }
 
     @Override
+    protected String getTaskName() {
+        return "UID Widgets validation";
+    }
+
+    @Override
     protected MigrationStatusReport getArtifactStatus(String artifactId) {
         return artifactBuilder.getWidgetStatus(artifactId);
     }

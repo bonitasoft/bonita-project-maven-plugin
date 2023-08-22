@@ -16,11 +16,6 @@
  */
 package org.bonitasoft.plugin.validation;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -37,7 +32,8 @@ import org.bonitasoft.web.designer.config.UiDesignerProperties;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The {@code validate} Mojo is used to execute validation criteria on Bonita artifacts sources located in the current project.
+ * The {@code validate} Mojo is used to execute validation criteria on Bonita artifacts sources located in the current
+ * project.
  * <p>
  * It handles the following artifacts:
  * <ul>
@@ -46,6 +42,9 @@ import lombok.extern.slf4j.Slf4j;
  * <li>BDM</li>
  * <li>BDM Access Control</li>
  * <li>Organizations</li>
+ * <li>UID Pages</li>
+ * <li>UID Fragments</li>
+ * <li>UID Widgets</li>
  * </ul>
  */
 @Slf4j
@@ -59,14 +58,17 @@ public class ValidateMojo extends AbstractBuildMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            executeXmlValidation("Executing XML validation on Applications", applicationXsdPath, applicationSourceDir);
+            executeXmlValidation("XML validation on Applications", applicationXsdPath, applicationSourceDir);
 
-            executeXmlValidation("Executing XML validation on Profiles", profileXsdPath, profileSourceDir);
+            executeXmlValidation("XML validation on Profiles", profileXsdPath, profileSourceDir);
 
-            executeXmlValidation("Executing XML validation on Organizations", organizationXsdPath,
-                    organizationSourceDir, ORGANIZATION_SOURCE_FILE_REGEX);
+            executeXmlValidation("XML validation on Organizations", organizationXsdPath, organizationSourceDir,
+                    ORGANIZATION_SOURCE_FILE_REGEX);
 
-            executeBdmValidation();
+            executeXmlValidation("XML validation on BDM", bdmXsdPath, bdmSourceDir, BDM_SOURCE_FILE_REGEX);
+
+            executeXmlValidation("XML validation on BDM Access Control", bdmAccessControlXsdPath,
+                    bdmAccessControlSourceDir, BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
 
             executeUidValidation();
         } catch (ValidationException e) {
@@ -75,57 +77,31 @@ public class ValidateMojo extends AbstractBuildMojo {
     }
 
     /**
-     * Call {@link XmlValidationTask#validate()} with given arguments if the directory {@code artifactsSourceDir} is
-     * valid.
+     * Call {@link XmlValidationTask#validate()} with given arguments.
      *
-     * @param logMessage a message to log before executing the validation
+     * @param taskName name of the validation task
      * @param xsdPath path to the XSD schema
      * @param artifactsSourceDir path to the directory containing XML source files to validate
      * @throws ValidationException if validation criteria are not met
      */
-    private void executeXmlValidation(String logMessage, String xsdPath, String artifactsSourceDir)
+    private void executeXmlValidation(String taskName, String xsdPath, String artifactsSourceDir)
             throws ValidationException {
-        executeXmlValidation(logMessage, xsdPath, artifactsSourceDir, null);
+        executeXmlValidation(taskName, xsdPath, artifactsSourceDir, null);
     }
 
     /**
-     * Call {@link XmlValidationTask#validate()} with given arguments if the directory {@code artifactsSourceDir} is
-     * valid.
+     * Call {@link XmlValidationTask#validate()} with given arguments.
      *
-     * @param logMessage a message to log before executing the validation
+     * @param taskName name of the validation task
      * @param xsdPath path to the XSD schema
      * @param artifactsSourceDir path to the directory containing XML source files to validate
      * @param sourceFileRegex regex used to filter source files
      * @throws ValidationException if validation criteria are not met
      */
-    private void executeXmlValidation(String logMessage, String xsdPath, String artifactsSourceDir,
+    private void executeXmlValidation(String taskName, String xsdPath, String artifactsSourceDir,
             String sourceFileRegex) throws ValidationException {
-        Path sourceDir = project.getBasedir().toPath().resolve(artifactsSourceDir);
-        if (isArtifactsSourceDirValid(sourceDir)) {
-            log.info(logMessage);
-            new XmlValidationTask(ValidateMojo.class.getResource(xsdPath), sourceDir, sourceFileRegex).validate();
-        }
-    }
-
-    /**
-     * Execute XML validation for BDM and BDM Access Control artifacts.
-     *
-     * @throws ValidationException if validation criteria are not met
-     */
-    private void executeBdmValidation() throws ValidationException {
-        // because xml files are located at root level of 'bdm' folder, we check that we are under this folder before
-        // instantiate unnecessary xml validators
-        String baseDirName = project.getBasedir().getName();
-        if (!BDM_FOLDER_NAME.equals(baseDirName)) {
-            log.debug("Current project base dir [{}] is not the '{}' directory, skip BDM validation", baseDirName,
-                    BDM_FOLDER_NAME);
-            return;
-        }
-
-        executeXmlValidation("Executing XML validation on BDM", bdmXsdPath, bdmSourceDir, BDM_SOURCE_FILE_REGEX);
-
-        executeXmlValidation("Executing XML validation on BDM Access Control", bdmAccessControlXsdPath,
-                bdmAccessControlSourceDir, BDM_ACCESS_CONTROL_SOURCE_FILE_REGEX);
+        new XmlValidationTask(taskName, ValidateMojo.class.getResource(xsdPath),
+                project.getBasedir().toPath().resolve(artifactsSourceDir), sourceFileRegex).validate();
     }
 
     /**
@@ -134,6 +110,8 @@ public class ValidateMojo extends AbstractBuildMojo {
      * @throws ValidationException if validation criteria are not met
      */
     private void executeUidValidation() throws ValidationException {
+        // check that the current base dir is the 'app' submodule to prevent the initialization of the UID artifact
+        // builder for every project submodules
         String baseDirName = project.getBasedir().getName();
         if (!APP_FOLDER_NAME.equals(baseDirName)) {
             log.debug("Current project base dir [{}] is not the '{}' directory, skip UID validation", baseDirName,
@@ -145,43 +123,14 @@ public class ValidateMojo extends AbstractBuildMojo {
         UiDesignerProperties uidWorkspaceProperties = uidWorkspaceProperties(outputDirectory.toPath());
         ArtifactBuilder uidArtifactBuilder = new ArtifactBuilderFactory(uidWorkspaceProperties).create();
 
-        Path pagesDir = uidWorkspaceProperties.getWorkspace().getPages().getDir();
-        if (isArtifactsSourceDirValid(pagesDir)) {
-            log.info("Executing UID validation on Pages");
-            new PageUidValidationTask(uidArtifactBuilder, pagesDir).validate();
-        }
+        new PageUidValidationTask(uidArtifactBuilder, uidWorkspaceProperties.getWorkspace().getPages().getDir())
+                .validate();
 
-        Path fragmentsDir = uidWorkspaceProperties.getWorkspace().getFragments().getDir();
-        if (isArtifactsSourceDirValid(fragmentsDir)) {
-            log.info("Executing UID validation on Fragments");
-            new FragmentUidValidationTask(uidArtifactBuilder, fragmentsDir).validate();
-        }
+        new FragmentUidValidationTask(uidArtifactBuilder, uidWorkspaceProperties.getWorkspace().getFragments().getDir())
+                .validate();
 
-        Path widgetsDir = uidWorkspaceProperties.getWorkspace().getWidgets().getDir();
-        if (isArtifactsSourceDirValid(widgetsDir)) {
-            log.info("Executing UID validation on Widgets");
-            new WidgetUidValidationTask(uidArtifactBuilder, widgetsDir).validate();
-        }
-    }
-
-    /**
-     * An artifacts source directory is valid if it exists and it is not empty.
-     *
-     * @param artifactsSourceDir path to the directory to check
-     * @return {@code true} if the artifacts source directory is valid
-     */
-    private boolean isArtifactsSourceDirValid(Path artifactsSourceDir) {
-        if (Files.exists(artifactsSourceDir) && Files.isDirectory(artifactsSourceDir)) {
-            // check if directory is not empty
-            try (Stream<Path> entries = Files.list(artifactsSourceDir)) {
-                return entries.findAny().isPresent();
-            } catch (IOException e) {
-                throw new ValidationErrorException(
-                        "An error occurred when listing files in the directory " + artifactsSourceDir, e);
-            }
-        }
-        log.debug("Artifacts source directory [{}] does not exist or is not a directory", artifactsSourceDir);
-        return false;
+        new WidgetUidValidationTask(uidArtifactBuilder, uidWorkspaceProperties.getWorkspace().getWidgets().getDir())
+                .validate();
     }
 
 }
