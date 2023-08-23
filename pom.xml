@@ -118,7 +118,7 @@
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
     <maven-invoker-plugin.version>3.6.0</maven-invoker-plugin.version>
     <mockito-junit-jupiter.version>5.5.0</mockito-junit-jupiter.version>
-    <mockito-core.version>5.4.0</mockito-core.version>
+    <mockito-core.version>5.5.0</mockito-core.version>
     <assertj-core.version>3.24.2</assertj-core.version>
     <logback-classic.version>1.2.11</logback-classic.version>
     <!-- Sonar -->
