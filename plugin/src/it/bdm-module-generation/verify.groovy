@@ -3,6 +3,9 @@ import java.io.*
 File bdmModel = new File( basedir, 'bdm/model/target/procurement-example-bdm-model-1.0.0-SNAPSHOT.jar');
 assert bdmModel.exists() : 'bdm-model-1.0.0-SNAPSHOT.jar is missing'
 
+File bdmModelDescriptor = new File( basedir, 'bdm/model/target/procurement-example-bdm-model-1.0.0-SNAPSHOT-descriptor.zip');
+assert bdmModelDescriptor.exists() : 'bdm-model-1.0.0-SNAPSHOT-descriptor.zip is missing'
+
 File bdmModelSources = new File( basedir, 'bdm/model/target/procurement-example-bdm-model-1.0.0-SNAPSHOT-sources.jar');
 assert bdmModelSources.exists() : 'bdm-model-1.0.0-SNAPSHOT-sources.jar is missing'
 
