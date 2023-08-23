@@ -28,7 +28,7 @@ import org.bonitasoft.plugin.validation.ValidationErrorException;
 import org.bonitasoft.plugin.validation.ValidationException;
 import org.bonitasoft.plugin.validation.ValidationTask;
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.model.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.ArtifactStatusReport;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public abstract class AbstractUidValidationTask implements ValidationTask {
 
     protected abstract String getTaskName();
 
-    protected abstract MigrationStatusReport getArtifactStatus(String artifactId);
+    protected abstract ArtifactStatusReport getArtifactStatus(String artifactId);
 
     protected List<String> getUidArtifacts() {
         if (!Files.exists(artifactsSourceDir) || !Files.isDirectory(artifactsSourceDir)) {

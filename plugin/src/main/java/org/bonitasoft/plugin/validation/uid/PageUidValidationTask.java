@@ -19,7 +19,7 @@ package org.bonitasoft.plugin.validation.uid;
 import java.nio.file.Path;
 
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.model.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.ArtifactStatusReport;
 
 /**
  * Class used to check that UID pages are valid.
@@ -36,7 +36,7 @@ public class PageUidValidationTask extends AbstractUidValidationTask {
     }
 
     @Override
-    protected MigrationStatusReport getArtifactStatus(String artifactId) {
+    protected ArtifactStatusReport getArtifactStatus(String artifactId) {
         return artifactBuilder.getPageStatus(artifactId);
     }
 }

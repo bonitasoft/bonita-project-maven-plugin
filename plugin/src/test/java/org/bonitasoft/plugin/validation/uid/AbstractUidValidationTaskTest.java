@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.model.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.ArtifactStatusReport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -124,7 +124,7 @@ class AbstractUidValidationTaskTest {
         }
 
         @Override
-        protected MigrationStatusReport getArtifactStatus(String artifactId) {
+        protected ArtifactStatusReport getArtifactStatus(String artifactId) {
             return null;
         }
     }

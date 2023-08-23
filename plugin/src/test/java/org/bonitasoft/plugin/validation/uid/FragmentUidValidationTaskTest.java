@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 
 import org.bonitasoft.plugin.validation.ValidationException;
 import org.bonitasoft.web.designer.ArtifactBuilder;
-import org.bonitasoft.web.designer.model.MigrationStatusReport;
+import org.bonitasoft.web.designer.model.ArtifactStatusReport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -38,8 +38,8 @@ class FragmentUidValidationTaskTest {
 
     @Mock
     private ArtifactBuilder artifactBuilder;
-    private final MigrationStatusReport validStatus = new MigrationStatusReport(true, true);
-    private final MigrationStatusReport invalidStatus = new MigrationStatusReport(false, false);
+    private final ArtifactStatusReport validStatus = new ArtifactStatusReport(true, true);
+    private final ArtifactStatusReport invalidStatus = new ArtifactStatusReport(false, false);
 
     @Test
     void should_validate_valid_uid_fragments() {
