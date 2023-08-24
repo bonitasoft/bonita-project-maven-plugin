@@ -72,7 +72,9 @@ public class IncompatibleDependencyValidator implements DependencyValidator {
 
     private String rootNodeId(DependencyNode node, String projectArtifactId) {
         var rootNode = node;
-        while (!Objects.equals(rootNode.getParent().getArtifact().getId(), projectArtifactId)) {
+        while (rootNode.getParent() != null
+                && rootNode.getParent().getArtifact() != null
+                && !Objects.equals(rootNode.getParent().getArtifact().getId(), projectArtifactId)) {
             rootNode = rootNode.getParent();
         }
         return rootNode.getArtifact().getId();
