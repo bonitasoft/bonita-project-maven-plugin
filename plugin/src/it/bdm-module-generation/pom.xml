@@ -29,6 +29,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>javax.persistence</groupId>
+        <artifactId>javax.persistence-api</artifactId>
+        <version>2.2</version>
+      </dependency>
+      <dependency>
         <groupId>org.bonitasoft.runtime</groupId>
         <artifactId>bonita-runtime-bom</artifactId>
         <version>${bonita.runtime.version}</version>
