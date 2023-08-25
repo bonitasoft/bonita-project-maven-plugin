@@ -431,5 +431,11 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>offline</id>
+      <properties>
+        <spotless.check.skip>true</spotless.check.skip>
+      </properties>
+    </profile>
   </profiles>
 </project>
