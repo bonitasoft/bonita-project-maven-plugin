@@ -59,7 +59,7 @@ import org.bonitasoft.web.designer.config.UiDesignerProperties;
  * This mojo builds Business archives from diagram sources.
  */
 @Mojo(name = "business-archive", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
-@Execute(lifecycle = "analyze-dependencies", phase = LifecyclePhase.PROCESS_RESOURCES)
+@Execute(goal = "analyze")
 public class BuildBarMojo extends AbstractBuildMojo {
 
     private static final String[] DEFAULT_EXCLUDES = new String[0];
