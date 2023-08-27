@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class InstallFileExecutionException extends Exception {
 
+    private static final long serialVersionUID = 1L;
     private final List<Throwable> errors = new ArrayList<>();
 
     public InstallFileExecutionException(String message, Throwable exception) {
