@@ -133,12 +133,15 @@ public class BuildBarMojo extends AbstractBuildMojo {
             getLog().warn(
                     "Process migration is enabled. If a process is in an older model version than expected, a migration will be attempted.");
         }
-        var tmpFolder = outputFolder.resolve("workdir");
-        var barBuilder = BarBuilderFactory.create(BuildConfig.builder().processRegistry(processRegistry)
-                .dependencyReport(getDependencyReport(reportFile)).allowEmptyFormMapping(allowEmptyFormMapping)
+        var tmpFolder = outputFolder.resolve("business-archive-tmp");
+        var barBuilder = BarBuilderFactory.create(BuildConfig.builder()
+                .processRegistry(processRegistry)
+                .dependencyReport(getDependencyReport(reportFile))
+                .allowEmptyFormMapping(allowEmptyFormMapping)
                 .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
                 .classpathResolver(ClasspathResolver.of(getClasspath()))
-                .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder))).workingDirectory(tmpFolder)
+                .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
+                .workingDirectory(tmpFolder)
                 .build());
 
         for (var pool : processRegistry.getProcesses()) {

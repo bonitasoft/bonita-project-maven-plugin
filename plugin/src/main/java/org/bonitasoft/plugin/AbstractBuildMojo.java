@@ -79,7 +79,7 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
     protected UiDesignerProperties uidWorkspaceProperties(Path outputDirectory) {
         var workspace = uidWorkspace();
         return new UiDesignerPropertiesBuilder()
-                .workspaceUidPath(outputDirectory.resolve("uid"))
+                .workspaceUidPath(outputDirectory.resolve("uid-tmp"))
                 .disableLiveBuild()
                 .experimental(false)
                 .workspacePath(Paths.get(workspace.get(WORKSPACE_PATH)))
