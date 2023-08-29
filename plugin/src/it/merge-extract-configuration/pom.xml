@@ -24,7 +24,7 @@
     <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
     <maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
     <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
-    <bonita.environment>Local</bonita.environment>
+    <bonita.environment>local</bonita.environment>
   </properties>
   
   <dependencyManagement>

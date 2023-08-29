@@ -16,13 +16,12 @@
     </pluginExecution>
     <pluginExecution>
      	<pluginExecutionFilter>
-        <goals>
-		  <goal>validate</goal>
-		  <goal>application-properties</goal>
-          <goal>business-archive</goal>
-          <goal>uid-page</goal>
-        </goals>
-      </pluginExecutionFilter>
+            <goals>
+    		  <goal>validate</goal>
+              <goal>business-archive</goal>
+              <goal>uid-page</goal>
+            </goals>
+       </pluginExecutionFilter>
        <action>
         <ignore/>
       </action>

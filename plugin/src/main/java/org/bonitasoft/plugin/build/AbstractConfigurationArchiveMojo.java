@@ -64,8 +64,11 @@ public abstract class AbstractConfigurationArchiveMojo extends AbstractMojo {
         if (environment == null) {
             var appModule = findAppModuleProject();
             environment = appModule.getProperties().getProperty("bonita.environment");
+            if (environment == null) {
+                throw new MojoExecutionException("Required bonita.environment properties is not set.");
+            }
         }
-        return environment;
+        return environment.toLowerCase();
     }
 
     protected File getAppModuleBuildDir() throws MojoExecutionException {

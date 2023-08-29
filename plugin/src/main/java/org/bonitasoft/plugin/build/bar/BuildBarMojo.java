@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,13 +67,19 @@ public class BuildBarMojo extends AbstractBuildMojo {
     /**
      * The configuration environment. Default to Local.
      */
-    @Parameter(defaultValue = "Local", property = "bonita.environment")
+    @Parameter(defaultValue = "local", property = "bonita.environment")
     String environment;
 
     /**
-     * The name of the Bonita configuration file name
+     * The Bonita configuration archive output directory. Default to ${project.build.directory}.
      */
-    @Parameter(defaultValue = "${project.artifactId}-${project.version}-${bonita.environment}.bconf", property = "bonita.configurationFile")
+    @Parameter(defaultValue = "${project.build.directory}", property = "bonita.applicationOutput")
+    String configurationOutputDirectory;
+
+    /**
+     * The name of the Bonita configuration file name. Default is ${project.artifactId}-${project.version}-${bonita.environment}.bconf
+     */
+    @Parameter(property = "bonita.configurationFile")
     String configurationFileName;
 
     /**
@@ -84,6 +89,14 @@ public class BuildBarMojo extends AbstractBuildMojo {
      */
     @Parameter(defaultValue = "false", property = "bonita.allowEmptyFormMapping")
     private boolean allowEmptyFormMapping;
+
+    /**
+     * Whether process parameter values are embedded in the Business archive file or not.
+     * Only Enterprise edition may update the parameters values at runtime.
+     * Default to true
+     */
+    @Parameter(defaultValue = "true", property = "bonita.includeParameters")
+    private boolean includeParameters = true;
 
     /**
      * Whether process diagram files should try to migrate their content if needed
@@ -138,6 +151,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                 .processRegistry(processRegistry)
                 .dependencyReport(getDependencyReport(reportFile))
                 .allowEmptyFormMapping(allowEmptyFormMapping)
+                .includeParameters(includeParameters)
                 .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
                 .classpathResolver(ClasspathResolver.of(getClasspath()))
                 .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
@@ -146,7 +160,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
 
         for (var pool : processRegistry.getProcesses()) {
             try {
-                var buildResult = barBuilder.build(pool, environment);
+                var buildResult = barBuilder.build(pool, environment.toLowerCase());
                 buildResult.writeBusinessArchivesTo(outputFolder.resolve("processes"));
                 getLog().info("");
             } catch (BuildBarException | IOException e) {
@@ -158,10 +172,15 @@ public class BuildBarMojo extends AbstractBuildMojo {
             var aggregatedResult = barBuilder.getBuildResult();
             if (aggregatedResult != null && !aggregatedResult.getConfigurations().isEmpty()) {
                 getLog().info("Building Bonita Configuration archive...");
-                var bonitaConfigurationFile = outputFolder.resolve(getConfigurationFileName(project));
+                var configurationOutputFolder = new File(configurationOutputDirectory).toPath();
+                if (!Files.exists(configurationOutputFolder)) {
+                    Files.createDirectories(configurationOutputFolder);
+                }
+                var bonitaConfigurationFile = configurationOutputFolder.resolve(getConfigurationFileName(project));
                 aggregatedResult.writeBonitaConfigurationTo(bonitaConfigurationFile);
                 if (Files.exists(bonitaConfigurationFile)) {
-                    projectHelper.attachArtifact(project, "bconf", environment, bonitaConfigurationFile.toFile());
+                    projectHelper.attachArtifact(project, "bconf", environment.toLowerCase(),
+                            bonitaConfigurationFile.toFile());
                 }
             }
         } catch (IOException e) {
@@ -170,9 +189,9 @@ public class BuildBarMojo extends AbstractBuildMojo {
     }
 
     String getConfigurationFileName(MavenProject project) {
-        if (Objects.equals(configurationFileName,
-                String.format("%s-%s-${bonita.environment}.bconf", project.getArtifactId(), project.getVersion()))) {
-            return String.format("%s-%s-%s.bconf", project.getArtifactId(), project.getVersion(), environment);
+        if (configurationFileName == null) {
+            return String.format("%s-%s-%s.bconf", project.getArtifactId(), project.getVersion(),
+                    environment.toLowerCase());
         }
         return configurationFileName;
     }
