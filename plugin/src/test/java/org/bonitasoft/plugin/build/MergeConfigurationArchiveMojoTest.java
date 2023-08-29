@@ -51,10 +51,10 @@ class MergeConfigurationArchiveMojoTest {
     @BeforeEach
     void setup(@TempDir Path tmpFolder) throws IOException {
         mojo = new MergeConfigurationArchiveMojo();
-        mojo.environment = "Local";
+        mojo.environment = "local";
         mojo.parametersFile = "parameters-${bonita.environment}.yml";
         var project = aProject("org.bonitasoft.example", "my-project", "1.0.0-SNAPSHOT", tmpFolder,
-                "/my-project-1.0.0-SNAPSHOT-Local.bconf");
+                "/my-project-1.0.0-SNAPSHOT-local.bconf");
         mojo.project = project;
         mojo.reactorProjects = List.of(project);
     }
@@ -62,25 +62,25 @@ class MergeConfigurationArchiveMojoTest {
     @Test
     void execute() throws Exception {
         mojo.parametersFile = new File(
-                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-Local.yml").getFile())
+                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-local.yml").getFile())
                 .getAbsolutePath();
 
         mojo.execute();
 
-        assertThat(new File(mojo.project.getBuild().getDirectory(), "my-project-1.0.0-SNAPSHOT-Local.bconf")).exists();
+        assertThat(new File(mojo.project.getBuild().getDirectory(), "my-project-1.0.0-SNAPSHOT-local.bconf")).exists();
     }
 
     @Test
     void executeGetEnvironmentFromProjectProperties() throws Exception {
         mojo.environment = null;
-        mojo.project.getProperties().setProperty("bonita.environment", "Local");
+        mojo.project.getProperties().setProperty("bonita.environment", "local");
         mojo.parametersFile = new File(
-                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-Local.yml").getFile())
+                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-local.yml").getFile())
                 .getAbsolutePath();
 
         mojo.execute();
 
-        assertThat(new File(mojo.project.getBuild().getDirectory(), "my-project-1.0.0-SNAPSHOT-Local.bconf")).exists();
+        assertThat(new File(mojo.project.getBuild().getDirectory(), "my-project-1.0.0-SNAPSHOT-local.bconf")).exists();
     }
 
     @Test
@@ -105,7 +105,7 @@ class MergeConfigurationArchiveMojoTest {
     @Test
     void executeFailsWhenNoConfigurationArchive() throws Exception {
         mojo.parametersFile = new File(
-                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-Local.yml").getFile())
+                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-local.yml").getFile())
                 .getAbsolutePath();
         mojo.bonitaConfiguration = "";
 
@@ -115,7 +115,7 @@ class MergeConfigurationArchiveMojoTest {
     @Test
     void executeFailsWhenMergerFails() throws Exception {
         mojo.parametersFile = new File(
-                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-Local.yml").getFile())
+                MergeConfigurationArchiveMojoTest.class.getResource("/parameters-local.yml").getFile())
                 .getAbsolutePath();
         mojo.merger = merger;
         doThrow(IOException.class).when(merger).merge(any(), any(), any());

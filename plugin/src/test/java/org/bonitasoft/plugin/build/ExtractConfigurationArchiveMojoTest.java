@@ -52,7 +52,7 @@ class ExtractConfigurationArchiveMojoTest {
         mojo.environment = "Local";
         mojo.outputFileName = "parameters-${bonita.environment}.yml";
         var project = aProject("org.bonitasoft.example", "my-project", "1.0.0-SNAPSHOT", tmpFolder,
-                "/my-project-1.0.0-SNAPSHOT-Local.bconf");
+                "/my-project-1.0.0-SNAPSHOT-local.bconf");
         mojo.project = project;
         mojo.reactorProjects = List.of(project);
     }
@@ -61,7 +61,7 @@ class ExtractConfigurationArchiveMojoTest {
     void execute() throws Exception {
         mojo.execute();
 
-        assertThat(new File(mojo.project.getBuild().getDirectory(), "parameters-Local.yml")).exists();
+        assertThat(new File(mojo.project.getBuild().getDirectory(), "parameters-local.yml")).exists();
     }
 
     @Test

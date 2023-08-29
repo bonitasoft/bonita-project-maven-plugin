@@ -44,10 +44,9 @@ class BuildBarMojoTest {
         var project = new MavenProject();
         project.setArtifactId("hello");
         project.setVersion("1.0.0");
-        mojo.environment = "Local";
-        mojo.configurationFileName = "hello-1.0.0-${bonita.environment}.bconf";
+        mojo.environment = "local";
 
-        assertThat(mojo.getConfigurationFileName(project)).isEqualTo("hello-1.0.0-Local.bconf");
+        assertThat(mojo.getConfigurationFileName(project)).isEqualTo("hello-1.0.0-local.bconf");
     }
 
     @Test
