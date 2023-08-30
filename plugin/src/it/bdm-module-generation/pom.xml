@@ -60,6 +60,20 @@
               <version>9.0-SNAPSHOT</version>
             </dependency>
           </dependencies>
+          <executions>
+              <execution>
+                <id>bdm-descriptor-archive</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>single</goal>
+                </goals>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>bdm-assembly</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+              </execution>
+          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>

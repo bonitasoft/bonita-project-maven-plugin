@@ -72,11 +72,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>bdm-assembly</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
