@@ -325,9 +325,6 @@
           <settingsFile>src/it/settings.xml</settingsFile>
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
           <postBuildHookScript>verify</postBuildHookScript>
-          <scriptVariables>
-            <localRepo>${project.build.directory}/local-repo</localRepo>
-          </scriptVariables>
         </configuration>
         <dependencies>
           <dependency>
