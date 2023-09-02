@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +44,8 @@ import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
 import org.bonitasoft.bonita2bar.BuildBarException;
 import org.bonitasoft.bonita2bar.ClasspathResolver;
+import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
+import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry.ConnectorImplementationJar;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
 import org.bonitasoft.bonita2bar.SourcePathProvider;
 import org.bonitasoft.bonita2bar.form.FormBuilder;
@@ -50,6 +53,7 @@ import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 import org.bonitasoft.plugin.AbstractBuildMojo;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
+import org.bonitasoft.plugin.analyze.report.model.Implementation;
 import org.bonitasoft.plugin.build.page.BuildPageException;
 import org.bonitasoft.plugin.build.page.UidArtifactBuilderFactory;
 import org.bonitasoft.web.designer.config.UiDesignerProperties;
@@ -149,7 +153,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
         var tmpFolder = outputFolder.resolve("business-archive-tmp");
         var barBuilder = BarBuilderFactory.create(BuildConfig.builder()
                 .processRegistry(processRegistry)
-                .dependencyReport(getDependencyReport(reportFile))
+                .connectorImplementationRegistry(getConnectorImplementationRegistry(reportFile))
                 .allowEmptyFormMapping(allowEmptyFormMapping)
                 .includeParameters(includeParameters)
                 .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
@@ -196,14 +200,27 @@ public class BuildBarMojo extends AbstractBuildMojo {
         return configurationFileName;
     }
 
-    DependencyReport getDependencyReport(File reportFile) throws MojoExecutionException {
+    ConnectorImplementationRegistry getConnectorImplementationRegistry(File reportFile) throws MojoExecutionException {
         DependencyReport dependencyReport = new DependencyReport();
         try {
             dependencyReport = DependencyReporter.objectMapper().readValue(reportFile, DependencyReport.class);
         } catch (IOException e) {
             throw new MojoExecutionException("Dependency report is missing");
         }
-        return dependencyReport;
+        var implementations = new ArrayList<ConnectorImplementationJar>();
+        dependencyReport.getConnectorImplementations().stream()
+                .map(BuildBarMojo::toConnectorImplementationJar)
+                .forEach(implementations::add);
+        dependencyReport.getFilterImplementations().stream()
+                .map(BuildBarMojo::toConnectorImplementationJar)
+                .forEach(implementations::add);
+        return ConnectorImplementationRegistry.of(implementations);
+    }
+
+    private static ConnectorImplementationJar toConnectorImplementationJar(Implementation implementation) {
+        return ConnectorImplementationJar.of(implementation.getImplementationId(),
+                implementation.getImplementationVersion(), new File(implementation.getArtifact().getFile()),
+                implementation.getJarEntry());
     }
 
     private List<Path> selectedProcFiles() {
