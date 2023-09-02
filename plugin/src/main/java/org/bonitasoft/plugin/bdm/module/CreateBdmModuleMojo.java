@@ -37,7 +37,7 @@ import org.bonitasoft.plugin.module.ModuleGenerator;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
- * This mojo create a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
+ * This mojo creates a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
  */
 @Mojo(name = "create-bdm-module", defaultPhase = LifecyclePhase.NONE)
 public class CreateBdmModuleMojo extends AbstractMojo {

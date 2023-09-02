@@ -60,7 +60,7 @@ public abstract class AbstractBuildMojo extends AbstractMojo {
     /**
      * The build output directory. Default to ${project.build.directory}
      */
-    @Parameter(defaultValue = "${project.build.directory}", property = "outputDirectory", required = true, readonly = false)
+    @Parameter(defaultValue = "${project.build.directory}", property = "outputDirectory")
     protected File outputDirectory;
 
     protected Map<String, String> uidWorkspace() {

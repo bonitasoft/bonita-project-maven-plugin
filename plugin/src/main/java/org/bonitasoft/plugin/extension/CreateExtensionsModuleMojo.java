@@ -33,7 +33,7 @@ import org.bonitasoft.plugin.module.ModuleGenerator;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
- * This mojo create an extensions module in the current project.
+ * This mojo creates an extensions module in the current project.
  */
 @Mojo(name = "create-extensions-module", defaultPhase = LifecyclePhase.NONE)
 public class CreateExtensionsModuleMojo extends AbstractMojo {

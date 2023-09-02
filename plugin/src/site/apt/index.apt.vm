@@ -16,7 +16,7 @@
   ------
   Romain Bioteau
   ------
-  2022-12-19
+  2023-09-02
   ------
 
 ${project.name}
@@ -30,8 +30,14 @@ ${project.name}
 
   *{{{./analyze-mojo.html}bonita-project:analyze}} analyzes the dependencies of this project and determines which are Bonita specific
   among connectors, actor fitlers, rest api extensions, themes or custom pages.
+  
+  *{{{./business-archive-mojo.html}bonita-project:business-archive}} build *.proc files into Bonita Business Achive files.
 
   *{{{./create-bdm-module-mojo.html}bonita-project:create-bdm-module}} adds a child 'bdm' maven module to a Bonita Project.
+  
+  *{{{./create-extensions-module-mojo.html}bonita-project:create-extensions-module}} adds a child 'extensions' maven module to a Bonita Project.
+  
+  *{{{./extract-configuration-mojo.html}bonita-project:extract-configuration}} extract the parameters values from a given Bonita Configuration file.
 
   *{{{./generate-bdm-dao-client-mojo.html}bonita-project:generate-bdm-dao-client}} generates dao-client java sources for a given BDM descriptor.
 
@@ -40,3 +46,9 @@ ${project.name}
   *{{{./help-mojo.html}bonita-project:help}} Display help information on bonita-project-maven-plugin.
 
   *{{{./install-mojo.html}bonita-project:install}} install project local dependencies in the local repository.
+  
+  *{{{./merge-configuration-mojo.html}bonita-project:merge-configuration}} merge additional parameters values into a given Bonita Configuration file.
+  
+  *{{{./uid-page-mojo.html}bonita-project:uid-page}} build UI Designer pages.
+  
+  *{{{./validate-mojo.html}bonita-project:validate}} validate Bonita project models and descriptors.
