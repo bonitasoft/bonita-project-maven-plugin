@@ -21,11 +21,7 @@ import java.io.IOException;
 
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class JsonDependencyReporter implements DependencyReporter {
-
-    private final ObjectMapper mapper = DependencyReporter.objectMapper();
 
     private final File outputFile;
 
@@ -40,7 +36,7 @@ public class JsonDependencyReporter implements DependencyReporter {
             if (!parentFile.exists()) {
                 parentFile.mkdirs();
             }
-            mapper.writeValue(outputFile, dependencyReport);
+            DependencyReporter.OBJECT_MAPPER.writeValue(outputFile, dependencyReport);
         } catch (IOException e) {
             throw new AnalysisResultReportException("Failed to generate report", e);
         }

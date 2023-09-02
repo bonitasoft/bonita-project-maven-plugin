@@ -203,7 +203,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
     ConnectorImplementationRegistry getConnectorImplementationRegistry(File reportFile) throws MojoExecutionException {
         DependencyReport dependencyReport = new DependencyReport();
         try {
-            dependencyReport = DependencyReporter.objectMapper().readValue(reportFile, DependencyReport.class);
+            dependencyReport = DependencyReporter.OBJECT_MAPPER.readValue(reportFile, DependencyReport.class);
         } catch (IOException e) {
             throw new MojoExecutionException("Dependency report is missing");
         }
