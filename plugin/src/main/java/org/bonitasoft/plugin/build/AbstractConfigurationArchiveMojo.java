@@ -45,12 +45,6 @@ public abstract class AbstractConfigurationArchiveMojo extends AbstractMojo {
     @Parameter(property = "bonita.parametersFile", defaultValue = "${maven.multiModuleProjectDirectory}/.bcd_configurations/parameters-${bonita.environment}.yml")
     protected String parametersFile;
 
-    /**
-     * The Bonita configuration file to extract. By default it uses the project attached artifact.
-     */
-    @Parameter(property = "bonita.configurationFile")
-    protected String bonitaConfiguration;
-
     protected MavenProject findAppModuleProject() throws MojoExecutionException {
         return reactorProjects.size() == 1 ? project
                 : reactorProjects.stream()

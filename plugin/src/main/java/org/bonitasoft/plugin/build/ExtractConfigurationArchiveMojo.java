@@ -91,6 +91,12 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
                     withoutParametersValue);
         } catch (IOException e) {
             throw new MojoExecutionException(e);
+        } finally {
+            try {
+                Files.deleteIfExists(confFile);
+            } catch (IOException e) {
+                getLog().debug("An error occured while deleting {}", e);
+            }
         }
     }
 
