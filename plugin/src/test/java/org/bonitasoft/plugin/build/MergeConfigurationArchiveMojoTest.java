@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -54,7 +56,7 @@ class MergeConfigurationArchiveMojoTest {
         mojo.environment = "local";
         mojo.parametersFile = "parameters-${bonita.environment}.yml";
         var project = aProject("org.bonitasoft.example", "my-project", "1.0.0-SNAPSHOT", tmpFolder,
-                "/my-project-1.0.0-SNAPSHOT-local.bconf");
+                "/my-project-1.0.0-SNAPSHOT-local.bconf", "local");
         mojo.project = project;
         mojo.reactorProjects = List.of(project);
     }
@@ -103,13 +105,15 @@ class MergeConfigurationArchiveMojoTest {
     }
 
     @Test
-    void executeFailsWhenNoConfigurationArchive() throws Exception {
+    void executeWhenNoConfigurationArchive() throws Exception {
         mojo.parametersFile = new File(
                 MergeConfigurationArchiveMojoTest.class.getResource("/parameters-local.yml").getFile())
                 .getAbsolutePath();
         mojo.bonitaConfiguration = "";
 
-        assertThrows(MojoExecutionException.class, () -> mojo.execute());
+        mojo.execute();
+
+        verify(merger, never()).merge(any(), any(), any());
     }
 
     @Test
@@ -124,19 +128,25 @@ class MergeConfigurationArchiveMojoTest {
     }
 
     private static MavenProject aProject(String groupId, String artifactId, String version, Path buildFolder,
-            String bconfTestResource) throws IOException {
+            String bconfTestResource, String environement) throws IOException {
         var aProject = new MavenProject();
         aProject.setGroupId(groupId);
         aProject.setArtifactId(artifactId);
         aProject.setVersion(version);
+        aProject.getProperties().setProperty("bonita.applicationOutput", buildFolder.toString());
         var build = new Build();
         build.setDirectory(buildFolder.toString());
         build.setFinalName(String.format("%s-%s", artifactId, version));
         aProject.setBuild(build);
-        // Add test bconf in build.dir
+        // Add test bconf in application output folder
         var bconfFile = new File(
                 MergeConfigurationArchiveMojoTest.class.getResource(bconfTestResource).getFile());
-        Files.copy(bconfFile.toPath(), buildFolder.resolve(bconfFile.getName()));
+        Path bConfFile = buildFolder.resolve(bconfFile.getName());
+        Files.copy(bconfFile.toPath(), bConfFile);
+        DefaultArtifactHandler artifactHandler = new DefaultArtifactHandler("bconf");
+        var artifact = new DefaultArtifact(groupId, artifactId, version, null, "bconf", environement, artifactHandler);
+        artifact.setFile(bconfFile);
+        aProject.getAttachedArtifacts().add(artifact);
         return aProject;
     }
 

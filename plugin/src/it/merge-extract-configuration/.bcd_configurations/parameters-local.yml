@@ -1,8 +1,0 @@
----
-processes:
-- name: "Product Rollout"
-  version: "%REVISION%"
-  parameters:
-  - name: "debug"
-    value: true
-    type: "Boolean"

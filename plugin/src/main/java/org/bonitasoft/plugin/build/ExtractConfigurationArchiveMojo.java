@@ -18,15 +18,30 @@ package org.bonitasoft.plugin.build;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.bonitasoft.bonita2bar.BarBuilder;
+import org.bonitasoft.bonita2bar.BarBuilderFactory;
+import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
+import org.bonitasoft.bonita2bar.ClasspathResolver;
+import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
+import org.bonitasoft.bonita2bar.ProcessRegistry;
+import org.bonitasoft.bonita2bar.SourcePathProvider;
 import org.bonitasoft.bonita2bar.configuration.ParameterConfigurationExtractor;
+import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 
 /**
- * This mojo extracts parameters from a Bonita configuration archive.
+ * This mojo extracts parameters from all the processes found in the project into a single parameters file.
  */
 @Mojo(name = "extract-configuration", aggregator = true, requiresProject = true)
 public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiveMojo {
@@ -36,37 +51,75 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
     /**
      * Extract parameters without their values. Default is false.
      */
-    @Parameter(property = "withoutParametersValue", defaultValue = "false")
+    @Parameter(property = "parameters.withoutValue", defaultValue = "false")
     protected boolean withoutParametersValue;
 
     /**
-     * The name of output file extracted from the Bonita configuration file. Default is parameters-${bonita.environment}.yml
+     * Overwrite existing parameters file. Default is false.
      */
-    @Parameter(property = "outputFileName", defaultValue = "parameters-${bonita.environment}.yml")
-    protected String outputFileName;
+    @Parameter(property = "parameters.overwrite", defaultValue = "false")
+    protected boolean overwrite;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        var confFile = bonitaConfiguration != null ? new File(bonitaConfiguration)
-                : defaultConfigurationFile();
-        if (!confFile.exists()) {
-            throw new MojoExecutionException(
-                    String.format("%s Bonita configuration archive does not exists.", confFile.getAbsolutePath()));
+        var tmpFolder = getTempFolder();
+        var barBuilder = createBarBuilder(tmpFolder);
+        var confFile = tmpFolder.resolve("configuration.bconf");
+        try {
+            var result = barBuilder.buildConfiguration(environment.toLowerCase());
+            result.writeBonitaConfigurationTo(confFile);
+            if (!Files.exists(confFile)) {
+                return;
+            }
+        } catch (IOException e) {
+            throw new MojoFailureException("Failed to extract process configurations.", e);
+        }
+        var outputFile = new File(parametersFile);
+        if (outputFile.exists() && !overwrite) {
+            throw new MojoFailureException(String.format(
+                    "%s already exists. Overwrite the existing parameters file setting parameters.overwrite property to true. ",
+                    outputFile));
         }
         try {
-            extractor.extract(confFile,
-                    new File(getAppModuleBuildDir(), outputFileName()).getAbsolutePath(),
+            Files.createDirectories(outputFile.toPath().getParent());
+        } catch (IOException e) {
+            throw new MojoExecutionException(e);
+        }
+        try {
+            extractor.extract(confFile.toFile(),
+                    outputFile.getAbsolutePath(),
                     withoutParametersValue);
         } catch (IOException e) {
             throw new MojoExecutionException(e);
         }
     }
 
-    private String outputFileName() throws MojoExecutionException {
-        if (outputFileName.contains("${bonita.environment}")) {
-            outputFileName = outputFileName.replace("${bonita.environment}", getEnvironment());
-        }
-        return outputFileName;
+    Path getTempFolder() throws MojoExecutionException {
+        return getAppModuleBuildDir().toPath().resolve("extract-configuration-tmp");
+    }
+
+    BarBuilder createBarBuilder(Path tmpFolder) throws MojoExecutionException {
+        var processRegistry = ProcessRegistry.of(selectedProcFiles(), MigrationPolicy.ALWAYS_MIGRATE_POLICY);
+        return BarBuilderFactory.create(BuildConfig.builder()
+                .processRegistry(processRegistry)
+                .connectorImplementationRegistry(ConnectorImplementationRegistry.of(List.of()))
+                .allowEmptyFormMapping(true)
+                .includeParameters(false)
+                .sourcePathProvider(SourcePathProvider.of(getAppModuleBaseDir().toPath()))
+                .classpathResolver(ClasspathResolver.of(List.of()))
+                .formBuilder(id -> new byte[0])
+                .workingDirectory(tmpFolder)
+                .build());
+    }
+
+    private List<Path> selectedProcFiles() throws MojoExecutionException {
+        var fileSetManager = new FileSetManager();
+        var procFileSet = new FileSet();
+        var appModuleBaesir = getAppModuleBaseDir();
+        procFileSet.setDirectory(appModuleBaesir.toPath().toString());
+        procFileSet.setIncludes(List.of("**/*.proc"));
+        return Stream.of(fileSetManager.getIncludedFiles(procFileSet))
+                .map(procFile -> appModuleBaesir.toPath().resolve(procFile)).collect(Collectors.toList());
     }
 
 }

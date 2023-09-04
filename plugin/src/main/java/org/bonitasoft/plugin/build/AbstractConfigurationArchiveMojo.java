@@ -19,6 +19,7 @@ package org.bonitasoft.plugin.build;
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,6 +40,12 @@ public abstract class AbstractConfigurationArchiveMojo extends AbstractMojo {
     protected String environment;
 
     /**
+     * Parameters file
+     */
+    @Parameter(property = "bonita.parametersFile", defaultValue = "${maven.multiModuleProjectDirectory}/.bcd_configurations/parameters-${bonita.environment}.yml")
+    protected String parametersFile;
+
+    /**
      * The Bonita configuration file to extract. By default it uses the project attached artifact.
      */
     @Parameter(property = "bonita.configurationFile")
@@ -56,8 +63,11 @@ public abstract class AbstractConfigurationArchiveMojo extends AbstractMojo {
 
     protected File defaultConfigurationFile() throws MojoExecutionException {
         var appModule = findAppModuleProject();
-        return new File(getAppModuleBuildDir(), String.format("%s-%s.bconf", appModule.getBuild().getFinalName(),
-                getEnvironment()));
+        return appModule.getAttachedArtifacts().stream()
+                .filter(artifact -> "bconf".equals(artifact.getType()))
+                .map(Artifact::getFile)
+                .findFirst()
+                .orElse(null);
     }
 
     protected String getEnvironment() throws MojoExecutionException {
@@ -74,5 +84,10 @@ public abstract class AbstractConfigurationArchiveMojo extends AbstractMojo {
     protected File getAppModuleBuildDir() throws MojoExecutionException {
         var appModule = findAppModuleProject();
         return new File(appModule.getBuild().getDirectory());
+    }
+
+    protected File getAppModuleBaseDir() throws MojoExecutionException {
+        var appModule = findAppModuleProject();
+        return appModule.getBasedir();
     }
 }
