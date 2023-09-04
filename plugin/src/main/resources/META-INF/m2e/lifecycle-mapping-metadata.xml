@@ -20,6 +20,7 @@
     		  <goal>validate</goal>
               <goal>business-archive</goal>
               <goal>uid-page</goal>
+              <goal>merge-configuration</goal>
             </goals>
        </pluginExecutionFilter>
        <action>
