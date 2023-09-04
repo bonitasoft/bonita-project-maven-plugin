@@ -29,16 +29,10 @@ import org.bonitasoft.bonita2bar.configuration.ParametersConfigurationMerger;
 /**
  * This mojo merges given parameters into a Bonita configuration archive.
  */
-@Mojo(name = "merge-configuration", defaultPhase = LifecyclePhase.PACKAGE, aggregator = true, requiresProject = true)
+@Mojo(name = "merge-configuration", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, aggregator = true, requiresProject = true)
 public class MergeConfigurationArchiveMojo extends AbstractConfigurationArchiveMojo {
 
     protected ParametersConfigurationMerger merger = new ParametersConfigurationMerger();
-
-    /**
-     * Parameters file to merge
-     */
-    @Parameter(property = "bonita.parametersFile", defaultValue = "${maven.multiModuleProjectDirectory}/.bcd_configurations/parameters-${bonita.environment}.yml")
-    protected String parametersFile;
 
     /**
      * Skip execution
@@ -59,9 +53,9 @@ public class MergeConfigurationArchiveMojo extends AbstractConfigurationArchiveM
         }
         var confFile = bonitaConfiguration != null ? new File(bonitaConfiguration)
                 : defaultConfigurationFile();
-        if (!confFile.exists()) {
-            throw new MojoExecutionException(
-                    String.format("%s Bonita configuration archive does not exists.", confFile.getAbsolutePath()));
+        if (confFile == null || !confFile.exists()) {
+            getLog().warn("Skipped. Bonita configuration archive does not exist.");
+            return;
         }
         try {
             merger.merge(confFile,
