@@ -99,8 +99,8 @@ public class BuildBarMojo extends AbstractBuildMojo {
      * Only Enterprise edition may update the parameters values at runtime.
      * Default to true
      */
-    @Parameter(defaultValue = "true", property = "bonita.includeParameters")
-    private boolean includeParameters = true;
+    @Parameter(defaultValue = "false", property = "bonita.includeParameters")
+    private boolean includeParameters = false;
 
     /**
      * Whether process diagram files should try to migrate their content if needed
