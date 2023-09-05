@@ -43,7 +43,7 @@ public class MergeConfigurationArchiveMojo extends AbstractConfigurationArchiveM
     /**
      * Skip execution
      */
-    @Parameter(property = "bonita.skipMergeParameters", defaultValue = "false")
+    @Parameter(property = "paremeters.skipMerge", defaultValue = "false")
     protected boolean skipMergeParameters = false;
 
     @Override
