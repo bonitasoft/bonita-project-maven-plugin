@@ -17,7 +17,7 @@
     <eclipse.importorder.file>${project.parent.basedir}/eclipse.importorder</eclipse.importorder.file>
     <header.file>${project.parent.basedir}/header.txt</header.file>
     <!-- Dependencies -->
-    <bonita-artifacts-model.version>1.0.0-SNAPSHOT</bonita-artifacts-model.version>
+    <bonita-artifacts-model.version>1.0.0-alpha-01</bonita-artifacts-model.version>
     <maven-plugin-api.version>3.9.4</maven-plugin-api.version>
     <maven-plugin-annotations.version>3.9.0</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
