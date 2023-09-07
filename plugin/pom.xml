@@ -195,6 +195,10 @@
     </dependency>
     <dependency>
       <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-application-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine</groupId>
       <artifactId>bonita-business-object-model</artifactId>
     </dependency>
     <dependency>
