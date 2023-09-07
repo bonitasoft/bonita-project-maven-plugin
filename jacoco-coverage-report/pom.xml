@@ -4,16 +4,11 @@
   <parent>
     <groupId>org.bonitasoft.maven</groupId>
     <artifactId>bonita-project-maven-plugin-parent</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jacoco-coverage-report</artifactId>
   <packaging>pom</packaging>
   <name>Jacoco Coverage report</name>
-  <properties>
-    <eclipse.formatter.file>${project.parent.basedir}/formatter.xml</eclipse.formatter.file>
-    <eclipse.importorder.file>${project.parent.basedir}/eclipse.importorder</eclipse.importorder.file>
-    <header.file>${project.parent.basedir}/header.txt</header.file>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

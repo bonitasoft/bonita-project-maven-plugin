@@ -10,15 +10,29 @@ A Maven plug-in used by Bonita projects to:
 * Install custom dependencies from the project store (where external projects dependencies are stored) to the local Maven repository.
 * Analyze Bonita dependencies and their content (Connector, Actor filters, Rest API Extensions...).
 * Generate Business Object Model artifacts from the BDM descriptor file
+* Generate Extensions submodule
+* Validate Bonita model artifacts
+* Build Business Archive from a `.proc` files
+* Build UID pages
+* Extract processes configuration from `.proc` files.
+* Merge parameters into the Bonita configuration file 
 
 ## Plugin Documentation Site
 
 https://bonitasoft.github.io/bonita-project-maven-plugin/
 
+
+## Branching strategy
+
+This repository follows the [GitFlow branching strategy](https://gitversion.net/docs/learn/branching-strategies/gitflow/examples).
+
 ## Release
 
-* Run the [Release action](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/release.yml)
-* Publish the staging repository from [oss.sonatype.org portal](https://oss.sonatype.org/#stagingRepositories)
+To release a new version, maintainers may use the Release and Publication GitHub actions.
+
+* Release action will invoke the `gitflow-maven-plugin` to perform all required merges, version updates and tag creation.
+* Publication action will build and deploy a given tag to Maven Central.
+* A Github release should be created and associated to the tag.
 * Deploy the latest site version using the [Publish Maven Site action](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish-site.yml)
 
 ## Contributing
