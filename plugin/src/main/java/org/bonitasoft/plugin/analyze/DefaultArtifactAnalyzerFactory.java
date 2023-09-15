@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.filtering.MavenResourcesFiltering;
+import org.bonitasoft.plugin.analyze.handler.ArtifactAnalyzerHandler;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 
 @Named
@@ -31,21 +32,19 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 class DefaultArtifactAnalyzerFactory implements ArtifactAnalyzerFactory {
 
     private ConnectorResolver connectorResolver;
-    private IssueCollector issueCollector;
     private MavenResourcesFiltering mavenResourcesFiltering;
 
     @Inject
-    public DefaultArtifactAnalyzerFactory(ConnectorResolver connectorResolver, IssueCollector issueCollector,
+    public DefaultArtifactAnalyzerFactory(ConnectorResolver connectorResolver,
             MavenResourcesFiltering mavenResourcesFiltering) {
         this.connectorResolver = connectorResolver;
-        this.issueCollector = issueCollector;
         this.mavenResourcesFiltering = mavenResourcesFiltering;
     }
 
     @Override
     public ArtifactAnalyzer create(LocalRepositoryManager localRepositoryManager, List<MavenProject> reactorProjects) {
-        return new DefaultArtifactAnalyzer(connectorResolver, issueCollector, localRepositoryManager,
-                mavenResourcesFiltering, reactorProjects);
+        return new DefaultArtifactAnalyzer(ArtifactAnalyzerHandler.create(connectorResolver, localRepositoryManager,
+                mavenResourcesFiltering, reactorProjects));
     }
 
 }

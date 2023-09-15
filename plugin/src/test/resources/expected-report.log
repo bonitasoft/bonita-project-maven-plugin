@@ -14,3 +14,5 @@
 [INFO] rest_name in org.bonita:a-rest-api:1.0.0
 [INFO] === 1 Themes found ===
 [INFO] theme_name in org.bonita:a-theme:1.0.0
+[INFO] === 1 Application Descriptors found ===
+[INFO] My App-1.0 in org.bonita:a-app:1.0.0:application

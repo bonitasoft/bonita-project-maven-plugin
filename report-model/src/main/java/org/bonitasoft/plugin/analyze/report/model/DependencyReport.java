@@ -40,6 +40,8 @@ public class DependencyReport {
 
     private final List<Theme> themes = new ArrayList<>();
 
+    private final List<ApplicationDescriptor> applicationDescriptors = new ArrayList<>();
+
     private final List<Issue> issues = new ArrayList<>();
 
     public void addConnectorImplementation(ConnectorImplementation connectorImplementation) {
@@ -72,6 +74,10 @@ public class DependencyReport {
 
     public void addTheme(Theme theme) {
         themes.add(theme);
+    }
+
+    public void addApplicationDescriptor(ApplicationDescriptor descriptor) {
+        applicationDescriptors.add(descriptor);
     }
 
     public void addIssue(Issue issue) {

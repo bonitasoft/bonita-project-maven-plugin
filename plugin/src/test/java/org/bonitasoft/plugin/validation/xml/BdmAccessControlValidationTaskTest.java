@@ -16,8 +16,9 @@
  */
 package org.bonitasoft.plugin.validation.xml;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.URL;
 import java.nio.file.Paths;
