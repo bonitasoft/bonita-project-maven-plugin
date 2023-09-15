@@ -133,7 +133,6 @@ class MergeConfigurationArchiveMojoTest {
         aProject.setGroupId(groupId);
         aProject.setArtifactId(artifactId);
         aProject.setVersion(version);
-        aProject.getProperties().setProperty("bonita.applicationOutput", buildFolder.toString());
         var build = new Build();
         build.setDirectory(buildFolder.toString());
         build.setFinalName(String.format("%s-%s", artifactId, version));

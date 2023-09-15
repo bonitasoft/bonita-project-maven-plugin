@@ -75,12 +75,6 @@ public class BuildBarMojo extends AbstractBuildMojo {
     String environment;
 
     /**
-     * The Bonita configuration archive output directory. Default to ${project.build.directory}.
-     */
-    @Parameter(defaultValue = "${project.build.directory}", property = "bonita.applicationOutput")
-    String configurationOutputDirectory;
-
-    /**
      * The name of the Bonita configuration file name. Default is ${project.artifactId}-${project.version}-${bonita.environment}.bconf
      */
     @Parameter(property = "bonita.configurationFile")
@@ -176,11 +170,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
             var aggregatedResult = barBuilder.getBuildResult();
             if (aggregatedResult != null && !aggregatedResult.getConfigurations().isEmpty()) {
                 getLog().info("Building Bonita Configuration archive...");
-                var configurationOutputFolder = new File(configurationOutputDirectory).toPath();
-                if (!Files.exists(configurationOutputFolder)) {
-                    Files.createDirectories(configurationOutputFolder);
-                }
-                var bonitaConfigurationFile = configurationOutputFolder.resolve(getConfigurationFileName(project));
+                var bonitaConfigurationFile = outputDirectory.toPath().resolve(getConfigurationFileName(project));
                 aggregatedResult.writeBonitaConfigurationTo(bonitaConfigurationFile);
                 if (Files.exists(bonitaConfigurationFile)) {
                     projectHelper.attachArtifact(project, "bconf", environment.toLowerCase(),

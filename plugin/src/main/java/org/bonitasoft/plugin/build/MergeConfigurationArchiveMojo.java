@@ -43,7 +43,7 @@ public class MergeConfigurationArchiveMojo extends AbstractConfigurationArchiveM
     /**
      * Skip execution
      */
-    @Parameter(property = "paremeters.skipMerge", defaultValue = "false")
+    @Parameter(property = "parameters.skipMerge", defaultValue = "false")
     protected boolean skipMergeParameters = false;
 
     @Override
