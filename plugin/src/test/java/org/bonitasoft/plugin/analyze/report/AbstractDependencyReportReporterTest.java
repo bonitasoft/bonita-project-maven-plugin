@@ -17,6 +17,7 @@
 package org.bonitasoft.plugin.analyze.report;
 
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
+import org.bonitasoft.plugin.analyze.report.model.ApplicationDescriptor;
 import org.bonitasoft.plugin.analyze.report.model.Artifact;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
@@ -77,6 +78,12 @@ abstract class AbstractDependencyReportReporterTest {
                 "theme_displayName",
                 "theme_description",
                 Artifact.create("org.bonita", "a-theme", "1.0.0", null, "/tmp/a-theme-1.0.0.zip")));
+        dependencyReport.addApplicationDescriptor(ApplicationDescriptor.create("My App",
+                "1.0",
+                "app_description",
+                "User",
+                "appToken",
+                Artifact.create("org.bonita", "a-app", "1.0.0", "application", "/tmp/a-application-1.0.0.zip")));
 
         // When
         getReporter().report(dependencyReport);

@@ -22,11 +22,12 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
+import org.bonitasoft.plugin.analyze.report.model.Issue;
 
 public interface ConnectorResolver {
 
-    List<Definition> findAllDefinitions(Artifact artifact, IssueCollector issueCollector) throws IOException;
+    List<Definition> findAllDefinitions(Artifact artifact, Issue.Collector issueCollector) throws IOException;
 
-    List<Implementation> findAllImplementations(Artifact artifact, IssueCollector issueCollector) throws IOException;
+    List<Implementation> findAllImplementations(Artifact artifact, Issue.Collector issueCollector) throws IOException;
 
 }

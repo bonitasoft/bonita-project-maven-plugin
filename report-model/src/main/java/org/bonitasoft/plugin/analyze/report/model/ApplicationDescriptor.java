@@ -1,5 +1,5 @@
 /** 
- * Copyright (C) 2021 BonitaSoft S.A.
+ * Copyright (C) 2023 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +19,29 @@ package org.bonitasoft.plugin.analyze.report.model;
 import lombok.Data;
 
 @Data
-public class Artifact {
+public class ApplicationDescriptor {
 
-    private String groupId;
-    private String artifactId;
+    private String displayName;
     private String version;
-    private String classifier;
-    private String file;
+    private String description;
+    private String profile;
+    private String appToken;
+    private Artifact artifact;
 
-    public static Artifact create(String groupId, String artifactId, String version, String classifier, String file) {
-        Artifact artifact = new Artifact();
-        artifact.setGroupId(groupId);
-        artifact.setArtifactId(artifactId);
-        artifact.setVersion(version);
-        artifact.setClassifier(classifier);
-        artifact.setFile(file);
-        return artifact;
-    }
-
-    @Override
-    public String toString() {
-        return classifier != null ? String.format("%s:%s:%s:%s", groupId, artifactId, version, classifier)
-                : String.format("%s:%s:%s", groupId, artifactId, version);
+    public static ApplicationDescriptor create(String displayName,
+            String version,
+            String description,
+            String profile,
+            String appToken,
+            Artifact artifact) {
+        var descriptor = new ApplicationDescriptor();
+        descriptor.setDisplayName(displayName);
+        descriptor.setDescription(description);
+        descriptor.setVersion(version);
+        descriptor.setProfile(profile);
+        descriptor.setAppToken(appToken);
+        descriptor.setArtifact(artifact);
+        return descriptor;
     }
 
 }

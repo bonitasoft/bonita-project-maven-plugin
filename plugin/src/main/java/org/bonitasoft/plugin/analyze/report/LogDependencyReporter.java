@@ -19,6 +19,7 @@ package org.bonitasoft.plugin.analyze.report;
 import static java.lang.String.format;
 
 import org.apache.maven.plugin.logging.Log;
+import org.bonitasoft.plugin.analyze.report.model.ApplicationDescriptor;
 import org.bonitasoft.plugin.analyze.report.model.Artifact;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
@@ -51,6 +52,11 @@ public class LogDependencyReporter implements DependencyReporter {
         return implementation.getImplementationId() + "-" + implementation.getImplementationVersion()
                 + " for " + implementation.getDefinitionId() + "-" + implementation.getDefinitionVersion()
                 + asStringLocation(implementation.getArtifact());
+    }
+
+    private static String asString(ApplicationDescriptor descriptor) {
+        return descriptor.getDisplayName() + "-" + descriptor.getVersion()
+                + asStringLocation(descriptor.getArtifact());
     }
 
     @Override
@@ -92,5 +98,9 @@ public class LogDependencyReporter implements DependencyReporter {
 
         log.info(format("=== %s Themes found ===", dependencyReport.getThemes().size()));
         dependencyReport.getThemes().stream().map(LogDependencyReporter::asString).forEach(log::info);
+
+        log.info(format("=== %s Application Descriptors found ===",
+                dependencyReport.getApplicationDescriptors().size()));
+        dependencyReport.getApplicationDescriptors().stream().map(LogDependencyReporter::asString).forEach(log::info);
     }
 }

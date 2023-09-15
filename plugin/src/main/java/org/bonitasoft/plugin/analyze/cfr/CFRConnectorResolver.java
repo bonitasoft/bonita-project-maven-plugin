@@ -47,7 +47,6 @@ import org.benf.cfr.reader.util.getopt.GetOptSinkFactory;
 import org.benf.cfr.reader.util.getopt.Options;
 import org.benf.cfr.reader.util.getopt.OptionsImpl;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
-import org.bonitasoft.plugin.analyze.IssueCollector;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
@@ -93,7 +92,7 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     @Override
-    public List<Implementation> findAllImplementations(Artifact artifact, IssueCollector issueCollector)
+    public List<Implementation> findAllImplementations(Artifact artifact, Issue.Collector issueCollector)
             throws IOException {
         return findImplementationDescriptors(artifact, issueCollector)
                 .stream()
@@ -136,7 +135,7 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     @Override
-    public List<Definition> findAllDefinitions(Artifact artifact, IssueCollector issueCollector) throws IOException {
+    public List<Definition> findAllDefinitions(Artifact artifact, Issue.Collector issueCollector) throws IOException {
         return findDefinitionDescriptors(artifact, issueCollector)
                 .stream()
                 .map(resource -> {
@@ -150,18 +149,18 @@ public class CFRConnectorResolver implements ConnectorResolver {
                 .collect(Collectors.toList());
     }
 
-    private List<DocumentResource> findImplementationDescriptors(Artifact artifact, IssueCollector issueCollector)
+    private List<DocumentResource> findImplementationDescriptors(Artifact artifact, Issue.Collector issueCollector)
             throws IOException {
         return getDocumentResources(artifact, IMPLEMENTATION_EXTENSION, IMPLEMENTATION_NS, issueCollector);
     }
 
-    private List<DocumentResource> findDefinitionDescriptors(Artifact artifact, IssueCollector issueCollector)
+    private List<DocumentResource> findDefinitionDescriptors(Artifact artifact, Issue.Collector issueCollector)
             throws IOException {
         return getDocumentResources(artifact, DEFINITION_EXTENSION, DEFINITION_NS, issueCollector);
     }
 
     private List<DocumentResource> getDocumentResources(Artifact artifact, String extension,
-            String namespace, IssueCollector issueCollector) throws IOException {
+            String namespace, Issue.Collector issueCollector) throws IOException {
         return findJarEntries(artifact.getFile(), entry -> entry.getName().endsWith(extension))
                 .stream()
                 .map(entry -> createDocumentResource(artifact, entry, namespace, issueCollector))
@@ -170,7 +169,7 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     private DocumentResource createDocumentResource(Artifact artifact, JarEntry entry, String implementationNs,
-            IssueCollector issueCollector) {
+            Issue.Collector issueCollector) {
         try (JarFile jarFile = new JarFile(artifact.getFile());
                 InputStream is = jarFile.getInputStream(entry)) {
             var document = asXMLDocument(is, implementationNs);
@@ -213,7 +212,7 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     private Set<String> detectImplementationHierarchy(String className, Artifact artifact, String resourcePath,
-            IssueCollector issueCollector) {
+            Issue.Collector issueCollector) {
         Set<String> hierarchy = new HashSet<>();
         var file = artifact.getFile();
         LOGGER.debug("Resolving connector type for {} in {}", className, file);

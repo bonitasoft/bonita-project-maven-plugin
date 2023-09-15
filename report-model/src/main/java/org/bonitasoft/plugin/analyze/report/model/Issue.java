@@ -16,6 +16,7 @@
  */
 package org.bonitasoft.plugin.analyze.report.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,4 +47,28 @@ public class Issue {
         return issue;
     }
 
+    public static Collector collector() {
+        return new Collector() {
+
+            private List<Issue> issues = new ArrayList<>();
+
+            @Override
+            public void addIssue(Issue issue) {
+                issues.add(issue);
+            }
+
+            @Override
+            public List<Issue> getIssues() {
+                return issues;
+            }
+
+        };
+    }
+
+    public static interface Collector {
+
+        void addIssue(Issue issue);
+
+        List<Issue> getIssues();
+    }
 }

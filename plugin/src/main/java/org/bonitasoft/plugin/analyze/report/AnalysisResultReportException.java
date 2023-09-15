@@ -18,6 +18,8 @@ package org.bonitasoft.plugin.analyze.report;
 
 public class AnalysisResultReportException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     public AnalysisResultReportException(String message) {
         super(message);
     }
