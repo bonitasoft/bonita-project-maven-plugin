@@ -38,7 +38,7 @@ public class GenerateBdmDaoClientSourceMojo extends AbstractGenerateBdmMojo {
     }
 
     @Override
-    protected Predicate<Path> exludedGeneratedSources() {
+    protected Predicate<Path> excludedGeneratedSources() {
         return file -> {
             String fileName = file.getFileName().toString();
             return fileName.endsWith(".java") && !fileName.endsWith("DAOImpl.java");

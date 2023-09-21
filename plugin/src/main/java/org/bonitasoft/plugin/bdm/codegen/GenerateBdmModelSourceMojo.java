@@ -41,7 +41,7 @@ public class GenerateBdmModelSourceMojo extends AbstractGenerateBdmMojo {
      * Only keep source files relevant for the bdm-model module.
      */
     @Override
-    protected Predicate<Path> exludedGeneratedSources() {
+    protected Predicate<Path> excludedGeneratedSources() {
         return file -> file.getFileName().toString().endsWith("DAOImpl.java");
     }
 
