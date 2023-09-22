@@ -23,9 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.function.Predicate;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -55,9 +55,9 @@ public abstract class AbstractGenerateBdmMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
 
-    private BusinessDataModelParser businessDataModelReader;
-    private BusinessDataModelGenerator generator;
-    private BuildContext buildContext;
+    private final BusinessDataModelParser businessDataModelReader;
+    private final BusinessDataModelGenerator generator;
+    private final BuildContext buildContext;
 
     AbstractGenerateBdmMojo(BusinessDataModelParser businessDataModelReader,
             BusinessDataModelGenerator generator,
@@ -82,7 +82,7 @@ public abstract class AbstractGenerateBdmMojo extends AbstractMojo {
         getLog().info("Generating Business Data Model sources...");
 
         var instant = Instant.now();
-        BusinessObjectModel model = null;
+        BusinessObjectModel model;
         try {
             model = businessDataModelReader.parse(bdmModelFile);
         } catch (ParseException e) {
@@ -90,18 +90,14 @@ public abstract class AbstractGenerateBdmMojo extends AbstractMojo {
         }
 
         if (outputFolder.exists()) { // Avoid duplicates in output folder
-            try (var files = Files.walk(outputFolder.toPath())) { // Delete outputFolder content
-                files.sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
+            try {
+                FileUtils.deleteDirectory(outputFolder);
             } catch (IOException e) {
-                throw new MojoFailureException(
-                        String.format("Failed to clean output directory: %s", outputFolder));
+                throw new MojoFailureException(String.format("Failed to clean output directory: %s", outputFolder));
             }
         }
         if (!outputFolder.mkdirs()) {
-            throw new MojoFailureException(
-                    String.format("Failed to create output directory: %s", outputFolder));
+            throw new MojoFailureException(String.format("Failed to create output directory: %s", outputFolder));
         }
 
         try {
@@ -111,7 +107,7 @@ public abstract class AbstractGenerateBdmMojo extends AbstractMojo {
         }
 
         try (var files = Files.walk(outputFolder.toPath())) {
-            files.filter(exludedGeneratedSources())
+            files.filter(excludedGeneratedSources())
                     .forEach(file -> {
                         try {
                             Files.delete(file);
@@ -129,6 +125,6 @@ public abstract class AbstractGenerateBdmMojo extends AbstractMojo {
         buildContext.refresh(outputFolder);
     }
 
-    protected abstract Predicate<Path> exludedGeneratedSources();
+    protected abstract Predicate<Path> excludedGeneratedSources();
 
 }
