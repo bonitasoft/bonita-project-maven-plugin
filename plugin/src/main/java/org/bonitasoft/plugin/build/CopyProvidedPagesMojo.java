@@ -124,7 +124,7 @@ public class CopyProvidedPagesMojo extends AbstractMojo {
             return Collections.emptyList();
         }
 
-        log.debug("Detecting provided pages usage in applications...");
+        log.info("Detecting provided pages usage in applications...");
         try (Stream<Path> sourcePaths = Files.list(appSourceDir)) {
             var providedPages = sourcePaths
                     .filter(path -> Files.isRegularFile(path) && path.getFileName().toString().matches("^.*\\.xml$"))
@@ -136,7 +136,8 @@ public class CopyProvidedPagesMojo extends AbstractMojo {
                     .map(PROVIDED_PAGES::get)
                     .map(this::setArtifactVersion)
                     .collect(Collectors.toList());
-            log.debug("Found {} provided pages: {}", providedPages.size(), providedPages);
+            log.info("Found the usage of {} provided pages", providedPages.size());
+            log.debug("Page artifacts coordinates: {}", providedPages);
             return providedPages;
         } catch (IOException e) {
             throw new MojoFailureException(String.format("Failed to list files in directory: %s", appSourceDir), e);
@@ -173,6 +174,7 @@ public class CopyProvidedPagesMojo extends AbstractMojo {
     private void copyArtifact(ArtifactCoordinate artifactCoordinate) throws MojoFailureException {
         var artifact = resolveArtifact(artifactCoordinate);
         try {
+            log.info("Copying page artifact '{}' into {}", artifact.getName(), outputFolder);
             Files.copy(artifact.toPath(), outputFolder.toPath().resolve(artifact.getName()));
         } catch (IOException e) {
             throw new MojoFailureException(String.format("Failed to copy artifact: %s", artifactCoordinate), e);
