@@ -18,6 +18,7 @@
      	<pluginExecutionFilter>
             <goals>
     		  <goal>validate</goal>
+              <goal>copy-provided-pages</goal>
               <goal>business-archive</goal>
               <goal>uid-page</goal>
               <goal>merge-configuration</goal>
