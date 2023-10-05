@@ -23,7 +23,7 @@
     <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
     <cfr.version>0.152</cfr.version>
     <maven-dependency-tree.version>3.2.1</maven-dependency-tree.version>
-    <maven-core.version>3.9.4</maven-core.version>
+    <maven-core.version>3.9.5</maven-core.version>
     <maven-artifact.version>3.9.4</maven-artifact.version>
     <maven-model.version>3.9.4</maven-model.version>
     <maven-model-builder.version>3.9.5</maven-model-builder.version>
