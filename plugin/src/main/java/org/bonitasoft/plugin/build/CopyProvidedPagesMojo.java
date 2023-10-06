@@ -58,7 +58,7 @@ import lombok.extern.slf4j.Slf4j;
  * Finally, it copies pages artifacts to an output folder (to be packaged afterward).
  */
 @Slf4j
-@Mojo(name = "copy-provided-pages", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
+@Mojo(name = "copy-provided-pages", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = true)
 public class CopyProvidedPagesMojo extends AbstractMojo {
 
     protected static final Map<String, DefaultArtifactCoordinate> PROVIDED_PAGES = Map.of(

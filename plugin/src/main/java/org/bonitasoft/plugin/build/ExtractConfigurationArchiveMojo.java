@@ -49,7 +49,7 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
     protected ParameterConfigurationExtractor extractor = new ParameterConfigurationExtractor();
 
     /**
-     * Extract parameters without their values. Default is false.
+     * Only extract parameters without values. Default is false.
      */
     @Parameter(property = "parameters.withoutValue", defaultValue = "false")
     protected boolean withoutParametersValue;

@@ -32,6 +32,8 @@ ${project.name}
   among connectors, actor fitlers, rest api extensions, themes or custom pages.
   
   *{{{./business-archive-mojo.html}bonita-project:business-archive}} build *.proc files into Bonita Business Achive files.
+  
+  *{{{./copy-provided-pages-mojo.html}bonita-project:copy-provided-pages}} detects and copy provided Bonita web pages.
 
   *{{{./create-bdm-module-mojo.html}bonita-project:create-bdm-module}} adds a child 'bdm' maven module to a Bonita Project.
   
