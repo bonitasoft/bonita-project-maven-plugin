@@ -29,7 +29,7 @@
     <maven-model-builder.version>3.9.5</maven-model-builder.version>
     <maven-settings.version>3.9.5</maven-settings.version>
     <maven-settings-builder.version>3.9.5</maven-settings-builder.version>
-    <maven-repository-metadata.version>3.9.4</maven-repository-metadata.version>
+    <maven-repository-metadata.version>3.9.5</maven-repository-metadata.version>
     <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
     <maven-filtering.version>3.3.1</maven-filtering.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
