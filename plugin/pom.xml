@@ -14,7 +14,7 @@
   </prerequisites>
   <properties>
     <!-- Dependencies -->
-    <bonita-artifacts-model.version>1.0.0-alpha-01</bonita-artifacts-model.version>
+    <bonita-artifacts-model.version>1.0.0</bonita-artifacts-model.version>
     <maven-plugin-api.version>3.9.5</maven-plugin-api.version>
     <maven-plugin-annotations.version>3.9.0</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
