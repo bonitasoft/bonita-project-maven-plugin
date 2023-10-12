@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bonitasoft.maven</groupId>
   <artifactId>bonita-project-maven-plugin-parent</artifactId>
-  <version>1.0.0-beta-01</version>
+  <version>1.0.0-beta-02</version>
   <packaging>pom</packaging>
   <name>Bonita Project Maven Plugin Parent</name>
   <description>Maven plug-in used for Bonita Project.</description>
