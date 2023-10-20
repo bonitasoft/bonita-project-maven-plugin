@@ -20,7 +20,7 @@
     <maven-project.version>2.2.1</maven-project.version>
     <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
     <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
-    <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
+    <maven-plugin-plugin.version>3.10.1</maven-plugin-plugin.version>
     <cfr.version>0.152</cfr.version>
     <maven-dependency-tree.version>3.2.1</maven-dependency-tree.version>
     <maven-core.version>3.9.5</maven-core.version>
