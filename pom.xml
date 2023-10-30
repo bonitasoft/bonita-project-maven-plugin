@@ -95,7 +95,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.site.skip>false</maven.site.skip>
-    <jackson.version>2.15.2</jackson.version>
+    <jackson.version>2.15.3</jackson.version>
     <lombok.version>1.18.30</lombok.version>
     <commons-io.version>2.15.0</commons-io.version>
     <!-- Spotless resources location -->
@@ -130,7 +130,7 @@
     <mockito-junit-jupiter.version>5.6.0</mockito-junit-jupiter.version>
     <mockito-core.version>5.6.0</mockito-core.version>
     <assertj-core.version>3.24.2</assertj-core.version>
-    <logback-classic.version>1.2.11</logback-classic.version>
+    <logback-classic.version>1.2.12</logback-classic.version>
     <!-- Sonar -->
     <sonar.projectKey>${sonar.organization}_bonita-project-maven-plugin</sonar.projectKey>
     <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
