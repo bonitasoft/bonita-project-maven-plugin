@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.bonitasoft.maven</groupId>
     <artifactId>bonita-project-maven-plugin-parent</artifactId>
-    <version>1.0.0-beta-02</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>bonita-project-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
@@ -16,11 +16,11 @@
     <!-- Dependencies -->
     <bonita-artifacts-model.version>1.0.0</bonita-artifacts-model.version>
     <maven-plugin-api.version>3.9.5</maven-plugin-api.version>
-    <maven-plugin-annotations.version>3.9.0</maven-plugin-annotations.version>
+    <maven-plugin-annotations.version>3.10.1</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
     <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
     <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
-    <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
+    <maven-plugin-plugin.version>3.10.1</maven-plugin-plugin.version>
     <cfr.version>0.152</cfr.version>
     <maven-dependency-tree.version>3.2.1</maven-dependency-tree.version>
     <maven-core.version>3.9.5</maven-core.version>
@@ -34,9 +34,9 @@
     <maven-filtering.version>3.3.1</maven-filtering.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
-    <bonita-ui-designer-artifact-builder.version>1.0.2</bonita-ui-designer-artifact-builder.version>
+    <bonita-ui-designer-artifact-builder.version>1.0.5</bonita-ui-designer-artifact-builder.version>
     <file-management.version>3.1.0</file-management.version>
-    <bonita2bar.version>8.0.0.beta-01</bonita2bar.version>
+    <bonita2bar.version>8.0.0</bonita2bar.version>
     <!-- Test -->
     <groovy.version>3.0.19</groovy.version>
   </properties>

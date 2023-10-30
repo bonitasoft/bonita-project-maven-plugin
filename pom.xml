@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bonitasoft.maven</groupId>
   <artifactId>bonita-project-maven-plugin-parent</artifactId>
-  <version>1.0.0-beta-02</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
   <name>Bonita Project Maven Plugin Parent</name>
   <description>Maven plug-in used for Bonita Project.</description>
@@ -95,15 +95,15 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.site.skip>false</maven.site.skip>
-    <jackson.version>2.15.2</jackson.version>
+    <jackson.version>2.15.3</jackson.version>
     <lombok.version>1.18.30</lombok.version>
-    <commons-io.version>2.14.0</commons-io.version>
+    <commons-io.version>2.15.0</commons-io.version>
     <!-- Spotless resources location -->
     <eclipse.formatter.file>${maven.multiModuleProjectDirectory}/formatter.xml</eclipse.formatter.file>
     <eclipse.importorder.file>${maven.multiModuleProjectDirectory}/eclipse.importorder</eclipse.importorder.file>
     <header.file>${maven.multiModuleProjectDirectory}/header.txt</header.file>
     <!-- Maven plugins -->
-    <surefire.version>3.1.2</surefire.version>
+    <surefire.version>3.2.1</surefire.version>
     <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
     <sonar-maven-plugin.version>3.10.0.2594</sonar-maven-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
@@ -116,7 +116,7 @@
     <maven-site-plugin.version>3.12.1</maven-site-plugin.version>
     <maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
     <maven-scm-publish-plugin.version>3.2.1</maven-scm-publish-plugin.version>
-    <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
+    <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
     <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
@@ -130,7 +130,7 @@
     <mockito-junit-jupiter.version>5.6.0</mockito-junit-jupiter.version>
     <mockito-core.version>5.6.0</mockito-core.version>
     <assertj-core.version>3.24.2</assertj-core.version>
-    <logback-classic.version>1.2.11</logback-classic.version>
+    <logback-classic.version>1.2.12</logback-classic.version>
     <!-- Sonar -->
     <sonar.projectKey>${sonar.organization}_bonita-project-maven-plugin</sonar.projectKey>
     <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
