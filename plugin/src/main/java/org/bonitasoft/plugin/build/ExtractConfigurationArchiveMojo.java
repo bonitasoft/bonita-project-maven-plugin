@@ -42,7 +42,7 @@ import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 
 /**
  * This mojo extracts parameters from all the processes found in the project's sources into a single parameters file.<br/>
- * This does <b>not</b> extract parameters from a Bonita configuration archive you may have updated. 
+ * This does <b>not</b> extract parameters from a Bonita configuration archive you may have updated.
  */
 @Mojo(name = "extract-configuration", aggregator = true, requiresProject = true)
 public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiveMojo {
