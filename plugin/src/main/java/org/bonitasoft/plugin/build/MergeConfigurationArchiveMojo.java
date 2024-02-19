@@ -35,7 +35,7 @@ public class MergeConfigurationArchiveMojo extends AbstractConfigurationArchiveM
     protected ParametersConfigurationMerger merger = new ParametersConfigurationMerger();
 
     /**
-     * The Bonita configuration file. By default it uses the attached bconf artifact.
+     * The Bonita configuration file to update. By default it uses the attached bconf artifact.
      */
     @Parameter(property = "bonita.configurationFile")
     protected String bonitaConfiguration;
