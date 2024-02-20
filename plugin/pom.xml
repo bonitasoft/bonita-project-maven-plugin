@@ -38,7 +38,7 @@
     <file-management.version>3.1.0</file-management.version>
     <bonita2bar.version>8.0.0</bonita2bar.version>
     <!-- Test -->
-    <groovy.version>3.0.19</groovy.version>
+    <groovy.version>3.0.20</groovy.version>
   </properties>
   <dependencyManagement>
     <dependencies>
