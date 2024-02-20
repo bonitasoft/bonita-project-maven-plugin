@@ -121,7 +121,7 @@
     <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
     <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
     <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
-    <gitflow-maven-plugin.version>1.20.0</gitflow-maven-plugin.version>
+    <gitflow-maven-plugin.version>1.21.0</gitflow-maven-plugin.version>
     <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
     <!-- Test -->
     <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
