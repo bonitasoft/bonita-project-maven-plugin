@@ -2,10 +2,14 @@ version: 2
 updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
+    # Set the directory to "/" to check for workflow files in .github/workflows
     directory: /
     target-branch: develop
     schedule:
       interval: weekly
+      day: sunday
+      time: 05:00
+    open-pull-requests-limit: 5
     groups:
       actions-minor:
         update-types:
@@ -17,4 +21,20 @@ updates:
     directory: /
     target-branch: develop
     schedule:
-      interval: daily
+      interval: weekly
+      day: sunday
+      time: 06:00
+    open-pull-requests-limit: 5
+    groups:
+      maven-plugins:
+        patterns:
+          - "*org.apache.maven.plugins*"
+      maven:
+        patterns:
+          - "*org.apache.maven*"
+      test:
+        patterns:
+          - "*assertj*"
+          - "*junit*"
+          - "*test*"
+          - "*mockito*"
