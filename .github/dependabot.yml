@@ -8,7 +8,7 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 05:00
+      time: "05:00"
     open-pull-requests-limit: 5
     groups:
       actions-minor:
@@ -23,7 +23,7 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 06:00
+      time: "06:00"
     open-pull-requests-limit: 5
     groups:
       maven-plugins:
