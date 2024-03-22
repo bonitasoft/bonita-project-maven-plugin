@@ -6,22 +6,27 @@ on:
       - develop
       - release/*
       - support/*
+    paths-ignore:
+      - "**/README.md"
+      - "CONTRIBUTING.md"
+      - ".github/**"
+      - "!.github/workflows/workflow-build.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-
   build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: 17
-          cache: 'maven'
+          cache: "maven"
           server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
           server-username: MAVEN_USERNAME # env variable for username in deploy
           server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
@@ -30,7 +35,7 @@ jobs:
 
       - name: Build and deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           MAVEN_USERNAME: ${{ secrets.ossrh_username }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.ossrh_password }}

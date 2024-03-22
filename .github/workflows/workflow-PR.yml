@@ -2,43 +2,52 @@ name: workflow-pr
 
 on:
   pull_request:
-    branches: [ 'master', 'support/*', 'develop']
-    
+    branches: ["master", "support/*", "develop"]
+    paths-ignore:
+      - "**/README.md"
+      - "CONTRIBUTING.md"
+      - ".github/**"
+      - "!.github/workflows/workflow-PR.yml"
+
 permissions:
   checks: write
-  
-jobs:
 
+jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: 17
-          cache: 'maven'
+          cache: "maven"
+
       - name: Build with Sonarcloud
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{ env.SONAR_TOKEN != '' }}
         run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
       - name: Build
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{ env.SONAR_TOKEN == '' }}
         run: ./mvnw -B -ntp clean verify
+
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
         if: success() || failure() # always run even if the previous step fails
         with:
-          report_paths: '**/target/*-reports/TEST-*.xml'
+          report_paths: "**/target/*-reports/TEST-*.xml"
