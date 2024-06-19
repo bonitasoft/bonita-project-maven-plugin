@@ -32,22 +32,29 @@ jobs:
           java-version: 17
           cache: "maven"
 
+      - uses: Keeper-Security/ksm-action@v1
+        env:
+          KSM_CONFIG: ${{ secrets.KSM_CONFIG }}
+        if: ${{ env.KSM_CONFIG != '' }}
+        with:
+          keeper-secret-config: ${{ secrets.KSM_CONFIG }}
+          secrets: |
+            ${{ vars.KEEPER_SONARCLOUD_RECORD_ID }}/field/login > env:SONAR_TOKEN
+
       - name: Build with Sonarcloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{ env.SONAR_TOKEN != '' }}
-        run: ./mvnw -B -ntp clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: ./mvnw -B -ntp clean verify sonar:sonar
 
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: ${{ env.SONAR_TOKEN == '' }}
         run: ./mvnw -B -ntp clean verify
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
-        if: success() || failure() # always run even if the previous step fails
+        if: always() # always run even if the previous step fails
         with:
           report_paths: "**/target/*-reports/TEST-*.xml"
