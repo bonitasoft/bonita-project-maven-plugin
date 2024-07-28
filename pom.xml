@@ -124,12 +124,12 @@
     <gitflow-maven-plugin.version>1.21.0</gitflow-maven-plugin.version>
     <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
     <!-- Test -->
-    <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
+    <junit-jupiter-engine.version>5.10.3</junit-jupiter-engine.version>
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
     <maven-invoker-plugin.version>3.6.0</maven-invoker-plugin.version>
     <mockito-junit-jupiter.version>5.12.0</mockito-junit-jupiter.version>
     <mockito-core.version>5.12.0</mockito-core.version>
-    <assertj-core.version>3.26.0</assertj-core.version>
+    <assertj-core.version>3.26.3</assertj-core.version>
     <logback-classic.version>1.2.12</logback-classic.version>
     <!-- Sonar -->
     <sonar.projectKey>${sonar.organization}_bonita-project-maven-plugin</sonar.projectKey>
