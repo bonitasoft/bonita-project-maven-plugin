@@ -100,7 +100,7 @@ public class IncompatibleDependencyValidator implements DependencyValidator {
             });
 
             return conflictingNodes.stream()
-                    .map(node -> createIssue(node, project.getArtifact().getId()))
+                    .map(node -> createIssue(node, projectBuildingRequest.getProject().getArtifact().getId()))
                     .collect(Collectors.toList());
         } catch (DependencyGraphBuilderException e) {
             throw new MojoExecutionException("Failed to build dependency graph", e);
