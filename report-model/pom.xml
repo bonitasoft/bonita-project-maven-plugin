@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.bonitasoft.maven</groupId>
     <artifactId>bonita-project-maven-plugin-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
   <artifactId>bonita-project-report-model</artifactId>
   <name>Report Model</name>
