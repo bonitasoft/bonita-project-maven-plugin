@@ -15,23 +15,23 @@
   <properties>
     <!-- Dependencies -->
     <bonita-artifacts-model.version>1.0.1</bonita-artifacts-model.version>
-    <maven-plugin-api.version>3.9.6</maven-plugin-api.version>
-    <maven-plugin-annotations.version>3.10.2</maven-plugin-annotations.version>
+    <maven-plugin-api.version>3.9.9</maven-plugin-api.version>
+    <maven-plugin-annotations.version>3.15.1</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
     <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
     <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
     <maven-plugin-plugin.version>3.15.1</maven-plugin-plugin.version>
     <cfr.version>0.152</cfr.version>
-    <maven-dependency-tree.version>3.2.1</maven-dependency-tree.version>
-    <maven-core.version>3.9.6</maven-core.version>
-    <maven-artifact.version>3.9.6</maven-artifact.version>
-    <maven-model.version>3.9.6</maven-model.version>
-    <maven-model-builder.version>3.9.6</maven-model-builder.version>
-    <maven-settings.version>3.9.6</maven-settings.version>
-    <maven-settings-builder.version>3.9.6</maven-settings-builder.version>
-    <maven-repository-metadata.version>3.9.5</maven-repository-metadata.version>
+    <maven-dependency-tree.version>3.3.0</maven-dependency-tree.version>
+    <maven-core.version>3.9.9</maven-core.version>
+    <maven-artifact.version>3.9.9</maven-artifact.version>
+    <maven-model.version>3.9.9</maven-model.version>
+    <maven-model-builder.version>3.9.9</maven-model-builder.version>
+    <maven-settings.version>3.9.9</maven-settings.version>
+    <maven-settings-builder.version>3.9.9</maven-settings-builder.version>
+    <maven-repository-metadata.version>3.9.9</maven-repository-metadata.version>
     <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
-    <maven-filtering.version>3.3.1</maven-filtering.version>
+    <maven-filtering.version>3.4.0</maven-filtering.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
     <bonita-ui-designer-artifact-builder.version>1.0.5</bonita-ui-designer-artifact-builder.version>
