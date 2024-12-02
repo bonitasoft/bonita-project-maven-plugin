@@ -84,7 +84,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private static final String VERSION = "version";
     private static final String ARTIFACT_ID = "artifactId";
 
-    static final String DEFAULT_INSTALL_PLUGIN_VERSION = "3.1.1";
+    static final String DEFAULT_INSTALL_PLUGIN_VERSION = "3.1.3";
     static final String INITIAL_INSTALL_PLUGIN_VERSION = "2.4";
     private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
@@ -353,6 +353,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
                 INSTALL_PLUGIN_ARTIFACT_ID,
                 installPluginVersion)));
         executionRequest.setLocalRepository(localRepository);
+        executionRequest.setSystemProperties(System.getProperties());
         Properties installFileProperties = new Properties();
         installFileProperties.setProperty(GROUP_ID, artifact.getGroupId());
         installFileProperties.setProperty(ARTIFACT_ID, artifact.getArtifactId());
@@ -387,6 +388,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
 
         buildingRequest.setRemoteRepositories(remoteRepositories);
+        buildingRequest.setSystemProperties(System.getProperties());
 
         return buildingRequest;
     }
