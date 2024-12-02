@@ -38,7 +38,8 @@
     <file-management.version>3.1.0</file-management.version>
     <bonita2bar.version>8.0.0</bonita2bar.version>
     <!-- Test -->
-    <groovy.version>3.0.21</groovy.version>
+    <groovy.version>3.0.23</groovy.version>
+    <byte-buddy.version>1.15.4</byte-buddy.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -109,6 +110,12 @@
         <version>${bonita-ui-designer-artifact-builder.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>${byte-buddy.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -262,11 +269,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
@@ -274,6 +276,11 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
