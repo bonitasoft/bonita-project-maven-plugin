@@ -4,41 +4,49 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release (leave empty to use pom version)
-        type: string
-        default: ''
-        required: false
-      nextVersion:
-        description: 'Next development version (leave empty to use default version incrementation policy)'
-        type: string
-        required: false
-        default: ''
-      skipMergeReleaseInMaster:
-        description: 'Whether release branch merge should be skip into master (major/minor version only should be merged)'
-        type: boolean
-        required: false
-        default: false
+        description: 'The version of the release. Used as tag name.'
+        required: true
+        default: 'x.y.z'
 
 jobs:
   build:
     name: Release pipeline
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
+		
+	  - uses: Keeper-Security/ksm-action@v1
+        with:
+          keeper-secret-config: ${{ secrets.KSM_CONFIG }}
+          secrets: |
+            ${{ vars.KEEPER_OSSRH_RECORD_ID }}/field/login > env:MAVEN_USERNAME
+            ${{ vars.KEEPER_OSSRH_RECORD_ID }}/field/password > env:MAVEN_CENTRAL_TOKEN
+            ${{ vars.KEEPER_GPG_ARTIFACT_SIGNING_RECORD_ID }}/field/login > env:GPG_KEYNAME
+            ${{ vars.KEEPER_GPG_ARTIFACT_SIGNING_RECORD_ID }}/custom_field/gpg-private-key > env:GPG_PRIVATE_KEY
+            ${{ vars.KEEPER_GPG_ARTIFACT_SIGNING_RECORD_ID }}/field/password > env:MAVEN_GPG_PASSPHRASE
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
         
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 11
-       
+          cache: 'maven'
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+          server-username: MAVEN_USERNAME # env variable for username in deploy
+          server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+          
       - name: Configure Git user
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
       
-      - name: Create Release 
-        run: ./mvnw -ntp --batch-mode -Dstyle.color=always gitflow:release -DgitFlowConfig.developmentBranch=${{ github.ref_name }} -DdevelopmentVersion=${{ github.event.inputs.nextVersion }} -DreleaseVersion=${{ github.event.inputs.version }} -DskipReleaseMergeProdBranch=${{ github.event.inputs.skipMergeReleaseInMaster }} -Dverbose
+      - name: Build Release 
+        run: ./mvnw --batch-mode release:prepare -DreleaseVersion=${{ github.event.inputs.version }}
+
+            
+      - name: Publish
+        env:
+        run: mvn --batch-mode release:perform
