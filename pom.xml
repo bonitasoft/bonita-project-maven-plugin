@@ -107,7 +107,7 @@
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-    <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
+    <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -127,7 +127,7 @@
     <!-- Test -->
     <junit-jupiter-engine.version>5.11.3</junit-jupiter-engine.version>
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
-    <maven-invoker-plugin.version>3.8.1</maven-invoker-plugin.version>
+    <maven-invoker-plugin.version>3.9.0</maven-invoker-plugin.version>
     <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
     <mockito-core.version>5.14.2</mockito-core.version>
     <assertj-core.version>3.26.3</assertj-core.version>
