@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
-import org.bonitasoft.plugin.extension.impl.ExtensionsModuleGeneratorImpl;
 
 public abstract class AbstractModuleGenerator implements ModuleGenerator {
 
@@ -40,7 +39,7 @@ public abstract class AbstractModuleGenerator implements ModuleGenerator {
 
         Path modulePom = moduleFolder.resolve(POM_FILE_NAME);
         modulePom.toFile().getParentFile().mkdirs();
-        try (var is = ExtensionsModuleGeneratorImpl.class.getResourceAsStream(templateFileName);
+        try (var is = AbstractModuleGenerator.class.getResourceAsStream(templateFileName);
                 var os = Files.newOutputStream(modulePom)) {
             var modelTemplate = modelReader.read(is, null);
             modelTemplate.setArtifactId(projectId + moduleNameSuffix);
