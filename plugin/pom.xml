@@ -39,7 +39,7 @@
     <bonita2bar.version>8.0.0</bonita2bar.version>
     <!-- Test -->
     <groovy.version>3.0.23</groovy.version>
-    <byte-buddy.version>1.15.4</byte-buddy.version>
+    <byte-buddy.version>1.15.10</byte-buddy.version>
   </properties>
   <dependencyManagement>
     <dependencies>
