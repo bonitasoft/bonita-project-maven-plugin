@@ -36,7 +36,7 @@
     <bonita-business-data-generator.version>7.15.0</bonita-business-data-generator.version>
     <bonita-ui-designer-artifact-builder.version>1.0.5</bonita-ui-designer-artifact-builder.version>
     <file-management.version>3.1.0</file-management.version>
-    <bonita2bar.version>8.0.0</bonita2bar.version>
+    <bonita2bar.version>8.1.0</bonita2bar.version>
     <!-- Test -->
     <groovy.version>3.0.23</groovy.version>
     <byte-buddy.version>1.15.10</byte-buddy.version>
