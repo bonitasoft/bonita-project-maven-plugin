@@ -33,6 +33,7 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilder;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
+import org.bonitasoft.bonita2bar.BuildBarException;
 import org.bonitasoft.bonita2bar.ClasspathResolver;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
@@ -107,16 +108,20 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
 
     BarBuilder createBarBuilder(Path tmpFolder) throws MojoExecutionException {
         var processRegistry = ProcessRegistry.of(selectedProcFiles(), MigrationPolicy.ALWAYS_MIGRATE_POLICY);
-        return BarBuilderFactory.create(BuildConfig.builder()
-                .processRegistry(processRegistry)
-                .connectorImplementationRegistry(ConnectorImplementationRegistry.of(List.of()))
-                .allowEmptyFormMapping(true)
-                .includeParameters(false)
-                .sourcePathProvider(SourcePathProvider.of(getAppModuleBaseDir().toPath()))
-                .classpathResolver(ClasspathResolver.of(List.of()))
-                .formBuilder(id -> new byte[0])
-                .workingDirectory(tmpFolder)
-                .build());
+        try {
+            return BarBuilderFactory.create(BuildConfig.builder()
+                    .processRegistry(processRegistry)
+                    .connectorImplementationRegistry(ConnectorImplementationRegistry.of(List.of()))
+                    .allowEmptyFormMapping(true)
+                    .includeParameters(false)
+                    .sourcePathProvider(SourcePathProvider.of(getAppModuleBaseDir().toPath()))
+                    .classpathResolver(ClasspathResolver.of(List.of()))
+                    .formBuilder(id -> new byte[0])
+                    .workingDirectory(tmpFolder)
+                    .build());
+        } catch (BuildBarException e) {
+            throw new MojoExecutionException(e);
+        }
     }
 
     private List<Path> selectedProcFiles() throws MojoExecutionException {

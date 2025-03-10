@@ -40,6 +40,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.bonitasoft.bonita2bar.BarBuilder;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
 import org.bonitasoft.bonita2bar.BuildBarException;
@@ -104,6 +105,12 @@ public class BuildBarMojo extends AbstractBuildMojo {
     private boolean migrateIfNeeded;
 
     /**
+     * Whether dependency jars should be included in the Business archive file. Default to true
+     */
+    @Parameter(defaultValue = "true", property = "bonita.includeDependencyJars")
+    private boolean includeDependencyJars;
+
+    /**
      * List of process diagram files to include.
      */
     @Parameter(property = "proc.includes")
@@ -145,16 +152,22 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     "Process migration is enabled. If a process is in an older model version than expected, a migration will be attempted.");
         }
         var tmpFolder = outputFolder.resolve("business-archive-tmp");
-        var barBuilder = BarBuilderFactory.create(BuildConfig.builder()
-                .processRegistry(processRegistry)
-                .connectorImplementationRegistry(getConnectorImplementationRegistry(reportFile))
-                .allowEmptyFormMapping(allowEmptyFormMapping)
-                .includeParameters(includeParameters)
-                .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
-                .classpathResolver(ClasspathResolver.of(getClasspath()))
-                .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
-                .workingDirectory(tmpFolder)
-                .build());
+        BarBuilder barBuilder;
+        try {
+            barBuilder = BarBuilderFactory.create(BuildConfig.builder()
+                    .processRegistry(processRegistry)
+                    .connectorImplementationRegistry(getConnectorImplementationRegistry(reportFile))
+                    .allowEmptyFormMapping(allowEmptyFormMapping)
+                    .includeParameters(includeParameters)
+                    .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
+                    .classpathResolver(ClasspathResolver.of(getClasspath()))
+                    .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
+                    .workingDirectory(tmpFolder)
+                    .withDependencyJars(includeDependencyJars)
+                    .build());
+        } catch (BuildBarException e) {
+            throw new MojoExecutionException(e);
+        }
 
         for (var pool : processRegistry.getProcesses()) {
             try {
