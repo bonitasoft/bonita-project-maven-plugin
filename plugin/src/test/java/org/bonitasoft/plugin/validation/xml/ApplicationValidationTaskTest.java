@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.net.URL;
 import java.nio.file.Paths;
 
+import org.bonitasoft.plugin.validation.ValidateMojo;
 import org.bonitasoft.plugin.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -30,8 +31,7 @@ class ApplicationValidationTaskTest {
 
     private static final String TEST_RESOURCES_APPLICATIONS_DIR = "src/test/resources/validation/applications";
 
-    private final URL xsdUrl = ApplicationValidationTaskTest.class
-            .getResource("/validation/applications/application.xsd");
+    private final URL xsdUrl = ValidateMojo.class.getResource("/application.xsd");
 
     @Test
     void should_validate_valid_application() {
