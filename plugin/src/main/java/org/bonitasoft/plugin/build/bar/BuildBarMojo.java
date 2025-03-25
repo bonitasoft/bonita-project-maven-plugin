@@ -44,11 +44,9 @@ import org.bonitasoft.bonita2bar.BarBuilder;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
 import org.bonitasoft.bonita2bar.BuildBarException;
-import org.bonitasoft.bonita2bar.ClasspathResolver;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry.ConnectorImplementationJar;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
-import org.bonitasoft.bonita2bar.SourcePathProvider;
 import org.bonitasoft.bonita2bar.form.FormBuilder;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 import org.bonitasoft.plugin.AbstractBuildMojo;
@@ -159,8 +157,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     .connectorImplementationRegistry(getConnectorImplementationRegistry(reportFile))
                     .allowEmptyFormMapping(allowEmptyFormMapping)
                     .includeParameters(includeParameters)
-                    .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
-                    .classpathResolver(ClasspathResolver.of(getClasspath()))
+                    .mavenProject(project)
                     .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
                     .workingDirectory(tmpFolder)
                     .withDependencyJars(includeDependencyJars)
