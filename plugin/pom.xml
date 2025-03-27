@@ -32,6 +32,7 @@
     <maven-repository-metadata.version>3.9.9</maven-repository-metadata.version>
     <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
     <maven-filtering.version>3.4.0</maven-filtering.version>
+    <maven-invoker.version>3.3.0</maven-invoker.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <bonita-business-data-generator.version>8.0.0</bonita-business-data-generator.version>
     <bonita-ui-designer-artifact-builder.version>1.0.5</bonita-ui-designer-artifact-builder.version>
@@ -170,6 +171,11 @@
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-filtering</artifactId>
       <version>${maven-filtering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-invoker</artifactId>
+      <version>${maven-invoker.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>

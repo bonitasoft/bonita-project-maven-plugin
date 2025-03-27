@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
@@ -50,6 +51,7 @@ import org.bonitasoft.bonita2bar.ProcessRegistry;
 import org.bonitasoft.bonita2bar.form.FormBuilder;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 import org.bonitasoft.plugin.AbstractBuildMojo;
+import org.bonitasoft.plugin.MavenSessionExecutor;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
@@ -125,6 +127,12 @@ public class BuildBarMojo extends AbstractBuildMojo {
      */
     private MavenProjectHelper projectHelper;
 
+    /**
+     * Maven session.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    private MavenSession session;
+
     @Inject
     public BuildBarMojo(MavenProjectHelper projectHelper) {
         this.projectHelper = projectHelper;
@@ -158,6 +166,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     .allowEmptyFormMapping(allowEmptyFormMapping)
                     .includeParameters(includeParameters)
                     .mavenProject(project)
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session))
                     .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
                     .workingDirectory(tmpFolder)
                     .withDependencyJars(includeDependencyJars)

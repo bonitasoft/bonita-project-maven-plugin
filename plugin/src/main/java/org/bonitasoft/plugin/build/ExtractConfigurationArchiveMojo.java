@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -38,6 +39,7 @@ import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
 import org.bonitasoft.bonita2bar.configuration.ParameterConfigurationExtractor;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
+import org.bonitasoft.plugin.MavenSessionExecutor;
 
 /**
  * <p>This mojo extracts parameters from all the processes found in the project into a single parameters file.</p>
@@ -59,6 +61,12 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
      */
     @Parameter(property = "parameters.overwrite", defaultValue = "false")
     protected boolean overwrite;
+
+    /**
+     * Maven session.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    private MavenSession session;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -113,6 +121,7 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
                     .allowEmptyFormMapping(true)
                     .includeParameters(false)
                     .mavenProject(findAppModuleProject())
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session))
                     .formBuilder(id -> new byte[0])
                     .workingDirectory(tmpFolder)
                     .build());
