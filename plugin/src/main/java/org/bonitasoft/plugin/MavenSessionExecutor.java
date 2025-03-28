@@ -1,16 +1,14 @@
-/** 
+/**
  * Copyright (C) 2025 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -93,15 +92,13 @@ public class MavenSessionExecutor implements MavenExecutor {
                 Invoker invoker = new DefaultInvoker();
                 InvocationResult result = invoker.execute(request);
                 if (result.getExitCode() != 0) {
-                    errStream.flush();
-                    throwBuildBarException(errorMessageBase, errStream.toString(), result.getExecutionException());
+                    throwBuildBarException(errorMessageBase, errStream, result.getExecutionException());
                 }
             } catch (MavenInvocationException e) {
-                errStream.flush();
-                throwBuildBarException(errorMessageBase, errStream.toString(), e);
+                throwBuildBarException(errorMessageBase, errStream, e);
             }
         } catch (IOException e) {
-            throwBuildBarException(errorMessageBase, null, e);
+            throw new BuildBarException(errorMessageBase.get(), e);
         }
 
     }
@@ -110,17 +107,18 @@ public class MavenSessionExecutor implements MavenExecutor {
      * Build and throw the exception
      * 
      * @param errorMessageBase the base message supplier
-     * @param errorString the error string from maven output (may be null of empty)
+     * @param errorStream the error stream from maven output
      * @param exception cause exception to encapsulate
      * @throws BuildBarException thrown exception
+     * @throws IOException exception while flushing the error stream
      */
-    private void throwBuildBarException(Supplier<String> errorMessageBase, String errorString,
-            Exception exception) throws BuildBarException {
-        String msg = errorMessageBase.get();
-        if (StringUtils.isNotBlank(errorString)) {
-            msg += "\n" + errorString;
-        }
-        throw new BuildBarException(msg, exception);
+    private void throwBuildBarException(Supplier<String> errorMessageBase, ByteArrayOutputStream errorStream,
+            Exception exception) throws BuildBarException, IOException {
+        StringBuffer msg = new StringBuffer(errorMessageBase.get());
+        errorStream.flush();
+        String fromStream = errorStream.toString();
+        Optional.ofNullable(fromStream).filter(StringUtils::isNotBlank).ifPresent(s -> msg.append("\n" + s));
+        throw new BuildBarException(msg.toString(), exception);
     }
 
     /**
