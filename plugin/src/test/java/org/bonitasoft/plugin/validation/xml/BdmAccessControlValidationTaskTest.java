@@ -31,8 +31,7 @@ class BdmAccessControlValidationTaskTest {
 
     private static final String TEST_RESOURCES_BDM_ACCESS_CONTROL_DIR = "src/test/resources/validation/bdm-access-control";
 
-    private final URL xsdUrl = BdmAccessControlValidationTaskTest.class
-            .getResource("/validation/bdm-access-control/bdm-access-control.xsd");
+    private final URL xsdUrl = ValidateMojo.class.getResource("/bdm-access-control.xsd");
 
     @Test
     void should_validate_valid_bdm_access_control() {

@@ -17,8 +17,11 @@
 package org.bonitasoft.plugin.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+
+import org.bonitasoft.bonita2bar.configuration.ZipUtil;
 
 public final class TestFiles {
 
@@ -28,5 +31,13 @@ public final class TestFiles {
 
     public static File getResourceAsFile(String filePath) throws URISyntaxException {
         return Paths.get(TestFiles.class.getResource(filePath).toURI()).toFile();
+    }
+
+    public static File getResourceAsZipFile(String folderPath) throws URISyntaxException, IOException {
+        var folder = Paths.get(TestFiles.class.getResource(folderPath).toURI());
+        // now make a temp zip with this folder
+        var tempZip = File.createTempFile(folder.getFileName().toString(), ".zip");
+        ZipUtil.zip(folder, tempZip.toPath());
+        return tempZip;
     }
 }

@@ -31,7 +31,7 @@ class BdmValidationTaskTest {
 
     private static final String TEST_RESOURCES_BDM_DIR = "src/test/resources/validation/bdm";
 
-    private final URL xsdUrl = BdmValidationTaskTest.class.getResource("/validation/bdm/bom.xsd");
+    private final URL xsdUrl = ValidateMojo.class.getResource("/bom.xsd");
 
     @Test
     void should_validate_valid_bdm() {

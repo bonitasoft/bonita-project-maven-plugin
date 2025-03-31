@@ -90,7 +90,7 @@
   </distributionManagement>
   <properties>
     <project.scm.id>github</project.scm.id>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -123,7 +123,7 @@
     <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
     <gitflow-maven-plugin.version>1.21.0</gitflow-maven-plugin.version>
     <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
-    <sisu-maven-plugin.version>0.3.5</sisu-maven-plugin.version>
+    <sisu-maven-plugin.version>0.9.0.M3</sisu-maven-plugin.version>
     <!-- Test -->
     <junit-jupiter-engine.version>5.11.3</junit-jupiter-engine.version>
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
