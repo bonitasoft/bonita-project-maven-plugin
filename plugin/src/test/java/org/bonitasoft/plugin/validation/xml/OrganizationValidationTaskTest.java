@@ -31,8 +31,7 @@ class OrganizationValidationTaskTest {
 
     private static final String TEST_RESOURCES_ORGANIZATIONS_DIR = "src/test/resources/validation/organizations";
 
-    private final URL xsdUrl = OrganizationValidationTaskTest.class
-            .getResource("/validation/organizations/organization.xsd");
+    private final URL xsdUrl = ValidateMojo.class.getResource("/organization.xsd");
 
     @Test
     void should_validate_valid_organization() {

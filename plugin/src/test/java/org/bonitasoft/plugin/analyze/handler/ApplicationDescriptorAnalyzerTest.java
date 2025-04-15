@@ -18,7 +18,7 @@ package org.bonitasoft.plugin.analyze.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.bonitasoft.plugin.test.TestFiles.getResourceAsFile;
+import static org.bonitasoft.plugin.test.TestFiles.getResourceAsZipFile;
 
 import java.io.File;
 
@@ -36,6 +36,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ApplicationDescriptorAnalyzerTest {
 
+    private static final String APPLICATION_ZIPS_PREFIX = "/validation/application_zips_unzipped/";
+
     @InjectMocks
     ApplicationDescriptorAnalyzer analyzer;
 
@@ -48,7 +50,7 @@ class ApplicationDescriptorAnalyzerTest {
         var artifact = new DefaultArtifact("org.bonita.application", "bonita-user-application", "1.0.0", "runtime",
                 "zip",
                 "application", new DefaultArtifactHandler("zip"));
-        artifact.setFile(getResourceAsFile("/application.zip"));
+        artifact.setFile(getResourceAsZipFile(APPLICATION_ZIPS_PREFIX + "application"));
 
         // Then
         assertThat(analyzer.appliesTo(artifact)).isTrue();
@@ -72,7 +74,7 @@ class ApplicationDescriptorAnalyzerTest {
         var artifact = new DefaultArtifact("org.bonita.application", "bonita-user-application", "1.0.0", "runtime",
                 "zip",
                 "application", new DefaultArtifactHandler("zip"));
-        artifact.setFile(getResourceAsFile("/application_without_descriptor.zip"));
+        artifact.setFile(getResourceAsZipFile(APPLICATION_ZIPS_PREFIX + "application_without_descriptor"));
 
         // Then
         assertThat(analyzer.appliesTo(artifact)).isFalse();
@@ -84,7 +86,7 @@ class ApplicationDescriptorAnalyzerTest {
         var artifact = new DefaultArtifact("org.bonita.application", "bonita-user-application", "1.0.0", "runtime",
                 "zip",
                 "application", new DefaultArtifactHandler("zip"));
-        artifact.setFile(getResourceAsFile("/application_without_descriptor2.zip"));
+        artifact.setFile(getResourceAsZipFile(APPLICATION_ZIPS_PREFIX + "application_without_descriptor2"));
 
         // Then
         assertThat(analyzer.appliesTo(artifact)).isFalse();
@@ -96,7 +98,7 @@ class ApplicationDescriptorAnalyzerTest {
         var artifact = new DefaultArtifact("org.bonita.application", "bonita-user-application", "1.0.0", "runtime",
                 "zip",
                 "application", new DefaultArtifactHandler("zip"));
-        artifact.setFile(getResourceAsFile("/application.zip"));
+        artifact.setFile(getResourceAsZipFile(APPLICATION_ZIPS_PREFIX + "application"));
 
         // When
         var result = analyzer.analyze(artifact, new DependencyReport());

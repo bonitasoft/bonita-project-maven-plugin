@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -33,15 +34,16 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilder;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
-import org.bonitasoft.bonita2bar.ClasspathResolver;
+import org.bonitasoft.bonita2bar.BuildBarException;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
-import org.bonitasoft.bonita2bar.SourcePathProvider;
 import org.bonitasoft.bonita2bar.configuration.ParameterConfigurationExtractor;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
+import org.bonitasoft.plugin.MavenSessionExecutor;
 
 /**
- * This mojo extracts parameters from all the processes found in the project into a single parameters file.
+ * <p>This mojo extracts parameters from all the processes found in the project into a single parameters file.</p>
+ * <p>This does <b>not</b> extract parameters from a Bonita configuration archive you may have updated.</p>
  */
 @Mojo(name = "extract-configuration", aggregator = true, requiresProject = true)
 public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiveMojo {
@@ -59,6 +61,12 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
      */
     @Parameter(property = "parameters.overwrite", defaultValue = "false")
     protected boolean overwrite;
+
+    /**
+     * Maven session.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    private MavenSession session;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -106,16 +114,20 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
 
     BarBuilder createBarBuilder(Path tmpFolder) throws MojoExecutionException {
         var processRegistry = ProcessRegistry.of(selectedProcFiles(), MigrationPolicy.ALWAYS_MIGRATE_POLICY);
-        return BarBuilderFactory.create(BuildConfig.builder()
-                .processRegistry(processRegistry)
-                .connectorImplementationRegistry(ConnectorImplementationRegistry.of(List.of()))
-                .allowEmptyFormMapping(true)
-                .includeParameters(false)
-                .sourcePathProvider(SourcePathProvider.of(getAppModuleBaseDir().toPath()))
-                .classpathResolver(ClasspathResolver.of(List.of()))
-                .formBuilder(id -> new byte[0])
-                .workingDirectory(tmpFolder)
-                .build());
+        try {
+            return BarBuilderFactory.create(BuildConfig.builder()
+                    .processRegistry(processRegistry)
+                    .connectorImplementationRegistry(ConnectorImplementationRegistry.of(List.of()))
+                    .allowEmptyFormMapping(true)
+                    .includeParameters(false)
+                    .mavenProject(findAppModuleProject())
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session))
+                    .formBuilder(id -> new byte[0])
+                    .workingDirectory(tmpFolder)
+                    .build());
+        } catch (BuildBarException e) {
+            throw new MojoExecutionException(e);
+        }
     }
 
     private List<Path> selectedProcFiles() throws MojoExecutionException {

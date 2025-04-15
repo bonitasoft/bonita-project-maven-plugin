@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
@@ -40,17 +41,17 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import org.bonitasoft.bonita2bar.BarBuilder;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
 import org.bonitasoft.bonita2bar.BuildBarException;
-import org.bonitasoft.bonita2bar.ClasspathResolver;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry.ConnectorImplementationJar;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
-import org.bonitasoft.bonita2bar.SourcePathProvider;
 import org.bonitasoft.bonita2bar.form.FormBuilder;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
 import org.bonitasoft.plugin.AbstractBuildMojo;
+import org.bonitasoft.plugin.MavenSessionExecutor;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.Implementation;
@@ -104,6 +105,12 @@ public class BuildBarMojo extends AbstractBuildMojo {
     private boolean migrateIfNeeded;
 
     /**
+     * Whether dependency jars should be included in the Business archive file. Default to true
+     */
+    @Parameter(defaultValue = "true", property = "bonita.includeDependencyJars")
+    private boolean includeDependencyJars;
+
+    /**
      * List of process diagram files to include.
      */
     @Parameter(property = "proc.includes")
@@ -119,6 +126,12 @@ public class BuildBarMojo extends AbstractBuildMojo {
      * Maven ProjectHelper.
      */
     private MavenProjectHelper projectHelper;
+
+    /**
+     * Maven session.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    private MavenSession session;
 
     @Inject
     public BuildBarMojo(MavenProjectHelper projectHelper) {
@@ -145,16 +158,22 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     "Process migration is enabled. If a process is in an older model version than expected, a migration will be attempted.");
         }
         var tmpFolder = outputFolder.resolve("business-archive-tmp");
-        var barBuilder = BarBuilderFactory.create(BuildConfig.builder()
-                .processRegistry(processRegistry)
-                .connectorImplementationRegistry(getConnectorImplementationRegistry(reportFile))
-                .allowEmptyFormMapping(allowEmptyFormMapping)
-                .includeParameters(includeParameters)
-                .sourcePathProvider(SourcePathProvider.of(project.getBasedir().toPath()))
-                .classpathResolver(ClasspathResolver.of(getClasspath()))
-                .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
-                .workingDirectory(tmpFolder)
-                .build());
+        BarBuilder barBuilder;
+        try {
+            barBuilder = BarBuilderFactory.create(BuildConfig.builder()
+                    .processRegistry(processRegistry)
+                    .connectorImplementationRegistry(getConnectorImplementationRegistry(reportFile))
+                    .allowEmptyFormMapping(allowEmptyFormMapping)
+                    .includeParameters(includeParameters)
+                    .mavenProject(project)
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session))
+                    .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
+                    .workingDirectory(tmpFolder)
+                    .withDependencyJars(includeDependencyJars)
+                    .build());
+        } catch (BuildBarException e) {
+            throw new MojoExecutionException(e);
+        }
 
         for (var pool : processRegistry.getProcesses()) {
             try {

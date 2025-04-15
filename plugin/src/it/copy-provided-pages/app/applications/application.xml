@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
     <application token="ticketing" version="1.0" profile="Administrator" homePage="main" state="ACTIVATED" layout="custompage_VerticalCSCLayoutV10" theme="custompage_customerservicetheme">
         <displayName>Ticketing Management</displayName>
         <applicationPages>

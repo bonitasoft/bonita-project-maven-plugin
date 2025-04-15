@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.net.URL;
 import java.nio.file.Paths;
 
+import org.bonitasoft.plugin.validation.ValidateMojo;
 import org.bonitasoft.plugin.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ class ProfileValidationTaskTest {
 
     private static final String TEST_RESOURCES_PROFILES_DIR = "src/test/resources/validation/profiles";
 
-    private final URL xsdUrl = ProfileValidationTaskTest.class.getResource("/validation/profiles/profiles.xsd");
+    private final URL xsdUrl = ValidateMojo.class.getResource("/profiles.xsd");
 
     @Test
     void should_validate_valid_profile() {

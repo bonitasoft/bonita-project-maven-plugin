@@ -10,7 +10,7 @@
   <properties>
     <bonita.runtime.version>7.15.0</bonita.runtime.version>
     <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
-    <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.release>17</maven.compiler.release>
     <bonita-project-maven-plugin.version>@project.version@</bonita-project-maven-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>

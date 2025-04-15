@@ -41,7 +41,7 @@ public class DefaultBomFactoryImpl implements DefaultBomFactory {
     private static final String RESERVED_ORG_PREFIX = "org.bonitasoft";
     static final String DEFAULT_PACKAGE_PREFIX = "com.company";
     static final String DEFAULT_BO_NAME = "BusinessObject";
-    static final String DEFAULT_FIELD_NAME = "attribute";
+    static final String DEFAULT_FIELD_NAME = "myAttribute";
     static final String BOM_FILE_NAME = "bom.xml";
 
     private BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
