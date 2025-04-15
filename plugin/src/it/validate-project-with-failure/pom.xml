@@ -15,7 +15,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <bonita-project-maven-plugin.version>@project.version@</bonita-project-maven-plugin.version>
-    <bonita.runtime.version>8.0.0</bonita.runtime.version>
+    <bonita.runtime.version>10.2.0</bonita.runtime.version>
   </properties>
   <dependencyManagement>
     <dependencies>
