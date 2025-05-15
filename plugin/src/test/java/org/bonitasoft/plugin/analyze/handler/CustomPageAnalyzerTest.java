@@ -25,6 +25,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,8 @@ import java.util.Properties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
+import org.bonitasoft.plugin.analyze.content.ZipArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage.CustomPageType;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -43,11 +46,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class CustomPageAnalyzerTest {
+
+    @Spy
+    ArtifactContentReader reader = new ZipArtifactContentReader();
 
     @InjectMocks
     CustomPageAnalyzer analyzer;
@@ -95,13 +101,15 @@ class CustomPageAnalyzerTest {
     @Test
     void should_read_customPage_properties_in_archive() throws Exception {
         // Given
+        var artifact = mock(Artifact.class);
         File file = getResourceAsFile("/my-rest-api-0.0.1-SNAPSHOT.zip");
+        when(artifact.getFile()).thenReturn(file);
 
         Properties expectedProperties = new Properties();
         expectedProperties.load(getClass().getResourceAsStream("/page.properties"));
 
         // When
-        final Properties properties = analyzer.readPagePropertiesInArchive(file);
+        final Properties properties = analyzer.readPageProperties(artifact);
 
         // Then
         assertThat(properties).isEqualTo(expectedProperties);
@@ -142,15 +150,19 @@ class CustomPageAnalyzerTest {
 
     @Test
     void doesNotAppliesWhenDetectionFails() throws Exception {
-        // Given
-        var spy = spy(analyzer);
-        doThrow(IOException.class).when(spy).hasCustomPageDescriptor(Mockito.any());
-        var artifact = new DefaultArtifact("org.bonita.connector", "my-rest-api", "0.0.1-SNAPSHOT", "runtime", "zip",
-                null, new DefaultArtifactHandler("zip"));
-        artifact.setFile(getResourceAsFile("/my-rest-api-0.0.1-SNAPSHOT.zip"));
+        try {
+            // Given
+            doThrow(IOException.class).when(reader).readFirstEntry(any(), any(), any());
+            var artifact = new DefaultArtifact("org.bonita.connector", "my-rest-api", "0.0.1-SNAPSHOT", "runtime",
+                    "zip", null, new DefaultArtifactHandler("zip"));
+            artifact.setFile(getResourceAsFile("/my-rest-api-0.0.1-SNAPSHOT.zip"));
 
-        // Then
-        assertThat(spy.appliesTo(artifact)).isFalse();
+            // Then
+            assertThat(analyzer.appliesTo(artifact)).isFalse();
+        } finally {
+            // Reset the reader spy to avoid side effects on other tests
+            lenient().doCallRealMethod().when(reader).readFirstEntry(any(), any(), any());
+        }
     }
 
 }

@@ -23,6 +23,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
+import org.bonitasoft.plugin.analyze.content.JarArtifactContentReader;
+import org.bonitasoft.plugin.analyze.content.ProjectArtifactContentReader;
+import org.bonitasoft.plugin.analyze.content.ZipArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 
@@ -36,10 +39,13 @@ public interface ArtifactAnalyzerHandler {
             LocalRepositoryManager localRepositoryManager,
             MavenResourcesFiltering mavenResourcesFiltering,
             List<MavenProject> reactorProjects) {
-        return List.of(new ConnectorAnalyzer(localRepositoryManager, connectorResolver),
-                new CustomPageAnalyzer(localRepositoryManager),
-                new CustomPageProjectAnalyzer(localRepositoryManager, mavenResourcesFiltering, reactorProjects),
-                new ApplicationDescriptorAnalyzer(localRepositoryManager));
+        return List.of(new ConnectorAnalyzer(localRepositoryManager, connectorResolver, new JarArtifactContentReader()),
+                new ConnectorAnalyzer(localRepositoryManager, connectorResolver,
+                        new ProjectArtifactContentReader(mavenResourcesFiltering, reactorProjects)),
+                new CustomPageAnalyzer(localRepositoryManager, new ZipArtifactContentReader()),
+                new CustomPageAnalyzer(localRepositoryManager,
+                        new ProjectArtifactContentReader(mavenResourcesFiltering, reactorProjects)),
+                new ApplicationDescriptorAnalyzer(localRepositoryManager, new ZipArtifactContentReader()));
     }
 
 }

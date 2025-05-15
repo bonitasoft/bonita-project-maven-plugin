@@ -14,20 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.plugin.analyze.cfr;
+package org.bonitasoft.plugin.analyze.connector;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -37,16 +32,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.artifact.Artifact;
-import org.benf.cfr.reader.bytecode.analysis.types.JavaRefTypeInstance;
-import org.benf.cfr.reader.bytecode.analysis.types.JavaTypeInstance;
-import org.benf.cfr.reader.entities.ClassFile;
-import org.benf.cfr.reader.state.ClassFileSourceImpl;
-import org.benf.cfr.reader.state.DCCommonState;
-import org.benf.cfr.reader.util.AnalysisType;
-import org.benf.cfr.reader.util.getopt.GetOptSinkFactory;
-import org.benf.cfr.reader.util.getopt.Options;
-import org.benf.cfr.reader.util.getopt.OptionsImpl;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
@@ -63,7 +50,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 @Named
-public class CFRConnectorResolver implements ConnectorResolver {
+public class ConnectorResolverImpl implements ConnectorResolver {
 
     private static final String CONNECTOR_TYPE = "org.bonitasoft.engine.connector.Connector";
     private static final String FILTER_TYPE = "org.bonitasoft.engine.filter.UserFilter";
@@ -73,7 +60,7 @@ public class CFRConnectorResolver implements ConnectorResolver {
     private static final Set<String> FILTER_TYPES = Set.of(FILTER_TYPE, ABSTRACT_FILTER_TYPE);
     private static final Set<String> CONNECTOR_TYPES = Set.of(CONNECTOR_TYPE, ABSTRACT_CONNECTOR_TYPE);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CFRConnectorResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorResolverImpl.class);
 
     private static final String IMPLEMENTATION_EXTENSION = ".impl";
 
@@ -92,9 +79,10 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     @Override
-    public List<Implementation> findAllImplementations(Artifact artifact, Issue.Collector issueCollector)
+    public List<Implementation> findAllImplementations(Artifact artifact, ArtifactContentReader reader,
+            Issue.Collector issueCollector)
             throws IOException {
-        return findImplementationDescriptors(artifact, issueCollector)
+        return findImplementationDescriptors(artifact, reader, issueCollector)
                 .stream()
                 .map(resource -> {
                     Document document = resource.getDocument();
@@ -104,8 +92,8 @@ public class CFRConnectorResolver implements ConnectorResolver {
                     String implementationVersion = readElement(document, "implementationVersion");
                     String definitionId = readElement(document, "definitionId");
                     String definitionVersion = readElement(document, "definitionVersion");
-                    Set<String> hierarchy = detectImplementationHierarchy(className, artifact, resource.getPath(),
-                            issueCollector);
+                    Set<String> hierarchy = detectImplementationHierarchy(className, artifact, reader,
+                            resource.getPath(), issueCollector);
                     if (!Collections.disjoint(hierarchy, CONNECTOR_TYPES)) {
                         return ConnectorImplementation.create(className,
                                 new DescriptorIdentifier(definitionId, definitionVersion),
@@ -135,8 +123,9 @@ public class CFRConnectorResolver implements ConnectorResolver {
     }
 
     @Override
-    public List<Definition> findAllDefinitions(Artifact artifact, Issue.Collector issueCollector) throws IOException {
-        return findDefinitionDescriptors(artifact, issueCollector)
+    public List<Definition> findAllDefinitions(Artifact artifact, ArtifactContentReader reader,
+            Issue.Collector issueCollector) throws IOException {
+        return findDefinitionDescriptors(artifact, reader, issueCollector)
                 .stream()
                 .map(resource -> {
                     Document document = resource.getDocument();
@@ -149,110 +138,71 @@ public class CFRConnectorResolver implements ConnectorResolver {
                 .collect(Collectors.toList());
     }
 
-    private List<DocumentResource> findImplementationDescriptors(Artifact artifact, Issue.Collector issueCollector)
+    private List<DocumentResource> findImplementationDescriptors(Artifact artifact, ArtifactContentReader reader,
+            Issue.Collector issueCollector)
             throws IOException {
-        return getDocumentResources(artifact, IMPLEMENTATION_EXTENSION, IMPLEMENTATION_NS, issueCollector);
+        return getDocumentResources(artifact, reader, IMPLEMENTATION_EXTENSION, IMPLEMENTATION_NS, issueCollector);
     }
 
-    private List<DocumentResource> findDefinitionDescriptors(Artifact artifact, Issue.Collector issueCollector)
+    private List<DocumentResource> findDefinitionDescriptors(Artifact artifact, ArtifactContentReader reader,
+            Issue.Collector issueCollector)
             throws IOException {
-        return getDocumentResources(artifact, DEFINITION_EXTENSION, DEFINITION_NS, issueCollector);
+        return getDocumentResources(artifact, reader, DEFINITION_EXTENSION, DEFINITION_NS, issueCollector);
     }
 
-    private List<DocumentResource> getDocumentResources(Artifact artifact, String extension,
+    private List<DocumentResource> getDocumentResources(Artifact artifact, ArtifactContentReader reader,
+            String extension,
             String namespace, Issue.Collector issueCollector) throws IOException {
-        return findJarEntries(artifact.getFile(), entry -> entry.getName().endsWith(extension))
-                .stream()
-                .map(entry -> createDocumentResource(artifact, entry, namespace, issueCollector))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    private DocumentResource createDocumentResource(Artifact artifact, JarEntry entry, String implementationNs,
-            Issue.Collector issueCollector) {
-        try (JarFile jarFile = new JarFile(artifact.getFile());
-                InputStream is = jarFile.getInputStream(entry)) {
-            var document = asXMLDocument(is, implementationNs);
-            if (document != null) {
-                return new DocumentResource(entry.toString(), document);
+        List<DocumentResource> result = new ArrayList<>();
+        reader.readEntries(artifact, path -> path.getFileName().toString().endsWith(extension), entry -> {
+            try (InputStream is = entry.supplier().get()) {
+                var document = asXMLDocument(is, namespace);
+                if (document != null) {
+                    result.add(new DocumentResource(entry.path().toString(), document));
+                } else {
+                    issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
+                            String.format("%s is not compliant with '%s' XML schema definition", entry.path(),
+                                    namespace),
+                            Severity.ERROR,
+                            artifact.getId()));
+                }
+            } catch (ParserConfigurationException e) {
+                LOGGER.error("Failed to parser connector descriptor", e);
+            } catch (SAXException e) {
+                issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
+                        String.format("%s is not a valid XML file: %s", entry.path(), e.toString()), Severity.ERROR,
+                        artifact.getId()));
+            } catch (IOException e) {
+                LOGGER.error("Failed to read {} in {}.", entry.path(), artifact.getFile(), e);
             }
-            issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
-                    String.format("%s is not compliant with '%s' XML schema definition", entry, implementationNs),
-                    Severity.ERROR,
-                    artifact.getId()));
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("Failed to parser connector descriptor", e);
-        } catch (SAXException e) {
-            issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
-                    String.format("%s is not a valid XML file: %s", entry, e.toString()), Severity.ERROR,
-                    artifact.getId()));
-        } catch (IOException e) {
-            LOGGER.error("Failed to read {} in {}.", entry, artifact.getFile(), e);
-        }
-        return null;
+        });
+        return result;
     }
 
-    static List<JarEntry> findJarEntries(File file, Predicate<? super JarEntry> entryPredicate)
-            throws IOException {
-        try (JarFile jarFile = new JarFile(file)) {
-            return jarFile.stream()
-                    .filter(entryPredicate)
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private ClassFile loadClassFile(DCCommonState dcCommonState, Map<Integer, List<JavaTypeInstance>> loadedTypes,
-            String className) throws ClassNotFoundException {
-        return loadedTypes.values().stream()
-                .flatMap(List<JavaTypeInstance>::stream)
-                .filter(type -> Objects.equals(className, type.toString()))
-                .map(dcCommonState::getClassFile)
-                .findFirst()
-                .orElseThrow(() -> new ClassNotFoundException(className));
-    }
-
-    private Set<String> detectImplementationHierarchy(String className, Artifact artifact, String resourcePath,
-            Issue.Collector issueCollector) {
-        Set<String> hierarchy = new HashSet<>();
-        var file = artifact.getFile();
-        LOGGER.debug("Resolving connector type for {} in {}", className, file);
-        GetOptSinkFactory<Options> factory = OptionsImpl.getFactory();
-        Options options = factory.create(Map.of());
-        ClassFileSourceImpl classFileSource = new ClassFileSourceImpl(options);
-        classFileSource.informAnalysisRelativePathDetail(null, null);
-        DCCommonState dcCommonState = new DCCommonState(options, classFileSource);
-        Map<Integer, List<JavaTypeInstance>> types = dcCommonState.explicitlyLoadJar(file.getAbsolutePath(),
-                AnalysisType.JAR);
-
-        try {
-            var classFile = loadClassFile(dcCommonState, types, className);
-            if (classFile != null) {
-                classFile.getBindingSupers().getBoundSuperClasses().keySet().stream()
-                        .map(JavaRefTypeInstance::getRawName)
-                        .forEach(hierarchy::add);
-            }
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Failed to load class {} from jar {}", className, file, e);
+    private Set<String> detectImplementationHierarchy(String className, Artifact artifact, ArtifactContentReader reader,
+            String resourcePath, Issue.Collector issueCollector) {
+        return reader.detectImplementationHierarchy(className, artifact, e -> {
+            LOGGER.error("Failed to load class {} from jar {}", className, artifact.getFile(), e);
             issueCollector.addIssue(Issue.create(Type.INVALID_DESCRIPTOR_FILE,
                     String.format("%s declares an unknown 'implementationClassname': %s", resourcePath, className),
                     Severity.ERROR, artifact.getId()));
-        }
-
-        return hierarchy;
+        });
     }
 
     private Document asXMLDocument(InputStream source, String namespace)
             throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new InputSource(source));
-        Node firstChild = document.getFirstChild();
-        String namespaceURI = firstChild.getNamespaceURI();
-        if (namespace.equals(namespaceURI)) {
-            return document;
+        if (source != null) {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(source));
+            Node firstChild = document.getFirstChild();
+            String namespaceURI = firstChild.getNamespaceURI();
+            if (namespace.equals(namespaceURI)) {
+                return document;
+            }
         }
         return null;
     }

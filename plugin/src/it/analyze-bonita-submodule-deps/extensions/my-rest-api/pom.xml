@@ -9,4 +9,26 @@
   <artifactId>my-rest-api</artifactId>
   <name>API REST de NomdeRessource</name>
   <description>API REST qui gère NomdeRessource</description>
+  <build>
+    <sourceDirectory>src/main/groovy</sourceDirectory>
+    <testSourceDirectory>src/test/groovy</testSourceDirectory>
+    <defaultGoal>verify</defaultGoal>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptorSourceDirectory>${project.basedir}/src/assembly</descriptorSourceDirectory>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

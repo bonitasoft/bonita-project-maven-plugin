@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <groupId>com.company.example</groupId>
+      <artifactId>procurement-example-extensions</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>myConnector</artifactId>
+    <name>My Custom Connector as submodule</name>
+    <properties>
+        <!-- Maven -->
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.build.timestamp.format>yyyy.MM.dd-hh.mm</maven.build.timestamp.format>
+
+        <!-- Connector -->
+        <connector-definition-id>${project.artifactId}</connector-definition-id>
+        <connector-definition-version>0.1.0</connector-definition-version>
+        <connector-impl-id>${connector-definition-id}-impl</connector-impl-id>
+        <connector-impl-version>${project.version}</connector-impl-version>
+        <connector-main-class>com.company.example.MyConnector</connector-main-class>
+
+        <!-- Maven plugins -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <maven.compiler.compilerId>groovy-eclipse-compiler</maven.compiler.compilerId>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
+        <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
+        <groovy-eclipse-compiler.version>3.7.0</groovy-eclipse-compiler.version>
+        <groovy-eclipse-batch.version>3.0.8-01</groovy-eclipse-batch.version>
+    </properties>
+
+    <dependencies>
+        <!-- Bonita -->
+        <dependency>
+            <artifactId>bonita-common</artifactId>
+            <groupId>org.bonitasoft.engine</groupId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- You may add more Groovy modules if required, see https://groovy-lang.org/documentation.html#groovymoduleguides -->
+
+    </dependencies>
+  <build>
+        <defaultGoal>package</defaultGoal>
+        <sourceDirectory>src/main/groovy</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources-filtered</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${maven-assembly-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                            <configuration>
+                                <descriptorSourceDirectory>${project.basedir}/src/assembly</descriptorSourceDirectory>
+                                <appendAssemblyId>true</appendAssemblyId>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-compiler</artifactId>
+                            <version>${groovy-eclipse-compiler.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-batch</artifactId>
+                            <version>${groovy-eclipse-batch.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>groovy-maven-plugin</artifactId>
+                    <version>${groovy-maven-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-xml</artifactId>
+                            <version>3.0.19</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>${project.basedir}/src/script/dependencies-as-var.groovy</source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
