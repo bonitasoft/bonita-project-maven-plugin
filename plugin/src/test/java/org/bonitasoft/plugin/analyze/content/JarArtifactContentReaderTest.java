@@ -25,6 +25,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,6 +91,29 @@ public class JarArtifactContentReaderTest {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @Test
+    void should_read_all_entries() throws IOException, URISyntaxException {
+        // given setUp,
+        List<Path> pathsFound = new ArrayList<>();
+        // when
+        jarArtifactContentReader.readEntries(artifact, path -> true, entry -> {
+            pathsFound.add(entry.path());
+        });
+        // then
+        assertThat(pathsFound).contains(Path.of("META-INF", "MANIFEST.MF"),
+                Path.of("bonita-actorfilter-single-user.properties"));
+    }
+
+    @Test
+    void should_collect_on_no_entry() throws IOException, URISyntaxException {
+        // given setUp,
+        // when
+        var result = jarArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
+                Collectors.counting());
+        // then
+        assertThat(result).isEqualTo(0L);
     }
 
     @Test

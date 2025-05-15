@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.content.ArtifactContentReader.Entry;
@@ -90,6 +91,7 @@ public class ProjectArtifactContentReaderTest {
             Files.copy(path, copyPath, StandardCopyOption.REPLACE_EXISTING);
             return copyPath;
         }).when(readerSpy).filterDescriptor(any(), any());
+
         // when
         readerSpy.readEntry(artifact, Path.of("applications", "bonita-user-application.xml"), is -> {
             // then
@@ -101,6 +103,49 @@ public class ProjectArtifactContentReaderTest {
                 throw new RuntimeException(e);
             }
         });
+
+        // when
+        var res = readerSpy.readFirstEntry(artifact, Path.of("applications", "bonita-user-application.xml")::equals,
+                entry -> {
+                    // then
+                    try (var is = entry.supplier().get()) {
+                        assertThat(is).isNotNull();
+                        assertThat(new String(is.readAllBytes()))
+                                .startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+                        return 1;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        assertThat(res).contains(1);
+
+        // when
+        var directTest = readerSpy.hasEntryWithPath(artifact, Path.of("applications", "bonita-user-application.xml"));
+        // then
+        assertThat(directTest).isTrue();
+    }
+
+    @Test
+    void should_read_all_entries() throws IOException, URISyntaxException {
+        // given setUp,
+        List<Path> pathsFound = new ArrayList<>();
+        // when
+        projArtifactContentReader.readEntries(artifact, path -> true, entry -> {
+            pathsFound.add(entry.path());
+        });
+        // then
+        assertThat(pathsFound).contains(Path.of("applications", "bonita-user-application.xml"),
+                Path.of("applications", "bonita-user-application.png"));
+    }
+
+    @Test
+    void should_collect_on_no_entry() throws IOException, URISyntaxException {
+        // given setUp,
+        // when
+        var result = projArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
+                Collectors.counting());
+        // then
+        assertThat(result).isEqualTo(0L);
     }
 
     @Test

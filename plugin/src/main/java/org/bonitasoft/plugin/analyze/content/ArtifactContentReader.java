@@ -122,7 +122,7 @@ public interface ArtifactContentReader {
      * @return true when there is a valid entry
      */
     default boolean hasEntryWithPath(Artifact artifact, Predicate<Path> predicateOnPath) {
-        return findEntry(artifact, path -> predicateOnPath.test(path)).isPresent();
+        return findEntry(artifact, predicateOnPath).isPresent();
     }
 
     /**
@@ -173,11 +173,11 @@ public interface ArtifactContentReader {
                 return Boolean.FALSE;
             }
         });
-        if (!entryRead.isPresent()) {
-            throw new IllegalArgumentException("Entry reading failed for path " + entryPath);
-        }
-        if (!entryRead.orElse(Boolean.FALSE)) {
+        if (entryRead.isEmpty()) {
             throw new IllegalArgumentException("No entry found for path " + entryPath);
+        }
+        if (!entryRead.get()) {
+            throw new IllegalArgumentException("Entry reading failed for path " + entryPath);
         }
     }
 
@@ -206,9 +206,9 @@ public interface ArtifactContentReader {
     default void readEntries(Artifact artifact, Predicate<Path> predicateOnPath, Consumer<Entry> reader)
             throws IOException {
         Collector<Entry, Void, Void> collector = Collector.of(
-                () -> (Void) null,
+                () -> null,
                 (v, entry) -> reader.accept(entry),
-                (v1, v2) -> (Void) null);
+                (v1, v2) -> null);
         readEntries(artifact, predicateOnPath, collector);
     }
 
