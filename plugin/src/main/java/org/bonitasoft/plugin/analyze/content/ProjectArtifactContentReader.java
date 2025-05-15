@@ -16,20 +16,22 @@
  */
 package org.bonitasoft.plugin.analyze.content;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -53,6 +55,12 @@ import org.slf4j.LoggerFactory;
  * <p>Java classes are loaded from build directory.</p>
  */
 public class ProjectArtifactContentReader implements ArtifactContentReader {
+
+    /**
+     * Contains the entry and cleans the filtered descriptor.
+     */
+    static record EntryAndCleaner(Entry entry, Closeable cleaner) {
+    }
 
     private MavenResourcesFiltering mavenResourcesFiltering;
     private List<MavenProject> reactorProjects;
@@ -85,88 +93,14 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
         if (!Files.exists(sourcePath)) {
             throw new IllegalArgumentException("File " + sourcePath + " does not exist");
         }
-        reader.accept(makeInputStream(baseDir, sourcePath));
-    }
 
-    private InputStream makeInputStream(File baseDir, Path sourcePath) throws IOException {
         var filteredDescriptor = filterDescriptor(baseDir, sourcePath);
-        var is = Files.newInputStream(filteredDescriptor);
-        // delegate everything to the original input stream, but customize the close method
-        return new InputStream() {
-
-            @Override
-            public void close() throws IOException {
-                is.close();
-                // delete the filtered descriptor
-                Files.deleteIfExists(filteredDescriptor);
-            }
-
-            @Override
-            public int read() throws IOException {
-                return is.read();
-            }
-
-            @Override
-            public int available() throws IOException {
-                return is.available();
-            }
-
-            @Override
-            public synchronized void mark(int readlimit) {
-                is.mark(readlimit);
-            }
-
-            @Override
-            public boolean markSupported() {
-                return is.markSupported();
-            }
-
-            @Override
-            public int read(byte[] b) throws IOException {
-                return is.read(b);
-            }
-
-            @Override
-            public int read(byte[] b, int off, int len) throws IOException {
-                return is.read(b, off, len);
-            }
-
-            @Override
-            public byte[] readAllBytes() throws IOException {
-                return is.readAllBytes();
-            }
-
-            @Override
-            public int readNBytes(byte[] b, int off, int len) throws IOException {
-                return is.readNBytes(b, off, len);
-            }
-
-            @Override
-            public byte[] readNBytes(int len) throws IOException {
-                return is.readNBytes(len);
-            }
-
-            @Override
-            public synchronized void reset() throws IOException {
-                is.reset();
-            }
-
-            @Override
-            public long skip(long n) throws IOException {
-                return is.skip(n);
-            }
-
-            @Override
-            public void skipNBytes(long n) throws IOException {
-                is.skipNBytes(n);
-            }
-
-            @Override
-            public long transferTo(OutputStream out) throws IOException {
-                return is.transferTo(out);
-            }
-
-        };
+        try (var is = Files.newInputStream(filteredDescriptor)) {
+            reader.accept(is);
+        } finally {
+            // delete the filtered descriptor
+            Files.deleteIfExists(filteredDescriptor);
+        }
     }
 
     @Override
@@ -184,7 +118,17 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
         };
         try (var pathsStream = Files.find(baseDir.toPath(), 10, matcher)) {
             var entriesStream = pathsStream.map(sourcePath -> makeEntry(baseDir, sourcePath));
-            return entriesStream.findFirst().map(entry -> reader.apply(entry));
+            Optional<EntryAndCleaner> firstEntry = entriesStream.findFirst();
+            if (firstEntry.isEmpty()) {
+                return Optional.empty();
+            } else {
+                var entry = firstEntry.get();
+                try {
+                    return Optional.of(reader.apply(entry.entry));
+                } finally {
+                    entry.cleaner.close();
+                }
+            }
         }
     }
 
@@ -203,21 +147,40 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
         };
         try (var pathsStream = Files.find(baseDir.toPath(), 10, matcher)) {
             var entriesStream = pathsStream.map(sourcePath -> makeEntry(baseDir, sourcePath));
-            return entriesStream.collect(reader);
+            List<Closeable> closables = new ArrayList<>();
+            try {
+                return entriesStream.map(entryWithCleaner -> {
+                    closables.add(entryWithCleaner.cleaner);
+                    return entryWithCleaner.entry;
+                }).collect(reader);
+            } finally {
+                for (var closable : closables) {
+                    closable.close();
+                }
+            }
         }
     }
 
-    private Entry makeEntry(File baseDir, Path sourcePath) {
+    EntryAndCleaner makeEntry(File baseDir, Path sourcePath) {
         Path relPath = baseDir.toPath().relativize(sourcePath);
+        AtomicReference<Path> filteredDescriptorRef = new AtomicReference<>();
         Entry entry = new Entry(relPath, () -> {
             try {
-                return makeInputStream(baseDir, sourcePath);
+                var filteredDescriptor = filterDescriptor(baseDir, sourcePath);
+                filteredDescriptorRef.set(filteredDescriptor);
+                return Files.newInputStream(filteredDescriptor);
             } catch (IOException e) {
                 logIOException(e, baseDir, relPath);
                 return null;
             }
         });
-        return entry;
+        return new EntryAndCleaner(entry, () -> {
+            // delete the filtered descriptor
+            var path = filteredDescriptorRef.get();
+            if (path != null) {
+                Files.deleteIfExists(path);
+            }
+        });
     }
 
     Path filterDescriptor(File basedir, Path descriptor) throws IOException {
@@ -270,8 +233,9 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
                 try {
                     return new File(elt).toURI().toURL();
                 } catch (MalformedURLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LoggerFactory.getLogger(ArtifactContentReader.class).error(
+                            "An error occured while loading implementation class {} from Maven project {}", className,
+                            baseDir, e);
                     return null;
                 }
             }).filter(Objects::nonNull).toArray(URL[]::new);
