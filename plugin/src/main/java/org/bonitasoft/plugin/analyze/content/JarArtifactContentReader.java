@@ -100,7 +100,7 @@ public class JarArtifactContentReader implements ArtifactContentReader {
     }
 
     private Entry makeEntry(File file, JarFile jarFile, JarEntry jarEntry) {
-        Entry entry = new Entry(toPath(jarEntry), () -> {
+        return new Entry(toPath(jarEntry), () -> {
             try {
                 return jarFile.getInputStream(jarEntry);
             } catch (IOException e) {
@@ -108,7 +108,6 @@ public class JarArtifactContentReader implements ArtifactContentReader {
                 return null;
             }
         });
-        return entry;
     }
 
     @Override

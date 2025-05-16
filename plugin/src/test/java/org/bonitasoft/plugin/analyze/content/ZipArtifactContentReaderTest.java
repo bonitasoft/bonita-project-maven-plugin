@@ -33,7 +33,7 @@ import org.apache.maven.artifact.Artifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ZipArtifactContentReaderTest {
+class ZipArtifactContentReaderTest {
 
     ZipArtifactContentReader zipArtifactContentReader = new ZipArtifactContentReader();
     Artifact artifact;
@@ -64,7 +64,7 @@ public class ZipArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_entry() throws IOException, URISyntaxException {
+    void should_read_entry() throws IOException {
         // given setUp,
         // when
         zipArtifactContentReader.readEntry(artifact, Path.of("page.properties"), is -> {
@@ -79,7 +79,7 @@ public class ZipArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_all_entries() throws IOException, URISyntaxException {
+    void should_read_all_entries() throws IOException {
         // given setUp,
         List<Path> pathsFound = new ArrayList<>();
         // when
@@ -91,21 +91,22 @@ public class ZipArtifactContentReaderTest {
     }
 
     @Test
-    void should_collect_on_no_entry() throws IOException, URISyntaxException {
+    void should_collect_on_no_entry() throws IOException {
         // given setUp,
         // when
         var result = zipArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
                 Collectors.counting());
         // then
-        assertThat(result).isEqualTo(0L);
+        assertThat(result).isZero();
     }
 
     @Test
-    void should_throw_exception_when_read_absent_entry() throws IOException, URISyntaxException {
+    void should_throw_exception_when_read_absent_entry() {
         // given setUp,
+        var path = Path.of("test", "not_a_file.txt");
         // then
         assertThrows(IllegalArgumentException.class,
-                () -> zipArtifactContentReader.readEntry(artifact, Path.of("test", "not_a_file.txt"), is -> {
+                () -> zipArtifactContentReader.readEntry(artifact, path, is -> {
                     throw new RuntimeException("Should not be called");
                 }));
 

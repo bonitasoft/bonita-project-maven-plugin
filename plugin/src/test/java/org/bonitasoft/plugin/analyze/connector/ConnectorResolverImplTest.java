@@ -59,7 +59,7 @@ class ConnectorResolverImplTest {
     private Artifact artifact;
 
     @BeforeEach
-    void createArtifact() throws Exception {
+    void createArtifact() {
         artifact = new DefaultArtifact(GROUP_ID, ARTIFACT_ID, VERSION, SCOPE, TYPE, CLASSIFIER,
                 new DefaultArtifactHandler());
     }

@@ -73,7 +73,7 @@ public class ZipArtifactContentReader implements ArtifactContentReader {
     }
 
     private Entry makeEntry(File file, ZipFile zipFile, ZipEntry zipEntry) {
-        Entry entry = new Entry(toPath(zipEntry), () -> {
+        return new Entry(toPath(zipEntry), () -> {
             try {
                 return zipFile.getInputStream(zipEntry);
             } catch (IOException e) {
@@ -81,7 +81,6 @@ public class ZipArtifactContentReader implements ArtifactContentReader {
                 return null;
             }
         });
-        return entry;
     }
 
     @Override

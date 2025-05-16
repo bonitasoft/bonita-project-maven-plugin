@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -49,7 +48,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectArtifactContentReaderTest {
+class ProjectArtifactContentReaderTest {
 
     ProjectArtifactContentReader projArtifactContentReader;
     Artifact artifact;
@@ -81,7 +80,7 @@ public class ProjectArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_entry() throws IOException, URISyntaxException {
+    void should_read_entry() throws IOException {
         // given setUp and
         var readerSpy = spy(projArtifactContentReader);
         doAnswer(invoc -> {
@@ -126,7 +125,7 @@ public class ProjectArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_all_entries() throws IOException, URISyntaxException {
+    void should_read_all_entries() throws IOException {
         // given setUp,
         List<Path> pathsFound = new ArrayList<>();
         // when
@@ -139,21 +138,22 @@ public class ProjectArtifactContentReaderTest {
     }
 
     @Test
-    void should_collect_on_no_entry() throws IOException, URISyntaxException {
+    void should_collect_on_no_entry() throws IOException {
         // given setUp,
         // when
         var result = projArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
                 Collectors.counting());
         // then
-        assertThat(result).isEqualTo(0L);
+        assertThat(result).isZero();
     }
 
     @Test
-    void should_throw_exception_when_read_absent_entry() throws IOException, URISyntaxException {
+    void should_throw_exception_when_read_absent_entry() {
         // given setUp,
+        var path = Path.of("test", "not_a_file.txt");
         // then
         assertThrows(IllegalArgumentException.class,
-                () -> projArtifactContentReader.readEntry(artifact, Path.of("test", "not_a_file.txt"), is -> {
+                () -> projArtifactContentReader.readEntry(artifact, path, is -> {
                     throw new RuntimeException("Should not be called");
                 }));
     }
@@ -177,9 +177,7 @@ public class ProjectArtifactContentReaderTest {
                     return null;
                 }
             });
-            return new EntryAndCleaner(entry, () -> {
-                countClean.incrementAndGet();
-            });
+            return new EntryAndCleaner(entry, countClean::incrementAndGet);
         }).when(readerSpy).makeEntry(any(), any());
 
         // when
@@ -198,7 +196,7 @@ public class ProjectArtifactContentReaderTest {
 
         // then clean was necessarily called
         assertThat(result2).isPresent();
-        assertThat(result2.get()).isEqualTo(2);
+        assertThat(result2).contains(2);
         assertThat(countClean.get()).isEqualTo(1);
 
         // given filter for 2 files: xml and png
@@ -224,7 +222,6 @@ public class ProjectArtifactContentReaderTest {
                 collector);
 
         // then clean was necessarily called as many times as needed
-        assertThat(result4).hasSize(2);
         assertThat(result4).containsExactly(4, 4);
         assertThat(countClean.get()).isEqualTo(2);
     }

@@ -36,6 +36,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,7 +108,7 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
     public <T> Optional<T> readFirstEntry(Artifact artifact, Predicate<Path> predicateOnPath, Function<Entry, T> reader)
             throws IOException {
         var baseDir = artifact.getFile();
-        Function<Path, Path> toRelative = baseDir.toPath()::relativize;
+        UnaryOperator<Path> toRelative = baseDir.toPath()::relativize;
         // max depth 10 is arbitrary
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> {
             if (attr.isRegularFile()) {
@@ -136,7 +137,7 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
     public <R, A> R readEntries(Artifact artifact, Predicate<Path> predicateOnPath, Collector<Entry, A, R> reader)
             throws IOException {
         var baseDir = artifact.getFile();
-        Function<Path, Path> toRelative = baseDir.toPath()::relativize;
+        UnaryOperator<Path> toRelative = baseDir.toPath()::relativize;
         // max depth 10 is arbitrary
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> {
             if (attr.isRegularFile()) {
@@ -239,20 +240,26 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
                     return null;
                 }
             }).filter(Objects::nonNull).toArray(URL[]::new);
-            try (var classLoader = new URLClassLoader(urls, this.getClass().getClassLoader())) {
-                var clazz = classLoader.loadClass(className);
-                var superClasses = ClassUtils.getAllSuperclasses(clazz);
-                var interfaces = ClassUtils.getAllInterfaces(clazz);
-                return Stream.concat(superClasses.stream(), interfaces.stream())
-                        .map(Class::getName)
-                        .collect(Collectors.toSet());
-            } catch (ClassNotFoundException e) {
-                exceptionHandler.accept(e);
-            }
+            detectImplementationHierarchyFromClasspath(className, exceptionHandler, urls);
         } catch (DependencyResolutionRequiredException | IOException e) {
             LoggerFactory.getLogger(ArtifactContentReader.class).error(
                     "An error occured while loading implementation class {} from Maven project {}", className, baseDir,
                     e);
+        }
+        return Set.of();
+    }
+
+    private Set<String> detectImplementationHierarchyFromClasspath(String className,
+            Consumer<ClassNotFoundException> exceptionHandler, URL[] classpathUrls) throws IOException {
+        try (var classLoader = new URLClassLoader(classpathUrls, this.getClass().getClassLoader())) {
+            var clazz = classLoader.loadClass(className);
+            var superClasses = ClassUtils.getAllSuperclasses(clazz);
+            var interfaces = ClassUtils.getAllInterfaces(clazz);
+            return Stream.concat(superClasses.stream(), interfaces.stream())
+                    .map(Class::getName)
+                    .collect(Collectors.toSet());
+        } catch (ClassNotFoundException e) {
+            exceptionHandler.accept(e);
         }
         return Set.of();
     }

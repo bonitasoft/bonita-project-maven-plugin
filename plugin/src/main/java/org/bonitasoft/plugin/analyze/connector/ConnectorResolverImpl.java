@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.xml.XMLConstants;
@@ -110,8 +109,7 @@ public class ConnectorResolverImpl implements ConnectorResolver {
                         return null;
                     }
                 })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     private static org.bonitasoft.plugin.analyze.report.model.Artifact create(Artifact artifact) {
@@ -134,8 +132,7 @@ public class ConnectorResolverImpl implements ConnectorResolver {
                     return Definition.create(new DescriptorIdentifier(definitionId, definitionVersion),
                             create(artifact),
                             resource.getPath());
-                })
-                .collect(Collectors.toList());
+                }).toList();
     }
 
     private List<DocumentResource> findImplementationDescriptors(Artifact artifact, ArtifactContentReader reader,

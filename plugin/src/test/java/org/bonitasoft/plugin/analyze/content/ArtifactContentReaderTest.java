@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -42,7 +41,7 @@ import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.content.ArtifactContentReader.Entry;
 import org.junit.jupiter.api.Test;
 
-public class ArtifactContentReaderTest {
+class ArtifactContentReaderTest {
 
     ArtifactContentReader artifactContentReader = new ArtifactContentReader() {
 
@@ -87,22 +86,23 @@ public class ArtifactContentReaderTest {
 
     @Test
     void should_throw_IllegalArgumentException_exception_when_reading_entry_fails()
-            throws IOException, URISyntaxException {
+            throws IOException {
         // given
         var spy = spy(artifactContentReader);
         Path anyPath = Path.of("somewhere/anywhere");
         when(spy.readFirstEntry(any(), any(), any())).thenReturn(Optional.of(false));
+        Artifact artifact = mock();
 
         // then
         assertThrows(IllegalArgumentException.class,
-                () -> spy.readEntry(mock(), anyPath, is -> {
+                () -> spy.readEntry(artifact, anyPath, is -> {
                 }),
                 "Entry reading failed for path " + anyPath.toString());
 
     }
 
     @Test
-    void should_log_IOException_when_reading_entry_fails() throws IOException, URISyntaxException {
+    void should_log_IOException_when_reading_entry_fails() throws IOException {
         // given
         var spy = spy(artifactContentReader);
         Path anyPath = Path.of("somewhere/anywhere");

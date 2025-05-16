@@ -33,7 +33,7 @@ import org.apache.maven.artifact.Artifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class JarArtifactContentReaderTest {
+class JarArtifactContentReaderTest {
 
     JarArtifactContentReader jarArtifactContentReader = new JarArtifactContentReader();
     Artifact artifact;
@@ -64,7 +64,7 @@ public class JarArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_top_entry() throws IOException, URISyntaxException {
+    void should_read_top_entry() throws IOException {
         // given setUp,
         // when
         jarArtifactContentReader.readEntry(artifact, Path.of("bonita-actorfilter-single-user.properties"), is -> {
@@ -79,7 +79,7 @@ public class JarArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_inner_entry() throws IOException, URISyntaxException {
+    void should_read_inner_entry() throws IOException {
         // given setUp,
         // when
         jarArtifactContentReader.readEntry(artifact, Path.of("META-INF", "MANIFEST.MF"), is -> {
@@ -94,7 +94,7 @@ public class JarArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_all_entries() throws IOException, URISyntaxException {
+    void should_read_all_entries() throws IOException {
         // given setUp,
         List<Path> pathsFound = new ArrayList<>();
         // when
@@ -107,7 +107,7 @@ public class JarArtifactContentReaderTest {
     }
 
     @Test
-    void should_collect_on_no_entry() throws IOException, URISyntaxException {
+    void should_collect_on_no_entry() throws IOException {
         // given setUp,
         // when
         var result = jarArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
@@ -117,11 +117,12 @@ public class JarArtifactContentReaderTest {
     }
 
     @Test
-    void should_throw_exception_when_read_absent_entry() throws IOException, URISyntaxException {
+    void should_throw_exception_when_read_absent_entry() {
         // given setUp,
+        var path = Path.of("test", "not_a_file.txt");
         // then
         assertThrows(IllegalArgumentException.class,
-                () -> jarArtifactContentReader.readEntry(artifact, Path.of("test", "not_a_file.txt"), is -> {
+                () -> jarArtifactContentReader.readEntry(artifact, path, is -> {
                     throw new RuntimeException("Should not be called");
                 }));
 

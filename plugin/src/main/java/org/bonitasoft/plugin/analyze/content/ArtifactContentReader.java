@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public interface ArtifactContentReader {
 
-    public static enum ArtifactFileType {
+    public enum ArtifactFileType {
 
         /** A compiled .jar file */
         JAR,
@@ -176,7 +176,7 @@ public interface ArtifactContentReader {
         if (entryRead.isEmpty()) {
             throw new IllegalArgumentException("No entry found for path " + entryPath);
         }
-        if (!entryRead.get()) {
+        if (Boolean.FALSE.equals(entryRead.get())) {
             throw new IllegalArgumentException("Entry reading failed for path " + entryPath);
         }
     }

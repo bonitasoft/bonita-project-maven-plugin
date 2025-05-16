@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Predicate;
 
@@ -66,10 +67,11 @@ class CustomPageAnalyzer extends AbstractArtifactAnalyzerHandler {
                 prop.load(reader);
                 return prop;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                getContentReader().logIOException(e, artifact.getFile(), entry.path());
+                return null;
             }
         });
-        return result.orElseThrow(
+        return result.filter(Objects::nonNull).orElseThrow(
                 () -> new IllegalArgumentException(format("No page.properties found in %s", artifact.getFile())));
     }
 
