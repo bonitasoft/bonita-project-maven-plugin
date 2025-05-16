@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,9 @@ import java.util.List;
 
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.bonitasoft.plugin.analyze.cfr.CFRConnectorResolver;
+import org.bonitasoft.plugin.analyze.connector.ConnectorResolverImpl;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
+import org.bonitasoft.plugin.analyze.content.JarArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.bonitasoft.plugin.analyze.report.model.DescriptorIdentifier;
@@ -46,16 +47,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ConnectorAnalyzerTest {
 
+    @Spy
+    ArtifactContentReader reader = new JarArtifactContentReader();
+
     @InjectMocks
     ConnectorAnalyzer analyzer;
 
     @Mock
-    CFRConnectorResolver connectorResolver;
+    ConnectorResolverImpl connectorResolver;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     LocalRepositoryManager localRepositoryManager;
@@ -80,7 +85,7 @@ class ConnectorAnalyzerTest {
         var artifact = new DefaultArtifact("org.bonita.connector", "bonita-connector-email", "1.3.0", "runtime", "jar",
                 null, new DefaultArtifactHandler("jar"));
         artifact.setFile(getResourceAsFile("/bonita-connector-email-1.3.0.jar"));
-        lenient().when(connectorResolver.findAllDefinitions(eq(artifact), any(Issue.Collector.class)))
+        lenient().when(connectorResolver.findAllDefinitions(eq(artifact), any(), any(Issue.Collector.class)))
                 .thenReturn(List.of(Definition.create(new DescriptorIdentifier("email", "1.3.0"),
                         org.bonitasoft.plugin.analyze.report.model.Artifact.create("org.bonita.connector",
                                 "bonita-connector-email", "1.3.0", null, artifact.getFile().getAbsolutePath()),
@@ -215,14 +220,19 @@ class ConnectorAnalyzerTest {
 
     @Test
     void doesNotAppliesWhenDetectionFails() throws Exception {
-        // Given
-        var spy = spy(analyzer);
-        doThrow(IOException.class).when(spy).hasConnectorDescriptor(any());
-        var artifact = new DefaultArtifact("org.bonita.connector", "bonita-connector-email", "1.3.0", "runtime", "jar",
-                null, new DefaultArtifactHandler("jar"));
-        artifact.setFile(getResourceAsFile("/bonita-connector-email-1.3.0.jar"));
+        try {
+            // Given
+            doThrow(IOException.class).when(reader).readFirstEntry(any(), any(), any());
+            var artifact = new DefaultArtifact("org.bonita.connector", "bonita-connector-email", "1.3.0", "runtime",
+                    "jar",
+                    null, new DefaultArtifactHandler("jar"));
+            artifact.setFile(getResourceAsFile("/bonita-connector-email-1.3.0.jar"));
 
-        // Then
-        assertThat(spy.appliesTo(artifact)).isFalse();
+            // Then
+            assertThat(analyzer.appliesTo(artifact)).isFalse();
+        } finally {
+            // Reset the reader spy to avoid side effects on other tests
+            lenient().doCallRealMethod().when(reader).readFirstEntry(any(), any(), any());
+        }
     }
 }

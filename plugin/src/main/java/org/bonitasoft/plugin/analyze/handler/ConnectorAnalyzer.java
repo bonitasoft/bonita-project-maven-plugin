@@ -18,20 +18,16 @@ package org.bonitasoft.plugin.analyze.handler;
 
 import static java.util.stream.Collectors.toList;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.plugin.analyze.ConnectorResolver;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.ActorFilterImplementation;
 import org.bonitasoft.plugin.analyze.report.model.ConnectorImplementation;
 import org.bonitasoft.plugin.analyze.report.model.Definition;
@@ -46,31 +42,29 @@ import org.slf4j.LoggerFactory;
 
 class ConnectorAnalyzer extends AbstractArtifactAnalyzerHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorAnalyzer.class);
+    protected static final String CONNECTOR_DESCRIPTOR_EXTENSION = "impl";
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ConnectorAnalyzer.class);
     private ConnectorResolver connectorResolver;
 
-    ConnectorAnalyzer(LocalRepositoryManager localRepositoryManager, ConnectorResolver connectorResolver) {
-        super(localRepositoryManager);
+    ConnectorAnalyzer(LocalRepositoryManager localRepositoryManager, ConnectorResolver connectorResolver,
+            ArtifactContentReader contentReader) {
+        super(localRepositoryManager, contentReader);
         this.connectorResolver = connectorResolver;
     }
 
     @Override
     public boolean appliesTo(Artifact artifact) {
-        File file = artifact.getFile();
-        var fileName = file.getName();
-        try {
-            return file.isFile() && fileName.endsWith(".jar") && hasConnectorDescriptor(file);
-        } catch (IOException e) {
-            LOGGER.warn("An error occured while reading {}", file, e);
-            return false;
-        }
+        return super.appliesTo(artifact) && hasConnectorDescriptor(artifact);
     }
 
     @Override
     public DependencyReport analyze(Artifact artifact, DependencyReport report) throws IOException {
         var issueCollector = Issue.collector();
-        List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact, issueCollector);
-        List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact, issueCollector);
+        List<Implementation> allImplementations = connectorResolver.findAllImplementations(artifact, getContentReader(),
+                issueCollector);
+        List<Definition> allDefinitions = connectorResolver.findAllDefinitions(artifact, getContentReader(),
+                issueCollector);
         List<ConnectorImplementation> connectorImplementations = allImplementations.stream()
                 .filter(ConnectorImplementation.class::isInstance).map(ConnectorImplementation.class::cast)
                 .collect(toList());
@@ -103,14 +97,9 @@ class ConnectorAnalyzer extends AbstractArtifactAnalyzerHandler {
                         && Objects.equals(def.getDefinitionVersion(), implementation.getDefinitionVersion()));
     }
 
-    private Optional<JarEntry> findJarEntry(File file, Predicate<? super JarEntry> entryPredicate)
-            throws IOException {
-        try (JarFile jarFile = new JarFile(file)) {
-            return jarFile.stream().filter(entryPredicate).findFirst();
-        }
-    }
-
-    boolean hasConnectorDescriptor(File artifactFile) throws IOException {
-        return findJarEntry(artifactFile, entry -> entry.getName().endsWith(".impl")).isPresent();
+    boolean hasConnectorDescriptor(Artifact artifact) {
+        return getContentReader()
+                .hasEntryWithPath(artifact,
+                        path -> path.getFileName().toString().endsWith("." + CONNECTOR_DESCRIPTOR_EXTENSION));
     }
 }

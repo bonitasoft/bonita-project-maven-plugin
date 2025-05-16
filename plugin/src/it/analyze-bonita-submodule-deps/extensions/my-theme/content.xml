@@ -1,0 +1,30 @@
+<assembly>
+	<id>page-package</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${project.basedir}</directory>
+			<outputDirectory/>
+			<includes>
+				<include>page.properties</include>
+			</includes>
+			<filtered>true</filtered>
+		</fileSet>
+        <fileSet>
+            <outputDirectory>META-INF/maven/${groupId}/${artifactId}</outputDirectory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>META-INF/maven/${groupId}/${artifactId}</outputDirectory>
+            <includes>
+                <include>pom.properties</include>
+            </includes>
+            <filtered>true</filtered>
+        </fileSet>
+	</fileSets>
+</assembly>

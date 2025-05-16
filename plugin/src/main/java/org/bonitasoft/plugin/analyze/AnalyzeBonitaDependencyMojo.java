@@ -35,6 +35,8 @@ import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -57,8 +59,11 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * This mojo runs an analysis on the current project dependencies to detect
  * Bonita specific extensions.
+ * <p>Note: extensions in reactor must be compiled first, so we can inspect the class hierarchy.<br/>
+ * Rest API extensions in reactor must be packaged so we can compile the app module with dependency...</p>
  */
 @Mojo(name = "analyze", aggregator = true)
+@Execute(phase = LifecyclePhase.PACKAGE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     protected final ArtifactResolver artifactResolver;
