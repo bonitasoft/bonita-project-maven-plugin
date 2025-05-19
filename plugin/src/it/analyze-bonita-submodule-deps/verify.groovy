@@ -37,7 +37,7 @@ assert connectorImpl.implementationVersion == '1.0.0-SNAPSHOT'
 assert connectorImpl.className == 'com.company.example.MyConnector'
 assert connectorImpl.jarEntry == 'myConnector.impl'
 assert connectorImpl.type == 'CONNECTOR'
-assert connectorImpl.artifact.file.endsWith('myConnector-1.0.0-SNAPSHOT.jar')
+assert connectorImpl.artifact.file.endsWith('myConnector')
 
 
 assert report.restApiExtensions.name == ['custompage_myRestApiExtension']

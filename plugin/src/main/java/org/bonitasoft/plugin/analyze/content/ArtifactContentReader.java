@@ -61,8 +61,8 @@ public interface ArtifactContentReader {
     }
 
     /**
-     * A content entry in the artifact.
-     * <p>Path is relative to the artifact root.</p>
+     * A compiled content entry in the artifact.
+     * <p>Path is relative to the compiled artifact root (it may not be the original source path).</p>
      * <p>Supplier provides an input stream to read the content.</p>
      * <p>Entry can often no longer be used once the artifact resource is closed,
      * so the supplier works only with read methods.</p>

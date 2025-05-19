@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.bonitasoft.bonita2bar.BuildBarException;
+import org.bonitasoft.plugin.MavenSessionExecutor.BuildException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -88,7 +88,7 @@ class MavenSessionExecutorTest {
     }
 
     @Test
-    void testSuccessfullMavenExecution() throws BuildBarException {
+    void testSuccessfullMavenExecution() throws BuildException {
         // given
         MavenSessionExecutor executor = MavenSessionExecutor.fromSession(session);
         File target = new File(pomFile.getParent(), "target");
@@ -119,7 +119,7 @@ class MavenSessionExecutorTest {
 
         // when, then
         assertThatThrownBy(() -> executor.execute(pomFile, goals, properties, activeProfiles, errorMessageBase))
-                .isInstanceOf(BuildBarException.class);
+                .isInstanceOf(BuildException.class);
     }
 
 }

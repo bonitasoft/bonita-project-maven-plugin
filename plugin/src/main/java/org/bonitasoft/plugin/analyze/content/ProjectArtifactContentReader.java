@@ -82,7 +82,7 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
         // direct search is much quicker than default implementation exploring the file tree
         var baseDir = artifact.getFile();
         var targetPath = baseDir.toPath().resolve(entryPath);
-        return Files.exists(targetPath);
+        return Files.exists(targetPath) && notInTargetDirectory(artifact).test(targetPath);
     }
 
     @Override
@@ -93,6 +93,9 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
         var sourcePath = baseDir.toPath().resolve(entryPath);
         if (!Files.exists(sourcePath)) {
             throw new IllegalArgumentException("File " + sourcePath + " does not exist");
+        }
+        if (!notInTargetDirectory(artifact).test(sourcePath)) {
+            throw new IllegalArgumentException("File " + sourcePath + " is in target build directory");
         }
 
         var filteredDescriptor = filterDescriptor(baseDir, sourcePath);
@@ -109,10 +112,11 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
             throws IOException {
         var baseDir = artifact.getFile();
         UnaryOperator<Path> toRelative = baseDir.toPath()::relativize;
+        var notInTarget = notInTargetDirectory(artifact);
         // max depth 10 is arbitrary
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> {
             if (attr.isRegularFile()) {
-                return predicateOnPath.test(toRelative.apply(path));
+                return predicateOnPath.and(notInTarget).test(toRelative.apply(path));
             }
             // we should not need directories
             return false;
@@ -138,10 +142,11 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
             throws IOException {
         var baseDir = artifact.getFile();
         UnaryOperator<Path> toRelative = baseDir.toPath()::relativize;
+        var notInTarget = notInTargetDirectory(artifact);
         // max depth 10 is arbitrary
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> {
             if (attr.isRegularFile()) {
-                return predicateOnPath.test(toRelative.apply(path));
+                return predicateOnPath.and(notInTarget).test(toRelative.apply(path));
             }
             // we should not need directories
             return false;
@@ -163,15 +168,17 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
     }
 
     EntryAndCleaner makeEntry(File baseDir, Path sourcePath) {
-        Path relPath = baseDir.toPath().relativize(sourcePath);
+        // we need the compiled target path for the entry
+        Path resolvedPathInTarget = sourcePath.getFileName();
+
         AtomicReference<Path> filteredDescriptorRef = new AtomicReference<>();
-        Entry entry = new Entry(relPath, () -> {
+        Entry entry = new Entry(resolvedPathInTarget, () -> {
             try {
                 var filteredDescriptor = filterDescriptor(baseDir, sourcePath);
                 filteredDescriptorRef.set(filteredDescriptor);
                 return Files.newInputStream(filteredDescriptor);
             } catch (IOException e) {
-                logIOException(e, baseDir, relPath);
+                logIOException(e, baseDir, baseDir.toPath().relativize(sourcePath));
                 return null;
             }
         });
@@ -198,9 +205,7 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
     private MavenResourcesExecution newMavenResourcesExecution(Resource resource, File basedir) {
         var mavenResourcesExecution = new MavenResourcesExecution();
         mavenResourcesExecution.setResources(List.of(resource));
-        var mavenProject = reactorProjects.stream()
-                .filter(p -> Objects.equals(basedir, p.getBasedir()))
-                .findFirst().orElseThrow();
+        var mavenProject = findMavenProject(basedir);
         mavenResourcesExecution.setMavenProject(mavenProject);
         var outputFolder = new File(mavenProject.getBuild().getDirectory());
         mavenResourcesExecution.setOutputDirectory(outputFolder);
@@ -223,9 +228,7 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
     public Set<String> detectImplementationHierarchy(String className, Artifact artifact,
             Consumer<ClassNotFoundException> exceptionHandler) throws UnsupportedOperationException {
         var baseDir = artifact.getFile();
-        var mavenProject = reactorProjects.stream()
-                .filter(p -> Objects.equals(baseDir, p.getBasedir()))
-                .findFirst().orElseThrow();
+        var mavenProject = findMavenProject(baseDir);
 
         try {
             List<String> classpathElements = mavenProject.getCompileClasspathElements();
@@ -240,13 +243,38 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
                     return null;
                 }
             }).filter(Objects::nonNull).toArray(URL[]::new);
-            detectImplementationHierarchyFromClasspath(className, exceptionHandler, urls);
+            return detectImplementationHierarchyFromClasspath(className, exceptionHandler, urls);
         } catch (DependencyResolutionRequiredException | IOException e) {
             LoggerFactory.getLogger(ArtifactContentReader.class).error(
                     "An error occured while loading implementation class {} from Maven project {}", className, baseDir,
                     e);
         }
         return Set.of();
+    }
+
+    /**
+     * Find the Maven project in the reactor projects list.
+     * 
+     * @param baseDir the base directory of the project
+     * @return the Maven project
+     */
+    MavenProject findMavenProject(File baseDir) {
+        return reactorProjects.stream()
+                .filter(p -> Objects.equals(baseDir, p.getBasedir()))
+                .findFirst().orElseThrow();
+    }
+
+    /**
+     * Predicate to filter out the entries in the target directory.
+     * 
+     * @param artifact the artifact the maven artifact
+     * @return the predicate to exclude target directory
+     */
+    private Predicate<Path> notInTargetDirectory(Artifact artifact) {
+        File baseDir = artifact.getFile();
+        var mavenProject = findMavenProject(baseDir);
+        var targetDir = baseDir.toPath().relativize(Path.of(mavenProject.getBuild().getDirectory()));
+        return path -> !path.startsWith(targetDir);
     }
 
     private Set<String> detectImplementationHierarchyFromClasspath(String className,

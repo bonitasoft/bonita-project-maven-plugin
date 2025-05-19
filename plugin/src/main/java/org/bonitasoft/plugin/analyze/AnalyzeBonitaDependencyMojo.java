@@ -23,7 +23,9 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -35,8 +37,6 @@ import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Execute;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -49,6 +49,8 @@ import org.apache.maven.shared.artifact.filter.collection.ScopeFilter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
+import org.bonitasoft.plugin.MavenSessionExecutor;
+import org.bonitasoft.plugin.MavenSessionExecutor.BuildException;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
 import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.JsonDependencyReporter;
@@ -59,11 +61,9 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * This mojo runs an analysis on the current project dependencies to detect
  * Bonita specific extensions.
- * <p>Note: extensions in reactor must be compiled first, so we can inspect the class hierarchy.<br/>
- * Rest API extensions in reactor must be packaged so we can compile the app module with dependency...</p>
+ * <p>Note: extensions in reactor must be compiled first, so we can inspect the class hierarchy.</p>
  */
 @Mojo(name = "analyze", aggregator = true)
-@Execute(phase = LifecyclePhase.PACKAGE)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     protected final ArtifactResolver artifactResolver;
@@ -232,9 +232,29 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
             // Handle child modules specific case
             // Artifact might not be installed in local repository yet
             artifact.setFile(moduleProject.getBasedir());
+            compileExtensionModule(artifact);
             return artifact;
         } catch (Exception e) {
             throw new AnalysisResultReportException(format("Failed to analyze artifact %s", artifact), e);
+        }
+    }
+
+    private void compileExtensionModule(Artifact artifact) {
+        var artifactBaseDir = artifact.getFile();
+        if (artifactBaseDir.isDirectory() && "jar".equals(Optional.ofNullable(artifact.getType()).orElse("jar"))) {
+            var mavenProject = reactorProjects.stream()
+                    .filter(p -> Objects.equals(artifactBaseDir, p.getBasedir()))
+                    .findFirst();
+            mavenProject.ifPresent(p -> {
+                try {
+                    MavenSessionExecutor.fromSession(session).execute(p.getModel().getPomFile(),
+                            List.of("compiler:compile"),
+                            Map.of(), List.of(),
+                            () -> "Error while compiling extension module " + p.getArtifactId());
+                } catch (BuildException e) {
+                    throw new AnalysisResultReportException(e.getMessage(), e.getCause());
+                }
+            });
         }
     }
 

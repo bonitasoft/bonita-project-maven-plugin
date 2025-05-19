@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -40,6 +41,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
 import org.bonitasoft.plugin.analyze.content.ArtifactContentReader.Entry;
 import org.bonitasoft.plugin.analyze.content.ProjectArtifactContentReader.EntryAndCleaner;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +61,17 @@ class ProjectArtifactContentReaderTest {
         projArtifactContentReader = new ProjectArtifactContentReader(mock(), mock());
 
         artifact = mock(Artifact.class);
-        when(artifact.getFile()).thenReturn(getResourceAsFile("/validation/application_zips_unzipped/application"));
+        File projDir = getResourceAsFile("/validation/application_zips_unzipped/application");
+        when(artifact.getFile()).thenReturn(projDir);
+    }
+
+    private MavenProject mockMavenProject() throws Exception {
+        var project = mock(MavenProject.class);
+        var mavenBuild = mock(Build.class);
+        File target = new File(getResourceAsFile("/validation/application_zips_unzipped/application"), "target");
+        when(mavenBuild.getDirectory()).thenReturn(target.toString());
+        when(project.getBuild()).thenReturn(mavenBuild);
+        return project;
     }
 
     @Test
@@ -80,7 +93,7 @@ class ProjectArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_entry() throws IOException {
+    void should_read_entry() throws Exception {
         // given setUp and
         var readerSpy = spy(projArtifactContentReader);
         doAnswer(invoc -> {
@@ -90,6 +103,7 @@ class ProjectArtifactContentReaderTest {
             Files.copy(path, copyPath, StandardCopyOption.REPLACE_EXISTING);
             return copyPath;
         }).when(readerSpy).filterDescriptor(any(), any());
+        doReturn(mockMavenProject()).when(readerSpy).findMavenProject(any());
 
         // when
         readerSpy.readEntry(artifact, Path.of("applications", "bonita-user-application.xml"), is -> {
@@ -107,6 +121,8 @@ class ProjectArtifactContentReaderTest {
         var res = readerSpy.readFirstEntry(artifact, Path.of("applications", "bonita-user-application.xml")::equals,
                 entry -> {
                     // then
+                    // target compiled path without applications folder
+                    assertThat(entry.path()).isEqualTo(Path.of("bonita-user-application.xml"));
                     try (var is = entry.supplier().get()) {
                         assertThat(is).isNotNull();
                         assertThat(new String(is.readAllBytes()))
@@ -125,23 +141,27 @@ class ProjectArtifactContentReaderTest {
     }
 
     @Test
-    void should_read_all_entries() throws IOException {
-        // given setUp,
-        List<Path> pathsFound = new ArrayList<>();
+    void should_read_all_entries() throws Exception {
+        // given setUp and
+        var readerSpy = spy(projArtifactContentReader);
+        doReturn(mockMavenProject()).when(readerSpy).findMavenProject(any());
+        List<Path> targetPathsFound = new ArrayList<>();
         // when
-        projArtifactContentReader.readEntries(artifact, path -> true, entry -> {
-            pathsFound.add(entry.path());
+        readerSpy.readEntries(artifact, path -> true, entry -> {
+            targetPathsFound.add(entry.path());
         });
-        // then
-        assertThat(pathsFound).contains(Path.of("applications", "bonita-user-application.xml"),
-                Path.of("applications", "bonita-user-application.png"));
+        // then (without applications folder)
+        assertThat(targetPathsFound).contains(Path.of("bonita-user-application.xml"),
+                Path.of("bonita-user-application.png"));
     }
 
     @Test
-    void should_collect_on_no_entry() throws IOException {
-        // given setUp,
+    void should_collect_on_no_entry() throws Exception {
+        // given setUp and
+        var readerSpy = spy(projArtifactContentReader);
+        doReturn(mockMavenProject()).when(readerSpy).findMavenProject(any());
         // when
-        var result = projArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
+        var result = readerSpy.readEntries(artifact, Path.of("not_a_file")::equals,
                 Collectors.counting());
         // then
         assertThat(result).isZero();
@@ -161,7 +181,7 @@ class ProjectArtifactContentReaderTest {
     // #detectImplementationHierarchy can not be tested easily without a real maven project. Tested in IT only.
 
     @Test
-    void should_read_clean_filteredDescriptor() throws IOException {
+    void should_read_clean_filteredDescriptor() throws Exception {
         var readerSpy = spy(projArtifactContentReader);
         AtomicInteger countClean = new AtomicInteger(0);
         // given setUp and
@@ -179,6 +199,7 @@ class ProjectArtifactContentReaderTest {
             });
             return new EntryAndCleaner(entry, countClean::incrementAndGet);
         }).when(readerSpy).makeEntry(any(), any());
+        doReturn(mockMavenProject()).when(readerSpy).findMavenProject(any());
 
         // when
         countClean.set(0);
@@ -195,7 +216,6 @@ class ProjectArtifactContentReaderTest {
                 });
 
         // then clean was necessarily called
-        assertThat(result2).isPresent();
         assertThat(result2).contains(2);
         assertThat(countClean.get()).isEqualTo(1);
 

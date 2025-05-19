@@ -113,7 +113,7 @@ class JarArtifactContentReaderTest {
         var result = jarArtifactContentReader.readEntries(artifact, Path.of("not_a_file")::equals,
                 Collectors.counting());
         // then
-        assertThat(result).isEqualTo(0L);
+        assertThat(result).isZero();
     }
 
     @Test
