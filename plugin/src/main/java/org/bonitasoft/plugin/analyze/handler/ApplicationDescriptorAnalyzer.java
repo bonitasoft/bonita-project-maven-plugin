@@ -41,7 +41,8 @@ class ApplicationDescriptorAnalyzer extends AbstractArtifactAnalyzerHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationDescriptorAnalyzer.class);
     private static final String APPLICATION_CLASSIFIER = "application";
-    private static final Predicate<Path> IS_APPLICATION_XML = path -> path.getParent().toString().equals("applications")
+    private static final Predicate<Path> IS_APPLICATION_XML = path -> path.getParent() != null
+            && path.getParent().toString().equals("applications")
             && path.getFileName().toString().matches(".*\\.xml");
 
     private ApplicationNodeContainerConverter converter = new ApplicationNodeContainerConverter();

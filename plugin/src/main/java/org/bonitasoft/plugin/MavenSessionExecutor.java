@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.shared.invoker.CommandLineConfigurationException;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -72,8 +73,8 @@ public class MavenSessionExecutor {
         this.session = session;
     }
 
-    public void execute(File pomFile, List<String> goals, Map<String, String> properties, List<String> activeProfiles,
-            Supplier<String> errorMessageBase) throws BuildException {
+    public void execute(File pomFile, File rootModuleDirectory, List<String> goals, Map<String, String> properties,
+            List<String> activeProfiles, Supplier<String> errorMessageBase) throws BuildException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(pomFile);
         request.addArgs(goals);
@@ -104,32 +105,58 @@ public class MavenSessionExecutor {
                 var errPrintStream = new PrintStream(errStream);) {
             var errHandler = new PrintStreamHandler(errPrintStream, false);
             request.setErrorHandler(errHandler);
-            try {
-                String mvnHome = Optional.ofNullable(System.getProperty("maven.home")).orElse("");
-                if (mvnHome.endsWith("\\EMBEDDED") || mvnHome.endsWith("/EMBEDDED")) {
-                    // we are in embedded mode and can not use invoker because the maven home is not a folder
-                    @SuppressWarnings("deprecation")
-                    MavenCli cli = new MavenCli(session.getContainer().getContainerRealm().getWorld());
-
-                    var exitCode = cli.doMain(request.getArgs().toArray(String[]::new),
-                            request.getBaseDirectory().getAbsolutePath(), null, errPrintStream);
-                    if (exitCode != 0) {
-                        throwBuildException(errorMessageBase, errStream, null);
-                    }
-                } else {
-                    Invoker invoker = new DefaultInvoker();
-                    InvocationResult result = invoker.execute(request);
-                    if (result.getExitCode() != 0) {
-                        throwBuildException(errorMessageBase, errStream, result.getExecutionException());
-                    }
-                }
-            } catch (MavenInvocationException e) {
-                throwBuildException(errorMessageBase, errStream, e);
-            }
+            invokeMaven(rootModuleDirectory, errorMessageBase, request, errStream, errPrintStream);
         } catch (IOException e) {
             throw new BuildException(errorMessageBase.get(), e);
         }
 
+    }
+
+    private void invokeMaven(File rootModuleDirectory, Supplier<String> errorMessageBase, InvocationRequest request,
+            ByteArrayOutputStream errStream, PrintStream errPrintStream) throws BuildException, IOException {
+        try {
+            String mvnHome = Optional.ofNullable(System.getProperty("maven.home")).orElse("");
+            if (mvnHome.endsWith("\\EMBEDDED") || mvnHome.endsWith("/EMBEDDED")) {
+                // we are in embedded mode or miss the executable and can not use invoker because the maven home is not a folder
+                String msg = "Embedded maven home.";
+                throw new MavenInvocationException(msg, new CommandLineConfigurationException(msg));
+            } else {
+                Invoker invoker = new DefaultInvoker();
+                InvocationResult result = invoker.execute(request);
+                if (result.getExitCode() != 0) {
+                    throwBuildException(errorMessageBase, errStream, result.getExecutionException());
+                }
+            }
+        } catch (MavenInvocationException e) {
+            if (e.getCause() instanceof CommandLineConfigurationException) {
+                invokeMavenCli(rootModuleDirectory, errorMessageBase, request, errStream, errPrintStream);
+            } else {
+                throwBuildException(errorMessageBase, errStream, e);
+            }
+        }
+    }
+
+    private void invokeMavenCli(File rootModuleDirectory, Supplier<String> errorMessageBase, InvocationRequest request,
+            ByteArrayOutputStream errStream, PrintStream errPrintStream) throws BuildException, IOException {
+        // try and use the maven cli class
+        @SuppressWarnings("deprecation")
+        MavenCli cli = new MavenCli(session.getContainer().getContainerRealm().getWorld());
+        String oldMultimoduleProjectProperty = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
+        try {
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootModuleDirectory.toURI().toString());
+            var exitCode = cli.doMain(request.getArgs().toArray(String[]::new),
+                    request.getBaseDirectory().getAbsolutePath(), null, errPrintStream);
+            if (exitCode != 0) {
+                throwBuildException(errorMessageBase, errStream, null);
+            }
+        } finally {
+            // restore the basedir property
+            if (oldMultimoduleProjectProperty == null) {
+                System.clearProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
+            } else {
+                System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, oldMultimoduleProjectProperty);
+            }
+        }
     }
 
     /**
@@ -170,7 +197,9 @@ public class MavenSessionExecutor {
         MavenSessionExecutor executor = fromSession(session);
         return (pomFile, goals, properties, activeProfiles, errorMessageBase) -> {
             try {
-                executor.execute(pomFile, goals, properties, activeProfiles, errorMessageBase);
+                // for bar, this is always executed on the app module, child of the root module
+                var rootModule = pomFile.getParentFile().getParentFile();
+                executor.execute(pomFile, rootModule, goals, properties, activeProfiles, errorMessageBase);
             } catch (BuildException e) {
                 throw new BuildBarException(errorMessageBase.get(), e);
             }

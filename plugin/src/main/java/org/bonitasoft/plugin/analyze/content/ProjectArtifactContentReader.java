@@ -218,7 +218,7 @@ public class ProjectArtifactContentReader implements ArtifactContentReader {
 
     private Resource newFilteredResource(Path descriptor) {
         var mavenResource = new Resource();
-        mavenResource.setDirectory(descriptor.getParent().toString());
+        mavenResource.setDirectory(descriptor.getParent() != null ? descriptor.getParent().toString() : ".");
         mavenResource.setIncludes(List.of(descriptor.getFileName().toString()));
         mavenResource.setFiltering(true);
         return mavenResource;

@@ -101,7 +101,7 @@ class MavenSessionExecutorTest {
         Supplier<String> errorMessageBase = () -> "Error";
 
         // when
-        executor.execute(pomFile, goals, properties, activeProfiles, errorMessageBase);
+        executor.execute(pomFile, pomFile.getParentFile(), goals, properties, activeProfiles, errorMessageBase);
 
         // then
         assertThat(target).doesNotExist();
@@ -118,8 +118,8 @@ class MavenSessionExecutorTest {
         Supplier<String> errorMessageBase = () -> "Error";
 
         // when, then
-        assertThatThrownBy(() -> executor.execute(pomFile, goals, properties, activeProfiles, errorMessageBase))
-                .isInstanceOf(BuildException.class);
+        assertThatThrownBy(() -> executor.execute(pomFile, pomFile.getParentFile(), goals, properties, activeProfiles,
+                errorMessageBase)).isInstanceOf(BuildException.class);
     }
 
 }

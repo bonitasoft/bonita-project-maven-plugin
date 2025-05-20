@@ -248,6 +248,7 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
             mavenProject.ifPresent(p -> {
                 try {
                     MavenSessionExecutor.fromSession(session).execute(p.getModel().getPomFile(),
+                            project.getBasedir(),
                             List.of("compiler:compile"),
                             Map.of(), List.of(),
                             () -> "Error while compiling extension module " + p.getArtifactId());
