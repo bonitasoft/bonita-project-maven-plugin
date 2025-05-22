@@ -26,6 +26,11 @@
 			<artifactId>bonita-actorfilter-single-user</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>myConnector</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>my-rest-api</artifactId>

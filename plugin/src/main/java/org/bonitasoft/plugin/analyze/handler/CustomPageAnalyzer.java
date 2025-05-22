@@ -18,16 +18,16 @@ package org.bonitasoft.plugin.analyze.handler;
 
 import static java.lang.String.format;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.zip.ZipFile;
+import java.util.function.Predicate;
 
 import org.apache.maven.artifact.Artifact;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.AnalysisResultReportException;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage;
 import org.bonitasoft.plugin.analyze.report.model.CustomPage.CustomPageType;
@@ -37,51 +37,42 @@ import org.bonitasoft.plugin.analyze.report.model.Page;
 import org.bonitasoft.plugin.analyze.report.model.RestAPIExtension;
 import org.bonitasoft.plugin.analyze.report.model.Theme;
 import org.eclipse.aether.repository.LocalRepositoryManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class CustomPageAnalyzer extends AbstractArtifactAnalyzerHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomPageAnalyzer.class);
     private static final String CUSTOMPAGE_DESCRIPTOR_PROPERTIES = "page.properties";
 
-    CustomPageAnalyzer(LocalRepositoryManager localRepositoryManager) {
-        super(localRepositoryManager);
+    CustomPageAnalyzer(LocalRepositoryManager localRepositoryManager, ArtifactContentReader contentReader) {
+        super(localRepositoryManager, contentReader);
     }
 
     @Override
     public boolean appliesTo(Artifact artifact) {
-        File file = artifact.getFile();
-        var fileName = file.getName();
-        try {
-            return file.isFile() && fileName.endsWith(".zip") && hasCustomPageDescriptor(file);
-        } catch (IOException e) {
-            LOGGER.warn("An error occured while reading {}", file, e);
-            return false;
-        }
+        return super.appliesTo(artifact) && hasCustomPageDescriptor(artifact);
     }
 
     @Override
     public DependencyReport analyze(Artifact artifact, DependencyReport report) throws IOException {
-        var properties = readPagePropertiesInArchive(artifact.getFile());
+        var properties = readPageProperties(artifact);
         analyzeCustomPageArtifact(artifact, properties, report);
         return report;
     }
 
-    Properties readPagePropertiesInArchive(File artifactFile) throws IOException {
-        return findZipEntry(artifactFile, entry -> entry.getName().equals(CUSTOMPAGE_DESCRIPTOR_PROPERTIES))
-                .map(entry -> {
-                    try (ZipFile zipFile = new ZipFile(artifactFile);
-                            Reader reader = new InputStreamReader(zipFile.getInputStream(entry),
-                                    StandardCharsets.UTF_8)) {
-                        Properties prop = new Properties();
-                        prop.load(reader);
-                        return prop;
-                    } catch (IOException e) {
-                        return null;
-                    }
-                }).filter(Objects::nonNull).orElseThrow(
-                        () -> new IllegalArgumentException(format("No page.properties found in %s", artifactFile)));
+    Properties readPageProperties(Artifact artifact) throws IOException {
+        Predicate<Path> isPageProperties = path -> path.getFileName().toString()
+                .equals(CUSTOMPAGE_DESCRIPTOR_PROPERTIES);
+        var result = getContentReader().readFirstEntry(artifact, isPageProperties, entry -> {
+            try (var reader = new InputStreamReader(entry.supplier().get(), StandardCharsets.UTF_8)) {
+                Properties prop = new Properties();
+                prop.load(reader);
+                return prop;
+            } catch (IOException e) {
+                getContentReader().logIOException(e, artifact.getFile(), entry.path());
+                return null;
+            }
+        });
+        return result.filter(Objects::nonNull).orElseThrow(
+                () -> new IllegalArgumentException(format("No page.properties found in %s", artifact.getFile())));
     }
 
     void analyzeCustomPageArtifact(Artifact artifact, Properties pageDescriptor, DependencyReport result) {
@@ -108,8 +99,7 @@ class CustomPageAnalyzer extends AbstractArtifactAnalyzerHandler {
         }
     }
 
-    boolean hasCustomPageDescriptor(File artifactFile) throws IOException {
-        return findZipEntry(artifactFile, entry -> entry.getName().equals(CUSTOMPAGE_DESCRIPTOR_PROPERTIES))
-                .isPresent();
+    boolean hasCustomPageDescriptor(Artifact artifact) {
+        return getContentReader().findEntryWithName(artifact, CUSTOMPAGE_DESCRIPTOR_PROPERTIES).isPresent();
     }
 }

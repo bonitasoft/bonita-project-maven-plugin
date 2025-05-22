@@ -45,6 +45,7 @@
   </build>
   <modules>
     <module>my-rest-api</module>
-     <module>my-theme</module>
+    <module>my-theme</module>
+    <module>myConnector</module>
   </modules>
 </project>

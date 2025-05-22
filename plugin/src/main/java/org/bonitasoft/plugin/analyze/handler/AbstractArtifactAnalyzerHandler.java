@@ -24,15 +24,25 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.maven.artifact.Artifact;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 
 public abstract class AbstractArtifactAnalyzerHandler implements ArtifactAnalyzerHandler {
 
     private LocalRepositoryManager localRepositoryManager;
+    private ArtifactContentReader contentReader;
 
-    AbstractArtifactAnalyzerHandler(LocalRepositoryManager localRepositoryManager) {
+    AbstractArtifactAnalyzerHandler(LocalRepositoryManager localRepositoryManager,
+            ArtifactContentReader contentReader) {
         this.localRepositoryManager = localRepositoryManager;
+        this.contentReader = contentReader;
+    }
+
+    @Override
+    public boolean appliesTo(Artifact artifact) {
+        // by default, rely on the artifact type, sub-implementations can specify extra criteria
+        return contentReader.appliesTo(artifact);
     }
 
     protected org.bonitasoft.plugin.analyze.report.model.Artifact create(Artifact artifact) {
@@ -52,6 +62,10 @@ public abstract class AbstractArtifactAnalyzerHandler implements ArtifactAnalyze
                         artifact.getBaseVersion() == null ? artifact.getVersion() : artifact.getBaseVersion()));
         var localRepositoryPath = localRepositoryManager.getRepository().getBasedir().toPath();
         return localRepositoryPath.resolve(artifactPath).toAbsolutePath().toString();
+    }
+
+    protected ArtifactContentReader getContentReader() {
+        return contentReader;
     }
 
     protected Optional<ZipEntry> findZipEntry(File file, Predicate<ZipEntry> entryPredicate)
