@@ -18,17 +18,18 @@ package org.bonitasoft.plugin.analyze.handler;
 
 import static java.lang.String.format;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.zip.ZipFile;
+import java.util.function.Predicate;
 
 import javax.xml.bind.JAXBException;
 
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.ApplicationDescriptor;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -40,31 +41,26 @@ class ApplicationDescriptorAnalyzer extends AbstractArtifactAnalyzerHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationDescriptorAnalyzer.class);
     private static final String APPLICATION_CLASSIFIER = "application";
+    private static final Predicate<Path> IS_APPLICATION_XML = path -> path.getParent() != null
+            && path.getParent().toString().equals("applications")
+            && path.getFileName().toString().matches(".*\\.xml");
 
     private ApplicationNodeContainerConverter converter = new ApplicationNodeContainerConverter();
 
-    ApplicationDescriptorAnalyzer(LocalRepositoryManager localRepositoryManager) {
-        super(localRepositoryManager);
+    ApplicationDescriptorAnalyzer(LocalRepositoryManager localRepositoryManager, ArtifactContentReader contentReader) {
+        super(localRepositoryManager, contentReader);
     }
 
     @Override
     public boolean appliesTo(Artifact artifact) {
-        File file = artifact.getFile();
-        var fileName = file.getName();
-        try {
-            return file.isFile()
-                    && fileName.endsWith(".zip")
-                    && Objects.equals(artifact.getClassifier(), APPLICATION_CLASSIFIER)
-                    && hasApplicationDescriptor(file);
-        } catch (IOException e) {
-            LOGGER.warn("An error occured while reading {}", file, e);
-            return false;
-        }
+        return super.appliesTo(artifact)
+                && Objects.equals(artifact.getClassifier(), APPLICATION_CLASSIFIER)
+                && hasApplicationDescriptor(artifact);
     }
 
     @Override
     public DependencyReport analyze(Artifact artifact, DependencyReport report) throws IOException {
-        var descriptor = readApplicationDescriptorInArchive(artifact.getFile());
+        var descriptor = readApplicationDescriptor(artifact);
         descriptor.ifPresent(app -> report.addApplicationDescriptor(ApplicationDescriptor.create(app.getDisplayName(),
                 app.getVersion(),
                 app.getDescription(),
@@ -77,28 +73,27 @@ class ApplicationDescriptorAnalyzer extends AbstractArtifactAnalyzerHandler {
     /**
      * Look for the first ApplicationNode found in the artifact file.
      * 
-     * @param artifactFile The application zip archive
+     * @param artifact The artifact to read
      * @return an optional ApplicationNode
      * @throws IOException
      */
-    Optional<ApplicationNode> readApplicationDescriptorInArchive(File artifactFile) throws IOException {
-        return findZipEntry(artifactFile, entry -> entry.getName().matches("applications/(.*).xml"))
-                .map(entry -> {
-                    try (ZipFile zipFile = new ZipFile(artifactFile);
-                            var is = zipFile.getInputStream(entry)) {
+    Optional<ApplicationNode> readApplicationDescriptor(Artifact artifact) throws IOException {
+        Optional<Optional<ApplicationNode>> appDesc = getContentReader().readFirstEntry(artifact,
+                IS_APPLICATION_XML, entry -> {
+                    try (var is = entry.supplier().get()) {
                         var container = converter.unmarshallFromXML(is.readAllBytes());
                         return container.getApplications().stream().findFirst();
                     } catch (IOException | JAXBException | SAXException e) {
-                        LOGGER.warn("Failed to parse {} for application descriptor", artifactFile, e);
-                        return null;
+                        LOGGER.warn("Failed to parse {} for application descriptor", artifact, e);
+                        return Optional.empty();
                     }
-                }).filter(Objects::nonNull).orElseThrow(
-                        () -> new IllegalArgumentException(
-                                format("No application descriptor found in %s", artifactFile)));
+                });
+        return appDesc.orElseThrow(() -> new IllegalArgumentException(
+                format("No application descriptor found in %s", artifact.getFile())));
     }
 
-    boolean hasApplicationDescriptor(File artifactFile) throws IOException {
-        return findZipEntry(artifactFile, entry -> entry.getName().matches("applications/(.*).xml")).isPresent();
+    boolean hasApplicationDescriptor(Artifact artifact) {
+        return getContentReader().hasEntryWithPath(artifact, IS_APPLICATION_XML);
     }
 
 }

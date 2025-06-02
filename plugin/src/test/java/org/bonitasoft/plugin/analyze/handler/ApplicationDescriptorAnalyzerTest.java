@@ -24,6 +24,8 @@ import java.io.File;
 
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.bonitasoft.plugin.analyze.content.ArtifactContentReader;
+import org.bonitasoft.plugin.analyze.content.ZipArtifactContentReader;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.junit.jupiter.api.Test;
@@ -31,12 +33,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationDescriptorAnalyzerTest {
 
     private static final String APPLICATION_ZIPS_PREFIX = "/validation/application_zips_unzipped/";
+
+    @Spy
+    ArtifactContentReader reader = new ZipArtifactContentReader();
 
     @InjectMocks
     ApplicationDescriptorAnalyzer analyzer;

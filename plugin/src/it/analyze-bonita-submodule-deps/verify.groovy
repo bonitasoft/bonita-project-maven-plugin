@@ -27,14 +27,27 @@ assert report.filterDefinitions.definitionVersion == ['1.0.0']
 assert report.filterDefinitions.jarEntry == ['bonita-actorfilter-single-user.def']
 assert report.filterDefinitions[0].artifact.file.endsWith('bonita-actorfilter-single-user-1.0.0.jar')
 
+
+def connectorImpl = report.connectorImplementations.find { it.definitionId == 'myConnector' }
+
+assert connectorImpl.definitionId == 'myConnector'
+assert connectorImpl.definitionVersion == '0.1.0'
+assert connectorImpl.implementationId == 'myConnector-impl'
+assert connectorImpl.implementationVersion == '1.0.0-SNAPSHOT'
+assert connectorImpl.className == 'com.company.example.MyConnector'
+assert connectorImpl.jarEntry == 'myConnector.impl'
+assert connectorImpl.type == 'CONNECTOR'
+assert connectorImpl.artifact.file.endsWith('myConnector')
+
+
 assert report.restApiExtensions.name == ['custompage_myRestApiExtension']
-assert report.restApiExtensions[0].artifact.file.endsWith(
+assert report.restApiExtensions[0].artifact.file.replace("\\\\", "\\").endsWith(
         Paths.get('com', 'company', 'example', 'my-rest-api', '1.0.0-SNAPSHOT', 'my-rest-api-1.0.0-SNAPSHOT.zip').toString()
 )
 
 assert report.themes.name == ['custompage_myTheme']
 assert report.themes.displayName == ['My custom Theme']
-assert report.themes[0].artifact.file.endsWith(
+assert report.themes[0].artifact.file.replace("\\\\", "\\").endsWith(
         Paths.get('com', 'company', 'example', 'my-theme', '1.0.0-SNAPSHOT', 'my-theme-1.0.0-SNAPSHOT.zip').toString()
 )
 

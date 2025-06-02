@@ -30,7 +30,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.shared.invoker.CommandLineConfigurationException;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -44,7 +46,20 @@ import org.bonitasoft.bonita2bar.MavenExecutor;
 /**
  * Executes maven requests with information from an active session.
  */
-public class MavenSessionExecutor implements MavenExecutor {
+public class MavenSessionExecutor {
+
+    /**
+     * Exception thrown when the maven build fails.
+     */
+    public static final class BuildException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
+        public BuildException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+    }
 
     /** The maven session */
     private MavenSession session;
@@ -58,9 +73,8 @@ public class MavenSessionExecutor implements MavenExecutor {
         this.session = session;
     }
 
-    @Override
-    public void execute(File pomFile, List<String> goals, Map<String, String> properties, List<String> activeProfiles,
-            Supplier<String> errorMessageBase) throws BuildBarException {
+    public void execute(File pomFile, File rootModuleDirectory, List<String> goals, Map<String, String> properties,
+            List<String> activeProfiles, Supplier<String> errorMessageBase) throws BuildException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(pomFile);
         request.addArgs(goals);
@@ -68,6 +82,7 @@ public class MavenSessionExecutor implements MavenExecutor {
         request.addArgs(propArguments.toList());
         request.setBaseDirectory(pomFile.getParentFile());
         request.setQuiet(true);
+        request.setBatchMode(true);
 
         // information from the session
         // no need to report system properties that will make the command line too long and fail on Windows
@@ -90,19 +105,58 @@ public class MavenSessionExecutor implements MavenExecutor {
                 var errPrintStream = new PrintStream(errStream);) {
             var errHandler = new PrintStreamHandler(errPrintStream, false);
             request.setErrorHandler(errHandler);
-            try {
+            invokeMaven(rootModuleDirectory, errorMessageBase, request, errStream, errPrintStream);
+        } catch (IOException e) {
+            throw new BuildException(errorMessageBase.get(), e);
+        }
+
+    }
+
+    private void invokeMaven(File rootModuleDirectory, Supplier<String> errorMessageBase, InvocationRequest request,
+            ByteArrayOutputStream errStream, PrintStream errPrintStream) throws BuildException, IOException {
+        try {
+            String mvnHome = Optional.ofNullable(System.getProperty("maven.home")).orElse("");
+            if (mvnHome.endsWith("\\EMBEDDED") || mvnHome.endsWith("/EMBEDDED")) {
+                // we are in embedded mode or miss the executable and can not use invoker because the maven home is not a folder
+                String msg = "Embedded maven home.";
+                throw new MavenInvocationException(msg, new CommandLineConfigurationException(msg));
+            } else {
                 Invoker invoker = new DefaultInvoker();
                 InvocationResult result = invoker.execute(request);
                 if (result.getExitCode() != 0) {
-                    throwBuildBarException(errorMessageBase, errStream, result.getExecutionException());
+                    throwBuildException(errorMessageBase, errStream, result.getExecutionException());
                 }
-            } catch (MavenInvocationException e) {
-                throwBuildBarException(errorMessageBase, errStream, e);
             }
-        } catch (IOException e) {
-            throw new BuildBarException(errorMessageBase.get(), e);
+        } catch (MavenInvocationException e) {
+            if (e.getCause() instanceof CommandLineConfigurationException) {
+                invokeMavenCli(rootModuleDirectory, errorMessageBase, request, errStream, errPrintStream);
+            } else {
+                throwBuildException(errorMessageBase, errStream, e);
+            }
         }
+    }
 
+    private void invokeMavenCli(File rootModuleDirectory, Supplier<String> errorMessageBase, InvocationRequest request,
+            ByteArrayOutputStream errStream, PrintStream errPrintStream) throws BuildException, IOException {
+        // try and use the maven cli class
+        @SuppressWarnings("deprecation")
+        MavenCli cli = new MavenCli(session.getContainer().getContainerRealm().getWorld());
+        String oldMultimoduleProjectProperty = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
+        try {
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootModuleDirectory.toURI().toString());
+            var exitCode = cli.doMain(request.getArgs().toArray(String[]::new),
+                    request.getBaseDirectory().getAbsolutePath(), null, errPrintStream);
+            if (exitCode != 0) {
+                throwBuildException(errorMessageBase, errStream, null);
+            }
+        } finally {
+            // restore the basedir property
+            if (oldMultimoduleProjectProperty == null) {
+                System.clearProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
+            } else {
+                System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, oldMultimoduleProjectProperty);
+            }
+        }
     }
 
     /**
@@ -111,16 +165,16 @@ public class MavenSessionExecutor implements MavenExecutor {
      * @param errorMessageBase the base message supplier
      * @param errorStream the error stream from maven output
      * @param exception cause exception to encapsulate
-     * @throws BuildBarException thrown exception
+     * @throws BuildException thrown exception
      * @throws IOException exception while flushing the error stream
      */
-    private void throwBuildBarException(Supplier<String> errorMessageBase, ByteArrayOutputStream errorStream,
-            Exception exception) throws BuildBarException, IOException {
+    private void throwBuildException(Supplier<String> errorMessageBase, ByteArrayOutputStream errorStream,
+            Exception exception) throws BuildException, IOException {
         StringBuffer msg = new StringBuffer(errorMessageBase.get());
         errorStream.flush();
         String fromStream = errorStream.toString();
         Optional.ofNullable(fromStream).filter(StringUtils::isNotBlank).ifPresent(s -> msg.append("\n" + s));
-        throw new BuildBarException(msg.toString(), exception);
+        throw new BuildException(msg.toString(), exception);
     }
 
     /**
@@ -131,6 +185,25 @@ public class MavenSessionExecutor implements MavenExecutor {
      */
     public static MavenSessionExecutor fromSession(MavenSession session) {
         return new MavenSessionExecutor(session);
+    }
+
+    /**
+     * Get the maven executor from the maven session
+     * 
+     * @param session maven session
+     * @return executor relying on the session
+     */
+    public static MavenExecutor forBarFromSession(MavenSession session) {
+        MavenSessionExecutor executor = fromSession(session);
+        return (pomFile, goals, properties, activeProfiles, errorMessageBase) -> {
+            try {
+                // for bar, this is always executed on the app module, child of the root module
+                var rootModule = pomFile.getParentFile().getParentFile();
+                executor.execute(pomFile, rootModule, goals, properties, activeProfiles, errorMessageBase);
+            } catch (BuildException e) {
+                throw new BuildBarException(errorMessageBase.get(), e);
+            }
+        };
     }
 
 }

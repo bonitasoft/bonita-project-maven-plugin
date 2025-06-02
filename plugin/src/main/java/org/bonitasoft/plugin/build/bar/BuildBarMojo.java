@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -166,7 +165,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     .allowEmptyFormMapping(allowEmptyFormMapping)
                     .includeParameters(includeParameters)
                     .mavenProject(project)
-                    .mavenExecutor(MavenSessionExecutor.fromSession(session))
+                    .mavenExecutor(MavenSessionExecutor.forBarFromSession(session))
                     .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
                     .workingDirectory(tmpFolder)
                     .withDependencyJars(includeDependencyJars)
@@ -240,15 +239,6 @@ public class BuildBarMojo extends AbstractBuildMojo {
         procFileSet.setExcludes(Arrays.asList(getExcludes()));
         return Stream.of(fileSetManager.getIncludedFiles(procFileSet))
                 .map(procFile -> project.getBasedir().toPath().resolve(procFile)).collect(Collectors.toList());
-    }
-
-    private List<String> getClasspath() throws MojoExecutionException {
-        try {
-            return Stream.concat(project.getCompileClasspathElements().stream(),
-                    project.getRuntimeClasspathElements().stream()).distinct().collect(Collectors.toList());
-        } catch (DependencyResolutionRequiredException e) {
-            throw new MojoExecutionException(e);
-        }
     }
 
     FormBuilder createFormBuilder(UiDesignerProperties uiDesignerProperties) {
