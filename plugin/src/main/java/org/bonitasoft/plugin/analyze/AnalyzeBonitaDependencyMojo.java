@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -56,6 +57,7 @@ import org.bonitasoft.plugin.analyze.report.DependencyReporter;
 import org.bonitasoft.plugin.analyze.report.JsonDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.LogDependencyReporter;
 import org.bonitasoft.plugin.analyze.report.model.DependencyReport;
+import org.bonitasoft.plugin.analyze.report.model.Issue;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -146,6 +148,8 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     @Parameter(property = "excludeScope", defaultValue = "")
     protected String excludeScope;
 
+    private List<BuildException> compilationErrors = new ArrayList<>();
+
     @Inject
     public AnalyzeBonitaDependencyMojo(ArtifactResolver artifactResolver,
             ArtifactAnalyzerFactory artifactAnalyzerFactory,
@@ -170,6 +174,9 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
         var artifactAnalyzer = artifactAnalyzerFactory
                 .create(session.getRepositorySession().getLocalRepositoryManager(), reactorProjects);
         DependencyReport dependencyReport = artifactAnalyzer.analyze(resolvedArtifacts);
+        compilationErrors.forEach(error -> dependencyReport.addIssue(
+                Issue.create(Issue.Type.EXTENSION_COMPILATION_ERROR, error.getMessage(), Issue.Severity.ERROR,
+                        ExceptionUtils.getStackTrace(error))));
 
         if (validateDeps) {
             dependencyValidator.validate(project, buildingRequest).stream().forEach(dependencyReport::addIssue);
@@ -253,7 +260,8 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
                             Map.of(), List.of(),
                             () -> "Error while compiling extension module " + p.getArtifactId());
                 } catch (BuildException e) {
-                    throw new AnalysisResultReportException(e.getMessage(), e.getCause());
+                    // build failed, we do not want to fail the whole analysis, but only report the error
+                    compilationErrors.add(e);
                 }
             });
         }

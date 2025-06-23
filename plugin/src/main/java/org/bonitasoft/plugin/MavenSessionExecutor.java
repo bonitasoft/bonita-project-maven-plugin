@@ -73,13 +73,43 @@ public class MavenSessionExecutor {
         this.session = session;
     }
 
+    /**
+     * Execute maven commands on a pom file.
+     * 
+     * @param pomFile the pom file
+     * @param rootModuleDirectory the root module directory, used to set the base directory for multi-module builds
+     * @param goals the goals to execute
+     * @param properties user properties to pass as -D arguments
+     * @param activeProfiles the active profiles to use
+     * @param errorMessageBase a supplier of the base error message to use in case of failure
+     * @throws BuildException if an error occurs or the execution fails
+     */
     public void execute(File pomFile, File rootModuleDirectory, List<String> goals, Map<String, String> properties,
+            List<String> activeProfiles, Supplier<String> errorMessageBase) throws BuildException {
+        execute(pomFile, rootModuleDirectory, goals, properties, List.of(), activeProfiles, errorMessageBase);
+    }
+
+    /**
+     * Execute maven commands on a pom file.
+     * 
+     * @param pomFile the pom file
+     * @param rootModuleDirectory the root module directory, used to set the base directory for multi-module builds
+     * @param goals the goals to execute
+     * @param properties user properties to pass as -D arguments
+     * @param extraArguments additional arguments to pass to the maven command (such as "-fn")
+     * @param activeProfiles the active profiles to use
+     * @param errorMessageBase a supplier of the base error message to use in case of failure
+     * @throws BuildException if an error occurs or the execution fails
+     */
+    public void execute(File pomFile, File rootModuleDirectory, List<String> goals, Map<String, String> properties,
+            List<String> extraArguments,
             List<String> activeProfiles, Supplier<String> errorMessageBase) throws BuildException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(pomFile);
         request.addArgs(goals);
         Stream<String> propArguments = properties.entrySet().stream().map(e -> "-D" + e.getKey() + "=" + e.getValue());
         request.addArgs(propArguments.toList());
+        request.addArgs(extraArguments);
         request.setBaseDirectory(pomFile.getParentFile());
         request.setQuiet(true);
         request.setBatchMode(true);
