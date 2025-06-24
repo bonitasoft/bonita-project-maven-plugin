@@ -13,7 +13,7 @@ def report = new JsonSlurper().parse(bonitaDependencyAnalysisOutputFile)
 def emailImpl = report.connectorImplementations.find{ it.definitionId == 'email' }
 assert emailImpl != null
 
-// compilation eror reported
+// compilation error reported
 def compilationIssue = report.issues.find { it.type == 'EXTENSION_COMPILATION_ERROR' }
 assert compilationIssue != null
 assert compilationIssue.message == 'Error while compiling extension module myConnectorWithError'
