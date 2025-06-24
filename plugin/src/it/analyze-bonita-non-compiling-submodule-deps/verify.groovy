@@ -9,7 +9,7 @@ if (!bonitaDependencyAnalysisOutputFile.isFile()) {
 
 def report = new JsonSlurper().parse(bonitaDependencyAnalysisOutputFile)
 
-// although the connector does not compile, analyzis is still done
+// although the connector does not compile, analysis is still done
 def emailImpl = report.connectorImplementations.find{ it.definitionId == 'email' }
 assert emailImpl != null
 
