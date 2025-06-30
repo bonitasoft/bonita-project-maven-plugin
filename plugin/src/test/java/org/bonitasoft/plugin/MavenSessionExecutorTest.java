@@ -119,7 +119,8 @@ class MavenSessionExecutorTest {
 
         // when, then
         assertThatThrownBy(() -> executor.execute(pomFile, pomFile.getParentFile(), goals, properties, activeProfiles,
-                errorMessageBase)).isInstanceOf(BuildException.class);
+                errorMessageBase)).isInstanceOf(BuildException.class).message()
+                .contains("Unknown lifecycle phase \"non-existing-goal\"");
     }
 
 }
