@@ -16,7 +16,7 @@ assert emailImpl != null
 // compilation error reported
 def compilationIssue = report.issues.find { it.type == 'EXTENSION_COMPILATION_ERROR' }
 assert compilationIssue != null
-assert compilationIssue.message == 'Error while compiling extension module myConnectorWithError'
+assert compilationIssue.message.startsWith('Error while compiling extension module myConnectorWithError\n')
 
 // connector implementation not found, as the connector does not compile
 def connectorImpl = report.connectorImplementations.find { it.definitionId == 'myConnectorWithError' }
