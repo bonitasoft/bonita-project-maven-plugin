@@ -57,7 +57,7 @@
     <surefire.version>3.5.2</surefire.version>
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
-    <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
+    <central-publishing-maven-plugin>0.8.0</central-publishing-maven-plugin>
     <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
@@ -347,6 +347,10 @@
           <scmBranch>gh-pages</scmBranch>
           <content>${project.build.directory}/staging/bonita-project-maven-plugin</content>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
