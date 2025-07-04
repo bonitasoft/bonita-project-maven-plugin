@@ -23,8 +23,8 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
-          <id>ossrh-snapshots</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <id>central-portal-snapshots</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </repository>
       </repositories>
       <pluginRepositories>
@@ -47,8 +47,8 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
-          <id>ossrh-snapshots</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <id>central-portal-snapshots</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </pluginRepository>
       </pluginRepositories>
     </profile>
