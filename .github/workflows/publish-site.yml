@@ -25,9 +25,9 @@ jobs:
           java-version: 17
 
       - name: Configure Git user
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
+        uses: bonitasoft/git-setup-action@v1
+        with:
+          keeper-secret-config: ${{ secrets.KSM_CONFIG }}
 
       - name: Publish Site
         env:
