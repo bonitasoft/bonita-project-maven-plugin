@@ -71,7 +71,7 @@
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
     <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
-    <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
+    <spotless-maven-plugin.version>2.44.5</spotless-maven-plugin.version>
     <gitflow-maven-plugin.version>1.21.0</gitflow-maven-plugin.version>
     <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
     <sisu-maven-plugin.version>0.9.0.M3</sisu-maven-plugin.version>
