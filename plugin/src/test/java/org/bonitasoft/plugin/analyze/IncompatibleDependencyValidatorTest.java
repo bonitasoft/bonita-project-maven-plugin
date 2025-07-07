@@ -40,9 +40,10 @@ class IncompatibleDependencyValidatorTest {
 
     @Test
     void shouldThrowMojoExcutionException() throws Exception {
-        when(graphBuilder.buildDependencyGraph(Mockito.any(), Mockito.any())).thenThrow(DependencyGraphBuilderException.class);
+        when(graphBuilder.buildDependencyGraph(Mockito.any(), Mockito.any()))
+                .thenThrow(DependencyGraphBuilderException.class);
         var validator = spy(new IncompatibleDependencyValidator(graphBuilder));
-        
+
         assertThrows(MojoExecutionException.class, () -> validator.validate(Mockito.eq(project), Mockito.any()));
     }
 
