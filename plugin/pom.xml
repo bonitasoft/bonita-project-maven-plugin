@@ -35,7 +35,7 @@
     <maven-invoker.version>3.3.0</maven-invoker.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <bonita-business-data-generator.version>10.0.0</bonita-business-data-generator.version>
-    <bonita-ui-designer-artifact-builder.version>1.0.5</bonita-ui-designer-artifact-builder.version>
+    <bonita-ui-designer-artifact-builder.version>1.0.10</bonita-ui-designer-artifact-builder.version>
     <file-management.version>3.2.0</file-management.version>
     <bonita2bar.version>9.0.2</bonita2bar.version>
     <!-- Test -->
