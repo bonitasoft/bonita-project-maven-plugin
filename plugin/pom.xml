@@ -40,7 +40,7 @@
     <bonita2bar.version>9.0.2</bonita2bar.version>
     <!-- Test -->
     <groovy.version>3.0.23</groovy.version>
-    <byte-buddy.version>1.15.10</byte-buddy.version>
+    <byte-buddy.version>1.17.6</byte-buddy.version>
   </properties>
   <dependencyManagement>
     <dependencies>
