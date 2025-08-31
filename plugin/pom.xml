@@ -39,7 +39,7 @@
     <file-management.version>3.2.0</file-management.version>
     <bonita2bar.version>9.0.2</bonita2bar.version>
     <!-- Test -->
-    <groovy.version>3.0.23</groovy.version>
+    <groovy.version>3.0.25</groovy.version>
     <byte-buddy.version>1.17.7</byte-buddy.version>
   </properties>
   <dependencyManagement>
