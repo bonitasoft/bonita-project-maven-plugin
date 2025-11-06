@@ -7,7 +7,7 @@
     <version>2.1</version>
     <packaging>pom</packaging>
     <properties>
-        <bonita.runtime.version>7.16-SNAPSHOT</bonita.runtime.version>
+        <bonita.runtime.version>8.0-SNAPSHOT</bonita.runtime.version>
         <maven-install-plugin.version>3.0.1</maven-install-plugin.version>
         <maven.compiler.release>17</maven.compiler.release>
         <bonita-project-maven-plugin.version>0.0.7-SNAPSHOT</bonita-project-maven-plugin.version>
