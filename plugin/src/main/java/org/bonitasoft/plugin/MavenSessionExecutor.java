@@ -32,6 +32,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.CommandLineConfigurationException;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -64,13 +67,27 @@ public class MavenSessionExecutor {
     /** The maven session */
     private MavenSession session;
 
+    /** Logger for Maven-style logging */
+    private Log log = new SystemStreamLog();
+
     /**
      * Private Constructor.
-     * 
+     *
      * @param session the maven session
      */
     private MavenSessionExecutor(MavenSession session) {
         this.session = session;
+    }
+
+    /**
+     * Set the Maven logger.
+     *
+     * @param log the Maven log
+     * @return this executor for chaining
+     */
+    public MavenSessionExecutor withLog(Log log) {
+        this.log = log;
+        return this;
     }
 
     /**
@@ -152,14 +169,17 @@ public class MavenSessionExecutor {
                 String msg = "Embedded maven home.";
                 throw new MavenInvocationException(msg, new CommandLineConfigurationException(msg));
             } else {
+                log.debug("Executing Maven request " + request.getArgs() + " on POM " + request.getPomFile());
                 Invoker invoker = new DefaultInvoker();
                 InvocationResult result = invoker.execute(request);
                 if (result.getExitCode() != 0) {
+                    log.debug("Maven execution failed with exit code " + result.getExitCode());
                     throwBuildException(errorMessageBase, outStream, result.getExecutionException());
                 }
             }
         } catch (MavenInvocationException e) {
             if (e.getCause() instanceof CommandLineConfigurationException) {
+                log.debug("Falling back to Maven CLI execution due to: " + e.getCause().getMessage());
                 invokeMavenCli(rootModuleDirectory, errorMessageBase, request, outStream, outPrintStream);
             } else {
                 throwBuildException(errorMessageBase, outStream, e);
@@ -219,22 +239,197 @@ public class MavenSessionExecutor {
     }
 
     /**
-     * Get the maven executor from the maven session
-     * 
-     * @param session maven session
-     * @return executor relying on the session
+     * Get the maven executor for building business archives.
+     *
+     * @return executor for bar building
      */
-    public static MavenExecutor forBarFromSession(MavenSession session) {
-        MavenSessionExecutor executor = fromSession(session);
+    public MavenExecutor forBarBuild() {
         return (pomFile, goals, properties, activeProfiles, errorMessageBase) -> {
             try {
-                // for bar, this is always executed on the app module, child of the root module
-                var rootModule = pomFile.getParentFile().getParentFile();
-                executor.execute(pomFile, rootModule, goals, properties, activeProfiles, errorMessageBase);
+                // Install only reactor artifacts that are dependencies of this POM
+                // This ensures that dependencies on reactor modules can be resolved
+                // when building the temporary process project
+                installReactorArtifactsForPom(pomFile);
+
+                // Use the multi-module project directory for proper reactor support
+                // This corresponds to maven.multiModuleProjectDirectory in fallback CLI mode
+                File multiModuleProjectDir = session.getRequest().getMultiModuleProjectDirectory();
+                execute(pomFile, multiModuleProjectDir, goals, properties, activeProfiles, errorMessageBase);
             } catch (BuildException e) {
                 throw new BuildBarException(errorMessageBase.get(), e);
             }
         };
+    }
+
+    /**
+     * Install reactor artifacts that are dependencies of the given POM file.
+     * Only installs artifacts that are both in the reactor and listed as dependencies.
+     *
+     * @param pomFile the POM file to analyze for dependencies
+     * @throws BuildException if installation fails
+     */
+    private void installReactorArtifactsForPom(File pomFile) throws BuildException {
+        List<MavenProject> reactorProjects = session.getProjects();
+        if (reactorProjects == null || reactorProjects.isEmpty()) {
+            return;
+        }
+
+        // Build a map of reactor projects by groupId:artifactId for quick lookup
+        Map<String, MavenProject> reactorProjectMap = reactorProjects.stream()
+                .filter(p -> !"pom".equals(p.getPackaging()))
+                .collect(java.util.stream.Collectors.toMap(
+                        p -> p.getGroupId() + ":" + p.getArtifactId(),
+                        p -> p,
+                        (p1, p2) -> p1));
+
+        if (reactorProjectMap.isEmpty()) {
+            return;
+        }
+
+        // Parse the POM file to find dependencies that match reactor projects
+        Set<String> requiredArtifacts = findReactorDependencies(pomFile, reactorProjectMap.keySet());
+        if (requiredArtifacts.isEmpty()) {
+            return;
+        }
+
+        log.info("Installing reactor artifacts to resolve dependencies...");
+        for (String artifactKey : requiredArtifacts) {
+            MavenProject project = reactorProjectMap.get(artifactKey);
+            if (project == null) {
+                continue;
+            }
+
+            File artifactFile = getProjectArtifactFile(project);
+            if (artifactFile != null && artifactFile.exists()) {
+                // Only install if not already in the local repository or if the file is newer
+                File localRepoFile = getLocalRepositoryFile(project);
+                if (!localRepoFile.exists() || artifactFile.lastModified() > localRepoFile.lastModified()) {
+                    log.info("Installing " + project.getGroupId() + ":" +
+                            project.getArtifactId() + ":" + project.getVersion());
+                    installArtifact(project, artifactFile);
+                }
+            }
+        }
+    }
+
+    /**
+     * Parse the POM file and find dependencies that match reactor project keys.
+     *
+     * @param pomFile the POM file to parse
+     * @param reactorKeys set of "groupId:artifactId" keys for reactor projects
+     * @return set of matching reactor dependency keys
+     */
+    private Set<String> findReactorDependencies(File pomFile, Set<String> reactorKeys) {
+        Set<String> result = new HashSet<>();
+        try {
+            var factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+            var builder = factory.newDocumentBuilder();
+            var document = builder.parse(pomFile);
+            var dependencies = document.getElementsByTagName("dependency");
+
+            for (int i = 0; i < dependencies.getLength(); i++) {
+                var dependency = dependencies.item(i);
+                String groupId = null;
+                String artifactId = null;
+
+                var children = dependency.getChildNodes();
+                for (int j = 0; j < children.getLength(); j++) {
+                    var child = children.item(j);
+                    if ("groupId".equals(child.getNodeName())) {
+                        groupId = child.getTextContent().trim();
+                    } else if ("artifactId".equals(child.getNodeName())) {
+                        artifactId = child.getTextContent().trim();
+                    }
+                }
+
+                if (groupId != null && artifactId != null) {
+                    String key = groupId + ":" + artifactId;
+                    if (reactorKeys.contains(key)) {
+                        result.add(key);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Could not parse POM file for dependencies: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Get the artifact file for a project from its target directory.
+     *
+     * @param project the maven project
+     * @return the artifact file, or null if not found
+     */
+    private File getProjectArtifactFile(MavenProject project) {
+        // First try to get it from the artifact if already set
+        if (project.getArtifact() != null && project.getArtifact().getFile() != null) {
+            return project.getArtifact().getFile();
+        }
+
+        // Otherwise build the path from the target directory
+        String buildDirectory = project.getBuild() != null ? project.getBuild().getDirectory() : null;
+        if (buildDirectory == null) {
+            buildDirectory = new File(project.getBasedir(), "target").getAbsolutePath();
+        }
+
+        String finalName = project.getBuild() != null ? project.getBuild().getFinalName() : null;
+        if (finalName == null) {
+            finalName = project.getArtifactId() + "-" + project.getVersion();
+        }
+
+        String extension = project.getPackaging();
+        File artifactFile = new File(buildDirectory, finalName + "." + extension);
+
+        return artifactFile.exists() ? artifactFile : null;
+    }
+
+    /**
+     * Get the expected local repository file path for a project artifact.
+     *
+     * @param project the maven project
+     * @return the file in the local repository
+     */
+    private File getLocalRepositoryFile(MavenProject project) {
+        String groupPath = project.getGroupId().replace('.', File.separatorChar);
+        String artifactId = project.getArtifactId();
+        String version = project.getVersion();
+        String fileName = artifactId + "-" + version + "." + project.getPackaging();
+
+        File localRepo = session.getRequest().getLocalRepositoryPath();
+        return new File(localRepo,
+                groupPath + File.separator + artifactId + File.separator + version + File.separator + fileName);
+    }
+
+    /**
+     * Install an artifact to the local repository.
+     *
+     * @param project the maven project
+     * @param artifactFile the artifact file to install
+     * @throws BuildException if installation fails
+     */
+    private void installArtifact(MavenProject project, File artifactFile) throws BuildException {
+        // Use the maven-install-plugin to install the artifact
+        File pomFile = project.getFile();
+        List<String> goals = List.of("org.apache.maven.plugins:maven-install-plugin:3.1.1:install-file");
+        Map<String, String> properties = Map.of(
+                "file", artifactFile.getAbsolutePath(),
+                "groupId", project.getGroupId(),
+                "artifactId", project.getArtifactId(),
+                "version", project.getVersion(),
+                "packaging", project.getPackaging(),
+                "pomFile", pomFile.getAbsolutePath(),
+                "generatePom", "false");
+
+        try {
+            execute(pomFile, pomFile.getParentFile(), goals, properties, List.of("-q"), List.of(),
+                    () -> "Failed to install reactor artifact " + project.getGroupId() + ":" + project.getArtifactId());
+        } catch (BuildException e) {
+            // Log but don't fail the build - the artifact might already be available
+            // or the installation might not be critical
+            log.warn("Could not install reactor artifact " +
+                    project.getGroupId() + ":" + project.getArtifactId() + ": " + e.getMessage());
+        }
     }
 
 }

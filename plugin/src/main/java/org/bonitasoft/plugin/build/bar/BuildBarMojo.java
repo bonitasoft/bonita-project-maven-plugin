@@ -165,7 +165,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     .allowEmptyFormMapping(allowEmptyFormMapping)
                     .includeParameters(includeParameters)
                     .mavenProject(project)
-                    .mavenExecutor(MavenSessionExecutor.forBarFromSession(session))
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session).withLog(getLog()).forBarBuild())
                     .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
                     .workingDirectory(tmpFolder)
                     .withDependencyJars(includeDependencyJars)

@@ -254,11 +254,13 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
                     .findFirst();
             mavenProject.ifPresent(p -> {
                 try {
-                    MavenSessionExecutor.fromSession(session).execute(p.getModel().getPomFile(),
-                            project.getBasedir(),
-                            List.of("compiler:compile"),
-                            Map.of(), List.of(),
-                            () -> "Error while compiling extension module " + p.getArtifactId());
+                    MavenSessionExecutor.fromSession(session)
+                            .withLog(getLog())
+                            .execute(p.getModel().getPomFile(),
+                                    project.getBasedir(),
+                                    List.of("compiler:compile"),
+                                    Map.of(), List.of(),
+                                    () -> "Error while compiling extension module " + p.getArtifactId());
                 } catch (BuildException e) {
                     // build failed, we do not want to fail the whole analysis, but only report the error
                     compilationErrors.add(e);

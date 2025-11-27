@@ -121,7 +121,7 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
                     .allowEmptyFormMapping(true)
                     .includeParameters(false)
                     .mavenProject(findAppModuleProject())
-                    .mavenExecutor(MavenSessionExecutor.forBarFromSession(session))
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session).withLog(getLog()).forBarBuild())
                     .formBuilder(id -> new byte[0])
                     .workingDirectory(tmpFolder)
                     .build());
