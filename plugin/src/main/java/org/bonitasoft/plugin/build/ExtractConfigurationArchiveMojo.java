@@ -27,8 +27,10 @@ import java.util.stream.Stream;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilder;
@@ -67,6 +69,12 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
      */
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
+
+    /**
+     * Project builder for parsing POM files.
+     */
+    @Component
+    private ProjectBuilder projectBuilder;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -121,7 +129,10 @@ public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiv
                     .allowEmptyFormMapping(true)
                     .includeParameters(false)
                     .mavenProject(findAppModuleProject())
-                    .mavenExecutor(MavenSessionExecutor.fromSession(session).withLog(getLog()).forBarBuild())
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session)
+                            .withLog(getLog())
+                            .withProjectBuilder(projectBuilder)
+                            .forBarBuild())
                     .formBuilder(id -> new byte[0])
                     .workingDirectory(tmpFolder)
                     .build());

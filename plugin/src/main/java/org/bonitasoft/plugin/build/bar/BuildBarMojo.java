@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -38,6 +39,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilder;
@@ -132,6 +134,12 @@ public class BuildBarMojo extends AbstractBuildMojo {
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
 
+    /**
+     * Project builder for parsing POM files.
+     */
+    @Component
+    private ProjectBuilder projectBuilder;
+
     @Inject
     public BuildBarMojo(MavenProjectHelper projectHelper) {
         this.projectHelper = projectHelper;
@@ -165,7 +173,10 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     .allowEmptyFormMapping(allowEmptyFormMapping)
                     .includeParameters(includeParameters)
                     .mavenProject(project)
-                    .mavenExecutor(MavenSessionExecutor.fromSession(session).withLog(getLog()).forBarBuild())
+                    .mavenExecutor(MavenSessionExecutor.fromSession(session)
+                            .withLog(getLog())
+                            .withProjectBuilder(projectBuilder)
+                            .forBarBuild())
                     .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
                     .workingDirectory(tmpFolder)
                     .withDependencyJars(includeDependencyJars)
