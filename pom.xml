@@ -76,11 +76,11 @@
     <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
     <sisu-maven-plugin.version>0.9.0.M4</sisu-maven-plugin.version>
     <!-- Test -->
-    <junit-jupiter-engine.version>6.0.0</junit-jupiter-engine.version>
+    <junit-jupiter-engine.version>6.0.1</junit-jupiter-engine.version>
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
     <maven-invoker-plugin.version>3.9.1</maven-invoker-plugin.version>
-    <mockito-junit-jupiter.version>5.20.0</mockito-junit-jupiter.version>
-    <mockito-core.version>5.20.0</mockito-core.version>
+    <mockito-junit-jupiter.version>5.21.0</mockito-junit-jupiter.version>
+    <mockito-core.version>5.21.0</mockito-core.version>
     <assertj-core.version>3.27.6</assertj-core.version>
     <logback-classic.version>1.2.13</logback-classic.version>
     <!-- Sonar -->
