@@ -190,9 +190,21 @@ public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
     }
 
     MavenProject findAppModuleProject() throws MojoExecutionException {
-        return reactorProjects.size() == 1 ? project
-                : reactorProjects.stream().filter(p -> p.getBasedir().getName().equals("app")).findFirst().orElseThrow(
-                        () -> new MojoExecutionException(String.format("Application module not found in %s",
+        if (reactorProjects.size() == 1) {
+            return project;
+        }
+
+        // Only look at projects that are children of the current project.
+        // This handles cases where multiple "app" modules exist in a larger reactor
+        // (e.g., when a Bonita project is part of a monorepo with other modules
+        // that also have an "app" subdirectory).
+        var projectBasePath = project.getBasedir().toPath();
+        return reactorProjects.stream()
+                .filter(p -> p.getBasedir().getName().equals("app"))
+                .filter(p -> p.getBasedir().toPath().startsWith(projectBasePath))
+                .findFirst()
+                .orElseThrow(() -> new MojoExecutionException(
+                        String.format("Application module not found in %s",
                                 project.getBasedir().toPath().resolve("app"))));
     }
 

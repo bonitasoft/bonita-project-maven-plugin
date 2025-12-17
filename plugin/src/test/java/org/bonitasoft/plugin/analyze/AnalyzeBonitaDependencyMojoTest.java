@@ -236,4 +236,94 @@ class AnalyzeBonitaDependencyMojoTest {
         verify(dependencyValidator).validate(project, buildingRequest);
         verify(reporter).report(any());
     }
+
+    @Test
+    void should_find_app_module_under_current_project_when_multiple_app_modules_exist() throws Exception {
+        // Given: A reactor with multiple "app" modules from different parent projects
+        // This simulates a monorepo where:
+        // - /monorepo/services/core/app exists (belongs to core project)
+        // - /monorepo/services/process-engine/app exists (belongs to process-engine project)
+        // When analyze goal runs on process-engine, it should find process-engine/app, not core/app
+
+        // Reset mocks to avoid UnnecessaryStubbingException (this test doesn't use artifactAnalyzerFactory)
+        Mockito.reset(artifactAnalyzerFactory);
+
+        File monorepoRoot = new File("/tmp/monorepo");
+        File processEngineDir = new File(monorepoRoot, "services/process-engine");
+        File processEngineAppDir = new File(processEngineDir, "app");
+        File coreDir = new File(monorepoRoot, "services/core");
+        File coreAppDir = new File(coreDir, "app");
+
+        // Current project is process-engine
+        MavenProject processEngineProject = mock(MavenProject.class);
+        when(processEngineProject.getBasedir()).thenReturn(processEngineDir);
+
+        // App module under process-engine (the correct one to find)
+        MavenProject processEngineAppProject = mock(MavenProject.class);
+        when(processEngineAppProject.getBasedir()).thenReturn(processEngineAppDir);
+
+        // App module under core (should NOT be selected)
+        MavenProject coreAppProject = mock(MavenProject.class);
+        when(coreAppProject.getBasedir()).thenReturn(coreAppDir);
+
+        // Configure mojo
+        mojo.project = processEngineProject;
+        // Order matters: core/app comes first in reactor (simulating alphabetical module order)
+        mojo.reactorProjects = List.of(coreAppProject, processEngineAppProject, processEngineProject);
+
+        // When
+        MavenProject foundAppModule = mojo.findAppModuleProject();
+
+        // Then: Should find process-engine/app, not core/app
+        assertThat(foundAppModule).isSameAs(processEngineAppProject);
+        assertThat(foundAppModule.getBasedir().getPath()).contains("process-engine");
+    }
+
+    @Test
+    void should_find_app_module_when_single_project_in_reactor() throws Exception {
+        // Given: A single project reactor (standalone Bonita project)
+
+        // Reset mocks to avoid UnnecessaryStubbingException (this test doesn't use artifactAnalyzerFactory)
+        Mockito.reset(artifactAnalyzerFactory);
+
+        // When reactorProjects.size() == 1, the method returns project directly without
+        // inspecting basedir, so no stubbing is needed for getBasedir()
+        MavenProject standaloneProject = mock(MavenProject.class);
+        mojo.project = standaloneProject;
+        mojo.reactorProjects = List.of(standaloneProject);
+
+        // When
+        MavenProject foundAppModule = mojo.findAppModuleProject();
+
+        // Then: Should return the project itself
+        assertThat(foundAppModule).isSameAs(standaloneProject);
+    }
+
+    @Test
+    void should_throw_when_no_app_module_found_under_current_project() {
+        // Given: A reactor where no "app" module exists under the current project
+
+        // Reset mocks to avoid UnnecessaryStubbingException (this test doesn't use artifactAnalyzerFactory)
+        Mockito.reset(artifactAnalyzerFactory);
+
+        File monorepoRoot = new File("/tmp/monorepo");
+        File processEngineDir = new File(monorepoRoot, "services/process-engine");
+        File coreDir = new File(monorepoRoot, "services/core");
+        File coreAppDir = new File(coreDir, "app");
+
+        MavenProject processEngineProject = mock(MavenProject.class);
+        when(processEngineProject.getBasedir()).thenReturn(processEngineDir);
+
+        // Only core/app exists, no process-engine/app
+        MavenProject coreAppProject = mock(MavenProject.class);
+        when(coreAppProject.getBasedir()).thenReturn(coreAppDir);
+
+        mojo.project = processEngineProject;
+        mojo.reactorProjects = List.of(coreAppProject, processEngineProject);
+
+        // When/Then
+        org.junit.jupiter.api.Assertions.assertThrows(MojoExecutionException.class, () -> {
+            mojo.findAppModuleProject();
+        });
+    }
 }
