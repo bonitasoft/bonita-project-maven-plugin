@@ -25,8 +25,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.xml.bind.JAXBException;
-
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelReader;
@@ -40,6 +38,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xml.sax.SAXException;
+
+import jakarta.xml.bind.JAXBException;
 
 class DefaultBomFactoryImplTest {
 
