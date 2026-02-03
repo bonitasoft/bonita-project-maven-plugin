@@ -23,7 +23,6 @@ import java.nio.file.Path;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -32,6 +31,8 @@ import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.plugin.bdm.module.DefaultBomFactory;
 import org.xml.sax.SAXException;
+
+import jakarta.xml.bind.JAXBException;
 
 @Singleton
 @Named
