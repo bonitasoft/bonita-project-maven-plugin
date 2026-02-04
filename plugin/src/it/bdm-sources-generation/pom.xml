@@ -8,6 +8,11 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <properties>
+    <bonita-project-maven-plugin.version>@project.version@</bonita-project-maven-plugin.version>
+    <bonita.runtime.version>10.4.0</bonita.runtime.version>
+  </properties>
+
   <modules>
     <module>model</module>
     <module>dao-client</module>
@@ -29,7 +34,7 @@
         <plugin>
           <groupId>org.bonitasoft.maven</groupId>
           <artifactId>bonita-project-maven-plugin</artifactId>
-          <version>@project.version@</version>
+          <version>${bonita-project-maven-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -39,6 +44,5 @@
       </plugins>
     </pluginManagement>
   </build>
-
 
 </project>
