@@ -2,12 +2,13 @@ name: workflow-pr
 
 on:
   pull_request:
-    branches: ["master", "support/*", "develop"]
+    branches:
+      - "support/*"
+      - "develop"
     paths-ignore:
-      - "**/README.md"
-      - "CONTRIBUTING.md"
       - ".github/**"
       - "!.github/workflows/workflow-PR.yml"
+      - "**/*.md"
 
 permissions:
   checks: write
