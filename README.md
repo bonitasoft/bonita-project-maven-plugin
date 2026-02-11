@@ -22,18 +22,78 @@ A Maven plug-in used by Bonita projects to:
 https://bonitasoft.github.io/bonita-project-maven-plugin/
 
 
-## Branching strategy
+## How to release
 
-This repository follows the [GitFlow branching strategy](https://gitversion.net/docs/learn/branching-strategies/gitflow/examples).
+This project uses the [gitflow-maven-plugin](https://github.com/aleksandr-m/gitflow-maven-plugin) for release
+management. Releases are created using the GitHub Actions workflow.
 
-## Release
+### Branch Strategy
 
-To release a new version, maintainers may use the Release and Publication GitHub actions.
+- **develop**: Main development branch for future releases
+- **support/A.B.x**: Maintenance branches for older versions (e.g., support/1.0.x, support/2.0.x, support/2.1.x)
+- **master**: Not used (removed, use support branches for maintenance)
 
-* Release action will invoke the `gitflow-maven-plugin` to perform all required merges, version updates and tag creation.
-* Publication action will build and deploy a given tag to Maven Central.
-* A Github release should be created and associated to the tag.
-* Deploy the latest site version using the [Publish Maven Site action](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish-site.yml)
+### Creating a Release
+
+Releases are created via the GitHub Actions
+workflow [Release](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/release.yml)
+
+#### Workflow Parameters
+
+| Parameter                   | Description                                                                  | Default     | Example                         |
+|-----------------------------|------------------------------------------------------------------------------|-------------|---------------------------------|
+| **version**                 | Version to release (leave empty to use current pom.xml version)              | empty       | `2.1.3`                         |
+| **nextDevelopmentVersion**  | Next development version (leave empty to use versionDigitToIncrement policy) | empty       | `2.1.4-SNAPSHOT`                |
+| **versionDigitToIncrement** | Version digit to increment in next development version                       | `2` (patch) | `0`=major, `1`=minor, `2`=patch |
+
+#### Release Types
+
+**Patch Release (X.Y.Z)** - Bug fixes and minor updates
+
+- Set `versionDigitToIncrement`: **2** (default)
+- Example: `2.1.2 → 2.1.3-SNAPSHOT`
+- Use for: Support branches, hotfixes
+
+**Minor Release (X.Y.0)** - New features, backward compatible
+
+- Set `versionDigitToIncrement`: **1**
+- Example: `2.1.2 → 2.2.0-SNAPSHOT`
+- Use for: Regular releases from develop
+
+**Major Release (X.0.0)** - Breaking changes
+
+- Set `versionDigitToIncrement`: **0**
+- Example: `2.1.2 → 3.0.0-SNAPSHOT`
+- Use for: Major version bumps
+
+### Release Process
+
+When you run the workflow from any branch (develop or support/*), it will:
+
+1. Update version to release version (removes -SNAPSHOT)
+2. Commit: "chore(release): Update versions for release"
+3. Create git tag (e.g., `2.1.3`)
+4. Update version to next development version
+5. Commit: "chore(release): Update for next development version"
+6. Push commits and tags to GitHub
+
+**Note**: The workflow does NOT create a release branch - it performs the release directly on the branch you selected.
+
+### Publishing Artifacts to Maven Central
+
+Publication is done via the [Publish](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish.yml) workflow which will build and deploy a given tag to Maven Central.
+
+### Publishing the Maven Site
+
+Deploy the latest site version using the [Publish Maven Site](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish-site.yml) workflow.
+
+### Cascade Merging for Support Branches
+
+When releasing from a **support branch**, you should manually cascade merge the changes up to newer branches and
+develop.
+
+**Example**: After doing a release from `support/1.0.x`, merge `support/1.0.x` into `support/2.0.x`, then merge
+`support/2.0.x` into `support/2.1.x`, and so on into `develop`.
 
 ## Contributing
 

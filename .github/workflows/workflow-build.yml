@@ -4,13 +4,11 @@ on:
   push:
     branches:
       - develop
-      - release/*
       - support/*
     paths-ignore:
-      - "**/README.md"
-      - "CONTRIBUTING.md"
       - ".github/**"
       - "!.github/workflows/workflow-build.yml"
+      - "**/*.md"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
