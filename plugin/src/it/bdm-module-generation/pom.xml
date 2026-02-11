@@ -57,7 +57,7 @@
             <dependency>
               <groupId>org.bonitasoft</groupId>
               <artifactId>bonita-project-assemblies</artifactId>
-              <version>9.0-SNAPSHOT</version>
+              <version>9.0.0</version>
             </dependency>
           </dependencies>
           <executions>
