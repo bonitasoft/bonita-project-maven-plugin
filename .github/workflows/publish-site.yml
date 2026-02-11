@@ -1,12 +1,14 @@
 name: Publish Maven Site
 
+run-name: Publish Maven Site from ${{ github.event.inputs.ref }}
+
 on:
   workflow_dispatch:
     inputs:
       ref:
         description: "The branch, tag or SHA to publish."
         required: true
-        default: "master"
+        default: "develop"
 
 jobs:
   build:

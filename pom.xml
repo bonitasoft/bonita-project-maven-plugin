@@ -237,8 +237,7 @@
           <version>${gitflow-maven-plugin.version}</version>
           <configuration>
             <versionsMavenPluginVersion>${versions-maven-plugin.version}</versionsMavenPluginVersion>
-            <!-- 0: increment major digit on develop, 1: increment minor digit on develop, 2: increment patch digit on develop -->
-            <versionDigitToIncrement>1</versionDigitToIncrement>
+            <skipReleaseMergeProdBranch>true</skipReleaseMergeProdBranch>
             <commitMessagePrefix xml:space="preserve">chore(release): </commitMessagePrefix>
           </configuration>
         </plugin>
