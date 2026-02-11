@@ -41,6 +41,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Settings;
 import org.eclipse.aether.repository.ArtifactRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -49,7 +50,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class InstallProjectStoreMojoTest {
 
-    MavenExecutionRequestPopulator populator = new DefaultMavenExecutionRequestPopulator(new MavenRepositorySystem());
+    @Mock
+    MavenRepositorySystem mavenRepositorySystem;
+
+    MavenExecutionRequestPopulator populator;
 
     @Mock
     MavenSession session;
@@ -59,6 +63,11 @@ class InstallProjectStoreMojoTest {
 
     @Mock
     ProjectArtifactFactory projectArtifactFactory;
+
+    @BeforeEach
+    void setUp() {
+        populator = new DefaultMavenExecutionRequestPopulator(mavenRepositorySystem);
+    }
 
     @Test
     void should_return_file_extension() throws Exception {
