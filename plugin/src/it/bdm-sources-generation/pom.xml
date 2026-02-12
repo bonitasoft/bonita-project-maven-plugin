@@ -10,7 +10,9 @@
 
   <properties>
     <bonita-project-maven-plugin.version>@project.version@</bonita-project-maven-plugin.version>
-    <bonita.runtime.version>10.4.0</bonita.runtime.version>
+    <bonita.runtime.version>@bonita.runtime.version@</bonita.runtime.version>
+    <jakarta.persistence-api.version>@jakarta.persistence-api.version@</jakarta.persistence-api.version>
+    <build-helper-maven-plugin.version>@build-helper-maven-plugin.version@</build-helper-maven-plugin.version>
   </properties>
 
   <modules>
@@ -23,7 +25,7 @@
       <dependency>
         <groupId>jakarta.persistence</groupId>
         <artifactId>jakarta.persistence-api</artifactId>
-        <version>3.0.0</version>
+        <version>${jakarta.persistence-api.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -39,7 +41,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>${build-helper-maven-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
