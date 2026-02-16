@@ -86,6 +86,14 @@ No release branches are created — `gitflow:release` performs the release direc
 - **Publish site:** via [Publish Maven Site workflow](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish-site.yml).
 - After releasing from a support branch, manually cascade merge up to newer support branches and into develop.
 
+## Coupled Versions
+
+Some Java constants must stay in sync with POM properties. When Dependabot (or a manual change) updates a POM version, update the corresponding constant too:
+
+| POM property | Java constant | File |
+|---|---|---|
+| `maven-install-plugin.version` | `DEFAULT_INSTALL_PLUGIN_VERSION` | `plugin/src/main/java/org/bonitasoft/plugin/install/InstallProjectStoreMojo.java` |
+
 ## CI/CD
 
 - GitHub Actions on push to `develop`, `support/*` and PRs

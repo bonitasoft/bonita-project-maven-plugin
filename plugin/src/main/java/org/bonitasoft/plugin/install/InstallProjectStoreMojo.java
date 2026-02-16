@@ -84,7 +84,7 @@ public class InstallProjectStoreMojo extends AbstractMojo {
     private static final String VERSION = "version";
     private static final String ARTIFACT_ID = "artifactId";
 
-    static final String DEFAULT_INSTALL_PLUGIN_VERSION = "3.1.3";
+    static final String DEFAULT_INSTALL_PLUGIN_VERSION = "3.1.4";
     static final String INITIAL_INSTALL_PLUGIN_VERSION = "2.4";
     private static final String INSTALL_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     private static final String INSTALL_PLUGIN_ARTIFACT_ID = "maven-install-plugin";
