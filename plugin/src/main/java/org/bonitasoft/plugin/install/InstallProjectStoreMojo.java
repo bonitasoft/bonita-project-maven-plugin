@@ -77,7 +77,7 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverExcepti
  * and look for them in a project local dependency store (.store folder by default).
  * Install missing dependencies found in the local store in the local repository.
  */
-@Mojo(name = "install", defaultPhase = LifecyclePhase.NONE)
+@Mojo(name = "install", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
 public class InstallProjectStoreMojo extends AbstractMojo {
 
     private static final String GROUP_ID = "groupId";

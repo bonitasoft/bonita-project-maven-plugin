@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
  * </ul>
  */
 @Slf4j
-@Mojo(name = "validate", defaultPhase = LifecyclePhase.VALIDATE)
+@Mojo(name = "validate", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true)
 public class ValidateMojo extends AbstractBuildMojo {
 
     public static final String BDM_SOURCE_FILE_REGEX = "^bom.xml$";

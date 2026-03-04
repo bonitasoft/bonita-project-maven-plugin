@@ -39,7 +39,7 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 /**
  * This mojo creates a bdm module and its submodules in the current project with a Business Object Model descriptor sample file.
  */
-@Mojo(name = "create-bdm-module", defaultPhase = LifecyclePhase.NONE)
+@Mojo(name = "create-bdm-module", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
 public class CreateBdmModuleMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)

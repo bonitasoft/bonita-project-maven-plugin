@@ -65,7 +65,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Bonita specific extensions.
  * <p>Note: extensions in reactor must be compiled first, so we can inspect the class hierarchy.</p>
  */
-@Mojo(name = "analyze", aggregator = true)
+@Mojo(name = "analyze", aggregator = true, threadSafe = true)
 public class AnalyzeBonitaDependencyMojo extends AbstractMojo {
 
     protected final ArtifactResolver artifactResolver;
