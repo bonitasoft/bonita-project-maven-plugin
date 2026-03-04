@@ -45,7 +45,7 @@ import org.bonitasoft.plugin.MavenSessionExecutor;
  * <p>This mojo extracts parameters from all the processes found in the project into a single parameters file.</p>
  * <p>This does <b>not</b> extract parameters from a Bonita configuration archive you may have updated.</p>
  */
-@Mojo(name = "extract-configuration", aggregator = true, requiresProject = true)
+@Mojo(name = "extract-configuration", aggregator = true, requiresProject = true, threadSafe = true)
 public class ExtractConfigurationArchiveMojo extends AbstractConfigurationArchiveMojo {
 
     protected ParameterConfigurationExtractor extractor = new ParameterConfigurationExtractor();

@@ -29,7 +29,7 @@ import org.bonitasoft.bonita2bar.configuration.ParametersConfigurationMerger;
 /**
  * This mojo merges given parameters into a Bonita configuration archive.
  */
-@Mojo(name = "merge-configuration", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, aggregator = true, requiresProject = true)
+@Mojo(name = "merge-configuration", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, aggregator = true, requiresProject = true, threadSafe = true)
 public class MergeConfigurationArchiveMojo extends AbstractConfigurationArchiveMojo {
 
     protected ParametersConfigurationMerger merger = new ParametersConfigurationMerger();

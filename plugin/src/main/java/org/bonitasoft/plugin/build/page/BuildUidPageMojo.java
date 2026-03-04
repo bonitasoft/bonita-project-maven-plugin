@@ -32,7 +32,7 @@ import org.bonitasoft.plugin.AbstractBuildMojo;
 /**
  * This mojo builds UI designer pages from sources.
  */
-@Mojo(name = "uid-page", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = false)
+@Mojo(name = "uid-page", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, requiresProject = false, threadSafe = true)
 public class BuildUidPageMojo extends AbstractBuildMojo {
 
     private static final String[] DEFAULT_EXCLUDES = new String[] { ".metadata" };

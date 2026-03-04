@@ -35,7 +35,7 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 /**
  * This mojo creates an extensions module in the current project.
  */
-@Mojo(name = "create-extensions-module", defaultPhase = LifecyclePhase.NONE)
+@Mojo(name = "create-extensions-module", defaultPhase = LifecyclePhase.NONE, threadSafe = true)
 public class CreateExtensionsModuleMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
