@@ -27,7 +27,7 @@ jobs:
           java-version: 17
 
       - name: Configure Git user
-        uses: bonitasoft/git-setup-action@9593cf641830d8eadee52875d064ab6903b8b149 # v1.1.0
+        uses: bonitasoft/git-setup-action@v1
         with:
           keeper-secret-config: ${{ secrets.KSM_CONFIG }}
 
