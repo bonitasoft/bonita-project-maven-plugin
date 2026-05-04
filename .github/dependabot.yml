@@ -38,3 +38,7 @@ updates:
           - "*junit*"
           - "*test*"
           - "*mockito*"
+    ignore:
+      # Skip maven-jar-plugin 3.5.0+ due to Guice incompatibility (BPA-427)
+      - dependency-name: "*maven-jar-plugin*"
+        versions: ["[3.5.0,)"]
