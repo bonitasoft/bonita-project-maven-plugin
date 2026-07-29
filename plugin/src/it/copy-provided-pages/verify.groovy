@@ -8,7 +8,7 @@ outputFolder.eachFileRecurse(FileType.FILES) {
     files << it.getName()
 }
 
-def bonitaVersion = '10.4.0'
+def bonitaVersion = '11.1.0'
 
 def expectedFiles = [
         'page-user-case-details-' + bonitaVersion + '.zip',
