@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import jakarta.xml.bind.JAXBException;
+
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
@@ -34,8 +36,6 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import jakarta.xml.bind.JAXBException;
 
 class ApplicationDescriptorAnalyzer extends AbstractArtifactAnalyzerHandler {
 
