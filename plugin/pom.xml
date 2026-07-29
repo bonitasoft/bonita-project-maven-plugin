@@ -15,33 +15,33 @@
   <properties>
     <!-- Dependencies -->
     <bonita-artifacts-model.version>2.0.0</bonita-artifacts-model.version>
+    <bonita-business-data-generator.version>11.1.0</bonita-business-data-generator.version>
+    <bonita-ui-designer-artifact-builder.version>1.0.10</bonita-ui-designer-artifact-builder.version>
+    <bonita2bar.version>9.0.9</bonita2bar.version>
+    <cfr.version>0.152</cfr.version>
+    <file-management.version>3.2.0</file-management.version>
+    <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
+    <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
+    <maven-artifact.version>3.9.16</maven-artifact.version>
+    <maven-core.version>3.9.16</maven-core.version>
+    <maven-dependency-tree.version>3.3.0</maven-dependency-tree.version>
+    <maven-filtering.version>3.5.1</maven-filtering.version>
+    <maven-invoker.version>3.3.0</maven-invoker.version>
+    <maven-model-builder.version>3.9.16</maven-model-builder.version>
+    <maven-model.version>3.9.16</maven-model.version>
     <maven-plugin-api.version>3.9.16</maven-plugin-api.version>
     <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
-    <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
-    <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
-    <maven-plugin-plugin.version>3.15.2</maven-plugin-plugin.version>
-    <cfr.version>0.152</cfr.version>
-    <maven-dependency-tree.version>3.3.0</maven-dependency-tree.version>
-    <maven-core.version>3.9.16</maven-core.version>
-    <maven-artifact.version>3.9.16</maven-artifact.version>
-    <maven-model.version>3.9.16</maven-model.version>
-    <maven-model-builder.version>3.9.16</maven-model-builder.version>
-    <maven-settings.version>3.9.16</maven-settings.version>
-    <maven-settings-builder.version>3.9.16</maven-settings-builder.version>
     <maven-repository-metadata.version>3.9.16</maven-repository-metadata.version>
-    <maven-aether-provider.version>3.3.9</maven-aether-provider.version>
-    <maven-filtering.version>3.5.1</maven-filtering.version>
-    <maven-invoker.version>3.3.0</maven-invoker.version>
+    <maven-settings-builder.version>3.9.16</maven-settings-builder.version>
+    <maven-settings.version>3.9.16</maven-settings.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <plexus-xml.version>3.0.1</plexus-xml.version>
-    <bonita-business-data-generator.version>10.0.0</bonita-business-data-generator.version>
-    <bonita-ui-designer-artifact-builder.version>1.0.10</bonita-ui-designer-artifact-builder.version>
-    <file-management.version>3.2.0</file-management.version>
-    <bonita2bar.version>9.0.9</bonita2bar.version>
     <!-- Test -->
-    <groovy.version>3.0.25</groovy.version>
     <byte-buddy.version>1.18.11</byte-buddy.version>
+    <groovy.version>3.0.25</groovy.version>
+    <!-- Maven Plugins -->
+    <maven-plugin-plugin.version>3.15.2</maven-plugin-plugin.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -364,6 +364,7 @@
           <postBuildHookScript>verify</postBuildHookScript>
           <filterProperties>
             <bonita.runtime.version>11.1.0</bonita.runtime.version>
+            <!-- Aligned with the versions defined in bonita-project -->
             <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
             <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
             <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
