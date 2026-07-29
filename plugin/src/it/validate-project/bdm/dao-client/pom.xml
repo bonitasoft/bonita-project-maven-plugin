@@ -28,12 +28,6 @@
       <groupId>org.bonitasoft.engine</groupId>
       <artifactId>bonita-client</artifactId>
     </dependency>
-    <dependency>
-      <groupId>jakarta.persistence</groupId>
-      <artifactId>jakarta.persistence-api</artifactId>
-      <version>${jakarta.persistence-api.version}</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

@@ -366,7 +366,6 @@
             <bonita.runtime.version>11.1.0</bonita.runtime.version>
             <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
             <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
-            <jakarta.persistence-api.version>3.0.0</jakarta.persistence-api.version>
             <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
             <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
             <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>

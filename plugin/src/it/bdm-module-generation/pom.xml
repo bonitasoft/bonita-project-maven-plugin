@@ -13,7 +13,6 @@
     <bonita.runtime.version>@bonita.runtime.version@</bonita.runtime.version>
     <build-helper-maven-plugin.version>@build-helper-maven-plugin.version@</build-helper-maven-plugin.version>
     <flatten-maven-plugin.version>@flatten-maven-plugin.version@</flatten-maven-plugin.version>
-    <jakarta.persistence-api.version>@jakarta.persistence-api.version@</jakarta.persistence-api.version>
     <maven-assembly-plugin.version>@maven-assembly-plugin.version@</maven-assembly-plugin.version>
     <maven-clean-plugin.version>@maven-clean-plugin.version@</maven-clean-plugin.version>
     <maven-compiler-plugin.version>@maven-compiler-plugin.version@</maven-compiler-plugin.version>
@@ -30,11 +29,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>jakarta.persistence</groupId>
-        <artifactId>jakarta.persistence-api</artifactId>
-        <version>${jakarta.persistence-api.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.bonitasoft.runtime</groupId>
         <artifactId>bonita-runtime-bom</artifactId>

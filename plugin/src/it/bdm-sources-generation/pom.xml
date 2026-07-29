@@ -11,7 +11,6 @@
   <properties>
     <bonita-project-maven-plugin.version>@project.version@</bonita-project-maven-plugin.version>
     <bonita.runtime.version>@bonita.runtime.version@</bonita.runtime.version>
-    <jakarta.persistence-api.version>@jakarta.persistence-api.version@</jakarta.persistence-api.version>
     <build-helper-maven-plugin.version>@build-helper-maven-plugin.version@</build-helper-maven-plugin.version>
   </properties>
 
@@ -19,16 +18,6 @@
     <module>model</module>
     <module>dao-client</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>jakarta.persistence</groupId>
-        <artifactId>jakarta.persistence-api</artifactId>
-        <version>${jakarta.persistence-api.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <build>
     <pluginManagement>
