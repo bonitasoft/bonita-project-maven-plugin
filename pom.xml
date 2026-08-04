@@ -88,7 +88,7 @@
     <spotless-maven-plugin.version>3.9.0</spotless-maven-plugin.version>
     <gitflow-maven-plugin.version>1.21.0</gitflow-maven-plugin.version>
     <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
-    <sisu-maven-plugin.version>1.0.0</sisu-maven-plugin.version>
+    <sisu-maven-plugin.version>1.1.0</sisu-maven-plugin.version>
     <!-- Test -->
     <junit-jupiter-engine.version>6.1.2</junit-jupiter-engine.version>
     <junit-platform-runner.version>1.7.0</junit-platform-runner.version>
