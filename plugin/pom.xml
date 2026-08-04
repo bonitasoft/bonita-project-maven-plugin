@@ -14,7 +14,7 @@
   </prerequisites>
   <properties>
     <!-- Dependencies -->
-    <bonita-artifacts-model.version>2.0.0</bonita-artifacts-model.version>
+    <bonita-artifacts-model.version>2.0.1</bonita-artifacts-model.version>
     <bonita-business-data-generator.version>11.1.0</bonita-business-data-generator.version>
     <bonita-ui-designer-artifact-builder.version>1.0.10</bonita-ui-designer-artifact-builder.version>
     <bonita2bar.version>9.0.9</bonita2bar.version>
