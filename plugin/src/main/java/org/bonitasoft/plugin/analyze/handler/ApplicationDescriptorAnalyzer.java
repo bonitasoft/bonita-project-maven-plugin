@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.maven.artifact.Artifact;
 import org.bonitasoft.engine.business.application.exporter.ApplicationNodeContainerConverter;

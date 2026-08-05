@@ -23,7 +23,8 @@ import java.nio.file.Path;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.bind.JAXBException;
+
+import jakarta.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;

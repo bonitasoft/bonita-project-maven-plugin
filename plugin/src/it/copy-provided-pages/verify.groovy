@@ -1,4 +1,5 @@
 import groovy.io.FileType
+import groovy.xml.XmlSlurper
 
 def outputFolder = new File(basedir, 'app/target/provided-pages');
 assert outputFolder.exists(): "Output folder '${outputFolder}' does not exist"
@@ -8,7 +9,9 @@ outputFolder.eachFileRecurse(FileType.FILES) {
     files << it.getName()
 }
 
-def bonitaVersion = '10.2.0'
+String bonitaVersion = new XmlSlurper()
+        .parse(new File(basedir, 'pom.xml'))
+        .properties.'bonita.runtime.version'.text()
 
 def expectedFiles = [
         'page-user-case-details-' + bonitaVersion + '.zip',
