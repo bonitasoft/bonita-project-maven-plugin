@@ -11,6 +11,11 @@
   <name>build-process-project</name>
   <dependencies>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>1.9</version>
+    </dependency>
+    <dependency>
       <groupId>org.bonitasoft.engine</groupId>
       <artifactId>bonita-common</artifactId>
       <scope>provided</scope>
