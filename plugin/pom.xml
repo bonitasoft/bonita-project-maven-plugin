@@ -36,7 +36,7 @@
     <maven-settings-builder.version>3.9.16</maven-settings-builder.version>
     <maven-settings.version>3.9.16</maven-settings.version>
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <plexus-xml.version>4.1.1</plexus-xml.version>
+    <plexus-xml.version>4.2.0</plexus-xml.version>
     <!-- Test -->
     <byte-buddy.version>1.18.11</byte-buddy.version>
     <groovy.version>3.0.25</groovy.version>
