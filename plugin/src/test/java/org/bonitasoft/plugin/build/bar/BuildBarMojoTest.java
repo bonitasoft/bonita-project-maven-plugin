@@ -17,9 +17,18 @@
 package org.bonitasoft.plugin.build.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.List;
+
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.bonitasoft.bonita2bar.BuildDiagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,12 +40,15 @@ class BuildBarMojoTest {
 
     @Mock
     private MavenProjectHelper projectHelper;
+    @Mock
+    private Log log;
 
     private BuildBarMojo mojo;
 
     @BeforeEach
     void createMojo() throws Exception {
         mojo = new BuildBarMojo(projectHelper);
+        mojo.setLog(log);
     }
 
     @Test
@@ -58,6 +70,43 @@ class BuildBarMojoTest {
         mojo.configurationFileName = "hello-1.0.0.bconf";
 
         assertThat(mojo.getConfigurationFileName(project)).isEqualTo("hello-1.0.0.bconf");
+    }
+
+    @Test
+    void reportDiagnosticsLogsEachWarning() throws Exception {
+        mojo.reportDiagnostics(List.of(
+                BuildDiagnostic.warning("xmlbeans-5.0.3.jar resolved as 5.4.0"),
+                BuildDiagnostic.warning("guava-31.1-jre.jar resolved as 33.0.0-jre")));
+
+        verify(log).warn("xmlbeans-5.0.3.jar resolved as 5.4.0");
+        verify(log).warn("guava-31.1-jre.jar resolved as 33.0.0-jre");
+        verifyNoMoreInteractions(log);
+    }
+
+    @Test
+    void reportDiagnosticsOnlyWarnsByDefault() {
+        assertThatCode(() -> mojo.reportDiagnostics(List.of(BuildDiagnostic.warning("a mismatch"))))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void reportDiagnosticsFailsOnWarningWhenConfiguredTo() {
+        mojo.failOnDependencyMismatch = true;
+
+        assertThatThrownBy(() -> mojo.reportDiagnostics(List.of(
+                BuildDiagnostic.warning("a mismatch"),
+                BuildDiagnostic.warning("another one"))))
+                .isInstanceOf(MojoFailureException.class)
+                .hasMessageContaining("2 dependency issue(s)")
+                .hasMessageContaining("bonita.failOnDependencyMismatch");
+    }
+
+    @Test
+    void reportDiagnosticsDoesNotFailWithoutWarning() {
+        mojo.failOnDependencyMismatch = true;
+
+        assertThatCode(() -> mojo.reportDiagnostics(List.of())).doesNotThrowAnyException();
+        verifyNoMoreInteractions(log);
     }
 
 }
