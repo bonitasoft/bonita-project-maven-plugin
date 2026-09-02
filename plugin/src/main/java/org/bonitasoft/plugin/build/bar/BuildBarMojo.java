@@ -116,7 +116,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
      * is reported.
      */
     @Parameter(defaultValue = "false", property = "bonita.failOnDependencyMismatch")
-    private boolean failOnDependencyMismatch;
+    boolean failOnDependencyMismatch;
 
     /**
      * List of process diagram files to include.
@@ -152,7 +152,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
      * @param diagnostics the diagnostics collected for every process
      * @throws MojoFailureException when a warning was reported and the build is configured to fail on it
      */
-    private void reportDiagnostics(List<BuildDiagnostic> diagnostics) throws MojoFailureException {
+    void reportDiagnostics(List<BuildDiagnostic> diagnostics) throws MojoFailureException {
         diagnostics.forEach(diagnostic -> {
             if (diagnostic.severity() == BuildDiagnostic.Severity.WARNING) {
                 getLog().warn(diagnostic.message());
