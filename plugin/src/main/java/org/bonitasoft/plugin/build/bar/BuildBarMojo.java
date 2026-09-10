@@ -153,16 +153,15 @@ public class BuildBarMojo extends AbstractBuildMojo {
      * @throws MojoFailureException when a warning was reported and the build is configured to fail on it
      */
     void reportDiagnostics(List<BuildDiagnostic> diagnostics) throws MojoFailureException {
-        diagnostics.forEach(diagnostic -> {
+        var warnings = 0;
+        for (var diagnostic : diagnostics) {
             if (diagnostic.severity() == BuildDiagnostic.Severity.WARNING) {
                 getLog().warn(diagnostic.message());
+                warnings++;
             } else {
                 getLog().info(diagnostic.message());
             }
-        });
-        var warnings = diagnostics.stream()
-                .filter(diagnostic -> diagnostic.severity() == BuildDiagnostic.Severity.WARNING)
-                .count();
+        }
         if (warnings > 0 && failOnDependencyMismatch) {
             throw new MojoFailureException(String.format(
                     "%d dependency issue(s) reported while building the business archives."
