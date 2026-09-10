@@ -150,19 +150,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <repositories>
-    <!-- TODO BPA-686: remove once bonita2bar 9.0.10 is released -->
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>central-portal-snapshots</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-    </repository>
-  </repositories>
   <build>
     <pluginManagement>
       <plugins>

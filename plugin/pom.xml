@@ -37,8 +37,7 @@
     <bonita-business-data-generator.version>10.0.0</bonita-business-data-generator.version>
     <bonita-ui-designer-artifact-builder.version>1.0.10</bonita-ui-designer-artifact-builder.version>
     <file-management.version>3.1.0</file-management.version>
-    <!-- TODO BPA-686: repin to the 9.0.10 release before merge -->
-    <bonita2bar.version>9.0.10-SNAPSHOT</bonita2bar.version>
+    <bonita2bar.version>9.0.10</bonita2bar.version>
     <!-- Test -->
     <groovy.version>3.0.23</groovy.version>
     <byte-buddy.version>1.15.10</byte-buddy.version>
