@@ -44,6 +44,7 @@ import org.bonitasoft.bonita2bar.BarBuilder;
 import org.bonitasoft.bonita2bar.BarBuilderFactory;
 import org.bonitasoft.bonita2bar.BarBuilderFactory.BuildConfig;
 import org.bonitasoft.bonita2bar.BuildBarException;
+import org.bonitasoft.bonita2bar.BuildDiagnostic;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry.ConnectorImplementationJar;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
@@ -110,6 +111,14 @@ public class BuildBarMojo extends AbstractBuildMojo {
     private boolean includeDependencyJars;
 
     /**
+     * Whether a dependency selected in a process configuration, but resolved by Maven in another version,
+     * should fail the build. Such a dependency is never embedded in the BAR. Default to false, a warning
+     * is reported.
+     */
+    @Parameter(defaultValue = "false", property = "bonita.failOnDependencyMismatch")
+    boolean failOnDependencyMismatch;
+
+    /**
      * List of process diagram files to include.
      */
     @Parameter(property = "proc.includes")
@@ -135,6 +144,30 @@ public class BuildBarMojo extends AbstractBuildMojo {
     @Inject
     public BuildBarMojo(MavenProjectHelper projectHelper) {
         this.projectHelper = projectHelper;
+    }
+
+    /**
+     * Surfaces the diagnostics reported while building, so that they are not buried in the logs.
+     *
+     * @param diagnostics the diagnostics collected for every process
+     * @throws MojoFailureException when a warning was reported and the build is configured to fail on it
+     */
+    void reportDiagnostics(List<BuildDiagnostic> diagnostics) throws MojoFailureException {
+        var warnings = 0;
+        for (var diagnostic : diagnostics) {
+            if (diagnostic.severity() == BuildDiagnostic.Severity.WARNING) {
+                getLog().warn(diagnostic.message());
+                warnings++;
+            } else {
+                getLog().info(diagnostic.message());
+            }
+        }
+        if (warnings > 0 && failOnDependencyMismatch) {
+            throw new MojoFailureException(String.format(
+                    "%d dependency issue(s) reported while building the business archives."
+                            + " Set bonita.failOnDependencyMismatch to false to only warn.",
+                    warnings));
+        }
     }
 
     @Override
@@ -174,9 +207,11 @@ public class BuildBarMojo extends AbstractBuildMojo {
             throw new MojoExecutionException(e);
         }
 
+        var diagnostics = new ArrayList<BuildDiagnostic>();
         for (var pool : processRegistry.getProcesses()) {
             try {
                 var buildResult = barBuilder.build(pool, environment.toLowerCase());
+                diagnostics.addAll(buildResult.getDiagnostics());
                 buildResult.writeBusinessArchivesTo(outputFolder.resolve("processes"));
                 getLog().info("");
             } catch (BuildBarException | IOException e) {
@@ -184,6 +219,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                         String.format("Failed to build %s (%s)", pool.getName(), pool.getVersion()), e);
             }
         }
+        reportDiagnostics(diagnostics);
         try {
             var aggregatedResult = barBuilder.getBuildResult();
             if (aggregatedResult != null && !aggregatedResult.getConfigurations().isEmpty()) {
