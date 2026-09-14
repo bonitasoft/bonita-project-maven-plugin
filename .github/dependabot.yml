@@ -1,29 +1,11 @@
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions
-  - package-ecosystem: github-actions
-    # Set the directory to "/" to check for workflow files in .github/workflows
-    directory: /
-    target-branch: develop
-    schedule:
-      interval: weekly
-      day: sunday
-      time: "05:00"
-    open-pull-requests-limit: 5
-    groups:
-      actions-minor:
-        update-types:
-          - minor
-          - patch
-
   # Maintain dependencies for maven
-  - package-ecosystem: maven
-    directory: /
+  - package-ecosystem: "maven"
+    directory: "/"
     target-branch: develop
     schedule:
-      interval: weekly
-      day: sunday
-      time: "06:00"
+      interval: "weekly"
     open-pull-requests-limit: 5
     groups:
       maven-plugins:
@@ -38,3 +20,59 @@ updates:
           - "*junit*"
           - "*test*"
           - "*mockito*"
+    ignore:
+      # Skip maven-jar-plugin 3.5.0+ due to Guice incompatibility (BPA-427)
+      - dependency-name: "*maven-jar-plugin*"
+        versions: [ "[3.5.0,)" ]
+
+  # Maintain dependencies for GitHub Actions (develop)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: develop
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
+
+  # Maintain dependencies for GitHub Actions (support/1.0.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/1.0.x
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
+
+  # Maintain dependencies for GitHub Actions (support/2.0.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/2.0.x
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
+
+  # Maintain dependencies for GitHub Actions (support/2.1.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/2.1.x
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
