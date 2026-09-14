@@ -1,21 +1,78 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
 version: 2
 updates:
+  # Maintain dependencies for maven
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: develop
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      maven-plugins:
+        patterns:
+          - "*org.apache.maven.plugins*"
+      maven:
+        patterns:
+          - "*org.apache.maven*"
+      test:
+        patterns:
+          - "*assertj*"
+          - "*junit*"
+          - "*test*"
+          - "*mockito*"
+    ignore:
+      # Skip maven-jar-plugin 3.5.0+ due to Guice incompatibility (BPA-427)
+      - dependency-name: "*maven-jar-plugin*"
+        versions: [ "[3.5.0,)" ]
 
-  # Maintain dependencies for GitHub Actions
+  # Maintain dependencies for GitHub Actions (develop)
   - package-ecosystem: "github-actions"
     directory: "/"
     target-branch: develop
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
 
-  # Maintain dependencies for maven
-  - package-ecosystem: "maven" 
-    directory: "/" 
-    target-branch: develop
+  # Maintain dependencies for GitHub Actions (support/1.0.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/1.0.x
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
+
+  # Maintain dependencies for GitHub Actions (support/2.0.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/2.0.x
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
+
+  # Maintain dependencies for GitHub Actions (support/2.1.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/2.1.x
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
