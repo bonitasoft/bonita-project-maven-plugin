@@ -30,7 +30,7 @@
     <maven-model-builder.version>3.9.16</maven-model-builder.version>
     <maven-model.version>3.9.16</maven-model.version>
     <maven-plugin-api.version>3.9.16</maven-plugin-api.version>
-    <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
+    <maven-plugin-annotations.version>3.16.0</maven-plugin-annotations.version>
     <maven-project.version>2.2.1</maven-project.version>
     <maven-repository-metadata.version>3.9.16</maven-repository-metadata.version>
     <maven-settings-builder.version>3.9.16</maven-settings-builder.version>
