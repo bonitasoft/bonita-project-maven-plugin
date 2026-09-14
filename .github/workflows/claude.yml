@@ -12,6 +12,11 @@ on:
 
 jobs:
   claude:
+    # Only run when "@claude" is mentioned in:
+    # 1. A comment on an issue or a PR
+    # 2. A PR review comment (inline, on a diff line)
+    # 3. A submitted PR review body
+    # 4. The title or body of an opened or assigned issue
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
@@ -32,7 +37,8 @@ jobs:
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@c038e4dcdedfbbca18dfb17df35a17e40ded4ddc # v1.0.186
+        # Intentionally NOT pinned to a SHA: this action is released several times a day, tracking the major tag instead
+        uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ORGANIZATION_ANTHROPIC_API_KEY }}
 
