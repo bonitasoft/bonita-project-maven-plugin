@@ -76,3 +76,16 @@ updates:
     groups:
       minor-patch:
         update-types: [ "minor", "patch" ]
+
+  # Maintain dependencies for GitHub Actions (support/3.0.x)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: support/3.0.x
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      minor-patch:
+        update-types: [ "minor", "patch" ]
