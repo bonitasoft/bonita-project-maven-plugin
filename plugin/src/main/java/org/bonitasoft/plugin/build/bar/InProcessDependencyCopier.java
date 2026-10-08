@@ -79,6 +79,12 @@ public class InProcessDependencyCopier {
             ProjectBuildingResult buildingResult = projectBuilder.build(pomFile, buildingRequest);
             Files.createDirectories(outputDirectory.toPath());
             DependencyResolutionResult dependencyResolutionResult = buildingResult.getDependencyResolutionResult();
+            // ProjectBuilder does NOT throw for unresolvable dependencies when resolveDependencies=true: it
+            // stores the failure in the result and getResolvedDependencies() silently omits it. The fork-based
+            // path failed the build in this situation (dependency:copy-dependencies exits non-zero) - replicate
+            // that here, otherwise a missing/offline/mismatched-version dependency would silently produce an
+            // incomplete BAR instead of failing loudly.
+            failOnUnresolvedDependencies(pomFile, dependencyResolutionResult);
             for (Dependency dependency : dependencyResolutionResult.getResolvedDependencies()) {
                 if (isRuntimeClasspathJar(dependency)) {
                     copyToOutputDirectory(dependency, outputDirectory);
@@ -89,14 +95,41 @@ public class InProcessDependencyCopier {
         }
     }
 
-    private boolean isRuntimeClasspathJar(Dependency dependency) {
-        return dependency.getScope() != null && RUNTIME_CLASSPATH_SCOPES.contains(dependency.getScope())
-                && JAR_EXTENSION.equals(dependency.getArtifact().getExtension())
-                && dependency.getArtifact().getFile() != null;
+    private void failOnUnresolvedDependencies(File pomFile, DependencyResolutionResult dependencyResolutionResult)
+            throws MojoExecutionException {
+        if (!dependencyResolutionResult.getCollectionErrors().isEmpty()) {
+            throw new MojoExecutionException("Failed to collect dependencies of " + pomFile + ": "
+                    + dependencyResolutionResult.getCollectionErrors());
+        }
+        List<Dependency> unresolved = dependencyResolutionResult.getUnresolvedDependencies();
+        if (!unresolved.isEmpty()) {
+            StringBuilder message = new StringBuilder("Failed to resolve dependencies of ").append(pomFile)
+                    .append(':');
+            for (Dependency dependency : unresolved) {
+                message.append("\n  ").append(dependency.getArtifact())
+                        .append(" - ").append(dependencyResolutionResult.getResolutionErrors(dependency));
+            }
+            throw new MojoExecutionException(message.toString());
+        }
     }
 
-    private void copyToOutputDirectory(Dependency dependency, File outputDirectory) throws IOException {
+    private boolean isRuntimeClasspathJar(Dependency dependency) {
+        return dependency.getScope() != null && RUNTIME_CLASSPATH_SCOPES.contains(dependency.getScope())
+                && JAR_EXTENSION.equals(dependency.getArtifact().getExtension());
+    }
+
+    private void copyToOutputDirectory(Dependency dependency, File outputDirectory)
+            throws IOException, MojoExecutionException {
         File resolvedFile = dependency.getArtifact().getFile();
+        // A reactor sibling module can resolve through Maven's workspace reader to its target/classes
+        // directory (not yet packaged) instead of a jar - the fork-based path never saw this, since it
+        // ran in a fresh, non-reactor Maven session. Fail loudly rather than silently dropping it.
+        if (resolvedFile == null || !resolvedFile.isFile()) {
+            throw new MojoExecutionException(String.format(
+                    "Dependency %s did not resolve to a jar file (got: %s). This can happen when it resolves "
+                            + "to an unpackaged reactor module; package/install that module before business-archive.",
+                    dependency.getArtifact(), resolvedFile));
+        }
         // reuse the resolved file name verbatim: reconstructing it manually risks a mismatch for
         // SNAPSHOT/classified artifacts, which would then be silently dropped downstream.
         File target = new File(outputDirectory, resolvedFile.getName());

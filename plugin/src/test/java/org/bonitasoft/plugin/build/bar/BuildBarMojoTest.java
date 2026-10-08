@@ -116,7 +116,7 @@ class BuildBarMojoTest {
     }
 
     @Test
-    void createMavenExecutorReturnsABarMavenExecutor() throws Exception {
+    void createMavenExecutorReturnsABarMavenExecutor() {
         mojo.session = session;
 
         assertThat(mojo.createMavenExecutor()).isInstanceOf(BarMavenExecutor.class);

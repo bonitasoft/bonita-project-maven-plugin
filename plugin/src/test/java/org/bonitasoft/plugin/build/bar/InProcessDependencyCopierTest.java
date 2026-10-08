@@ -17,7 +17,9 @@
 package org.bonitasoft.plugin.build.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -31,6 +33,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -69,6 +72,8 @@ class InProcessDependencyCopierTest {
         when(session.getProjectBuildingRequest()).thenReturn(new DefaultProjectBuildingRequest());
         when(projectBuilder.build(any(File.class), any(ProjectBuildingRequest.class))).thenReturn(buildingResult);
         when(buildingResult.getDependencyResolutionResult()).thenReturn(dependencyResolutionResult);
+        when(dependencyResolutionResult.getCollectionErrors()).thenReturn(List.of());
+        when(dependencyResolutionResult.getUnresolvedDependencies()).thenReturn(List.of());
         when(dependencyResolutionResult.getResolvedDependencies()).thenReturn(dependencies);
         copier = new InProcessDependencyCopier(session, projectBuilder);
     }
@@ -156,7 +161,7 @@ class InProcessDependencyCopierTest {
 
         copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of("env-Production"));
 
-        org.mockito.Mockito.verify(projectBuilder).build(any(File.class), captor.capture());
+        verify(projectBuilder).build(any(File.class), captor.capture());
         ProjectBuildingRequest usedRequest = captor.getValue();
         assertThat(usedRequest.getActiveProfileIds()).containsExactly("env-Production");
         assertThat(usedRequest.isResolveDependencies()).isTrue();
@@ -170,13 +175,15 @@ class InProcessDependencyCopierTest {
         when(session.getProjectBuildingRequest()).thenReturn(sessionRequest);
         when(projectBuilder.build(any(File.class), any(ProjectBuildingRequest.class))).thenReturn(buildingResult);
         when(buildingResult.getDependencyResolutionResult()).thenReturn(dependencyResolutionResult);
+        when(dependencyResolutionResult.getCollectionErrors()).thenReturn(List.of());
+        when(dependencyResolutionResult.getUnresolvedDependencies()).thenReturn(List.of());
         when(dependencyResolutionResult.getResolvedDependencies()).thenReturn(List.of());
         copier = new InProcessDependencyCopier(session, projectBuilder);
         ArgumentCaptor<ProjectBuildingRequest> captor = ArgumentCaptor.forClass(ProjectBuildingRequest.class);
 
         copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of("env-Production"));
 
-        org.mockito.Mockito.verify(projectBuilder).build(any(File.class), captor.capture());
+        verify(projectBuilder).build(any(File.class), captor.capture());
         assertThat(captor.getValue().getActiveProfileIds()).containsExactlyInAnyOrder("env-Base", "env-Production");
     }
 
@@ -184,11 +191,62 @@ class InProcessDependencyCopierTest {
     void should_wrap_project_building_exception_in_mojo_execution_exception() throws Exception {
         when(session.getProjectBuildingRequest()).thenReturn(new DefaultProjectBuildingRequest());
         when(projectBuilder.build(any(File.class), any(ProjectBuildingRequest.class)))
-                .thenThrow(new org.apache.maven.project.ProjectBuildingException("id", "failed", (File) null));
+                .thenThrow(new ProjectBuildingException("id", "failed", (File) null));
         copier = new InProcessDependencyCopier(session, projectBuilder);
 
-        org.junit.jupiter.api.Assertions.assertThrows(MojoExecutionException.class,
-                () -> copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of()));
+        assertThatThrownBy(() -> copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of()))
+                .isInstanceOf(MojoExecutionException.class)
+                .hasCauseInstanceOf(ProjectBuildingException.class);
+    }
+
+    @Test
+    void should_fail_when_dependency_collection_has_errors() throws Exception {
+        when(session.getProjectBuildingRequest()).thenReturn(new DefaultProjectBuildingRequest());
+        when(projectBuilder.build(any(File.class), any(ProjectBuildingRequest.class))).thenReturn(buildingResult);
+        when(buildingResult.getDependencyResolutionResult()).thenReturn(dependencyResolutionResult);
+        when(dependencyResolutionResult.getCollectionErrors())
+                .thenReturn(List.of(new Exception("could not compute the dependency graph")));
+        copier = new InProcessDependencyCopier(session, projectBuilder);
+
+        assertThatThrownBy(() -> copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of()))
+                .isInstanceOf(MojoExecutionException.class)
+                .hasMessageContaining("could not compute the dependency graph");
+    }
+
+    @Test
+    void should_fail_when_a_dependency_is_unresolved_instead_of_silently_skipping_it() throws Exception {
+        Dependency unresolved = runtimeDependency("com.company", "missing-lib", "", "1.0.0", "runtime", "jar",
+                "irrelevant");
+        when(session.getProjectBuildingRequest()).thenReturn(new DefaultProjectBuildingRequest());
+        when(projectBuilder.build(any(File.class), any(ProjectBuildingRequest.class))).thenReturn(buildingResult);
+        when(buildingResult.getDependencyResolutionResult()).thenReturn(dependencyResolutionResult);
+        when(dependencyResolutionResult.getCollectionErrors()).thenReturn(List.of());
+        when(dependencyResolutionResult.getUnresolvedDependencies()).thenReturn(List.of(unresolved));
+        when(dependencyResolutionResult.getResolutionErrors(unresolved))
+                .thenReturn(List.of(new Exception("artifact not found in any repository")));
+        copier = new InProcessDependencyCopier(session, projectBuilder);
+
+        assertThatThrownBy(() -> copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of()))
+                .isInstanceOf(MojoExecutionException.class)
+                .hasMessageContaining("missing-lib")
+                .hasMessageContaining("artifact not found in any repository");
+    }
+
+    @Test
+    void should_fail_when_resolved_artifact_is_a_directory_instead_of_a_jar() throws Exception {
+        // happens when a dependency resolves to an unpackaged reactor sibling module via Maven's
+        // workspace reader (e.g. its target/classes directory) instead of a real jar file
+        Path reactorClassesDir = sourceRepo.resolve("target/classes");
+        Files.createDirectories(reactorClassesDir);
+        var artifact = new DefaultArtifact("com.company", "sibling-module", "", "jar", "1.0.0", Map.of(),
+                reactorClassesDir.toFile());
+        Dependency dependency = new Dependency(artifact, "compile");
+        givenResolvedDependencies(List.of(dependency));
+
+        assertThatThrownBy(() -> copier.copyRuntimeDependencies(new File("pom.xml"), outputDir.toFile(), List.of()))
+                .isInstanceOf(MojoExecutionException.class)
+                .hasMessageContaining("sibling-module");
+        assertThat(outputDir).isEmptyDirectory();
     }
 
 }

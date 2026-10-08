@@ -90,7 +90,7 @@ class BarMavenExecutorTest {
 
         executor.execute(pomFile, List.of("dependency:copy-dependencies"), properties, List.of(), errorMessageBase);
 
-        verify(copier).copyRuntimeDependencies(eq(pomFile), eq(absoluteOutputDirectory), eq(List.of()));
+        verify(copier).copyRuntimeDependencies(pomFile, absoluteOutputDirectory, List.of());
     }
 
     @Test
