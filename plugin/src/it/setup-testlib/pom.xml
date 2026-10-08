@@ -9,7 +9,7 @@
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven-jar-plugin.version>@maven-jar-plugin.version@</maven-jar-plugin.version>
+    <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
   </properties>
   <build>
     <plugins>
