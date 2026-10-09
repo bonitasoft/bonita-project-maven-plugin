@@ -38,6 +38,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.bonitasoft.bonita2bar.BarBuilder;
@@ -47,6 +48,7 @@ import org.bonitasoft.bonita2bar.BuildBarException;
 import org.bonitasoft.bonita2bar.BuildDiagnostic;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry;
 import org.bonitasoft.bonita2bar.ConnectorImplementationRegistry.ConnectorImplementationJar;
+import org.bonitasoft.bonita2bar.MavenExecutor;
 import org.bonitasoft.bonita2bar.ProcessRegistry;
 import org.bonitasoft.bonita2bar.form.FormBuilder;
 import org.bonitasoft.bpm.model.process.util.migration.MigrationPolicy;
@@ -135,15 +137,18 @@ public class BuildBarMojo extends AbstractBuildMojo {
      */
     private MavenProjectHelper projectHelper;
 
+    private ProjectBuilder projectBuilder;
+
     /**
      * Maven session.
      */
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
-    private MavenSession session;
+    MavenSession session;
 
     @Inject
-    public BuildBarMojo(MavenProjectHelper projectHelper) {
+    public BuildBarMojo(MavenProjectHelper projectHelper, ProjectBuilder projectBuilder) {
         this.projectHelper = projectHelper;
+        this.projectBuilder = projectBuilder;
     }
 
     /**
@@ -198,7 +203,7 @@ public class BuildBarMojo extends AbstractBuildMojo {
                     .allowEmptyFormMapping(allowEmptyFormMapping)
                     .includeParameters(includeParameters)
                     .mavenProject(project)
-                    .mavenExecutor(MavenSessionExecutor.forBarFromSession(session))
+                    .mavenExecutor(createMavenExecutor())
                     .formBuilder(createFormBuilder(uidWorkspaceProperties(outputFolder)))
                     .workingDirectory(tmpFolder)
                     .withDependencyJars(includeDependencyJars)
@@ -234,6 +239,11 @@ public class BuildBarMojo extends AbstractBuildMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e);
         }
+    }
+
+    MavenExecutor createMavenExecutor() {
+        return new BarMavenExecutor(new InProcessDependencyCopier(session, projectBuilder),
+                MavenSessionExecutor.forBarFromSession(session));
     }
 
     String getConfigurationFileName(MavenProject project) {

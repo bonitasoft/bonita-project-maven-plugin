@@ -25,6 +25,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,6 +35,9 @@ import java.util.function.Supplier;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.bonitasoft.plugin.MavenSessionExecutor.BuildException;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -121,6 +126,36 @@ class MavenSessionExecutorTest {
         assertThatThrownBy(() -> executor.execute(pomFile, pomFile.getParentFile(), goals, properties, activeProfiles,
                 errorMessageBase)).isInstanceOf(BuildException.class).message()
                 .contains("Unknown lifecycle phase \"non-existing-goal\"");
+    }
+
+    @Test
+    void should_restore_the_context_class_loader_after_an_embedded_maven_execution() throws Exception {
+        // given
+        var container = mock(PlexusContainer.class);
+        var containerRealm = mock(ClassRealm.class);
+        when(session.getContainer()).thenReturn(container);
+        when(container.getContainerRealm()).thenReturn(containerRealm);
+        when(containerRealm.getWorld()).thenReturn(new ClassWorld("plexus.core", getClass().getClassLoader()));
+        MavenSessionExecutor executor = MavenSessionExecutor.fromSession(session);
+        var callerContextClassLoader = new URLClassLoader(new URL[0], getClass().getClassLoader());
+        var mavenHome = System.getProperty("maven.home");
+        var thread = Thread.currentThread();
+        var initialContextClassLoader = thread.getContextClassLoader();
+        // an embedded maven home makes the executor run MavenCli in the current thread instead of a new process
+        System.setProperty("maven.home", new File(mavenHome, "EMBEDDED").getPath());
+        thread.setContextClassLoader(callerContextClassLoader);
+        try {
+            // when
+            // validate binds no plugin: the embedded maven has no repository connector to download one in tests
+            executor.execute(pomFile, pomFile.getParentFile(), List.of("validate"), Map.of(), List.of(),
+                    () -> "Error");
+
+            // then
+            assertThat(thread.getContextClassLoader()).isSameAs(callerContextClassLoader);
+        } finally {
+            thread.setContextClassLoader(initialContextClassLoader);
+            System.setProperty("maven.home", mavenHome);
+        }
     }
 
 }
