@@ -24,10 +24,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.List;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
 import org.bonitasoft.bonita2bar.BuildDiagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,13 +43,17 @@ class BuildBarMojoTest {
     @Mock
     private MavenProjectHelper projectHelper;
     @Mock
+    private ProjectBuilder projectBuilder;
+    @Mock
+    private MavenSession session;
+    @Mock
     private Log log;
 
     private BuildBarMojo mojo;
 
     @BeforeEach
     void createMojo() throws Exception {
-        mojo = new BuildBarMojo(projectHelper);
+        mojo = new BuildBarMojo(projectHelper, projectBuilder);
         mojo.setLog(log);
     }
 
@@ -107,6 +113,13 @@ class BuildBarMojoTest {
 
         assertThatCode(() -> mojo.reportDiagnostics(List.of())).doesNotThrowAnyException();
         verifyNoMoreInteractions(log);
+    }
+
+    @Test
+    void createMavenExecutorReturnsABarMavenExecutor() {
+        mojo.session = session;
+
+        assertThat(mojo.createMavenExecutor()).isInstanceOf(BarMavenExecutor.class);
     }
 
 }
