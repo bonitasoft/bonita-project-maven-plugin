@@ -87,6 +87,13 @@ Publication is done via the [Publish](https://github.com/bonitasoft/bonita-proje
 
 Deploy the latest site version using the [Publish Maven Site](https://github.com/bonitasoft/bonita-project-maven-plugin/actions/workflows/publish-site.yml) workflow.
 
+### Updating consumers
+
+Once the version is available on Maven Central, bump it in:
+
+- [bonita-project](https://github.com/bonitasoft/bonita-project): `bonita-project-maven-plugin.version` in `parent/pom.xml`
+- [bonita-studio-sp](https://github.com/bonitasoft/bonita-studio-sp): `BONITA_PROJECT_MAVEN_PLUGIN_DEFAULT_VERSION` in `DefaultPluginVersions.java`
+
 ### Cascade Merging for Support Branches
 
 When releasing from a **support branch**, you should manually cascade merge the changes up to newer branches and
