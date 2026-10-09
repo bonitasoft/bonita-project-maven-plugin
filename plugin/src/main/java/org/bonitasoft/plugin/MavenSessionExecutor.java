@@ -173,6 +173,8 @@ public class MavenSessionExecutor {
         @SuppressWarnings("deprecation")
         MavenCli cli = new MavenCli(session.getContainer().getContainerRealm().getWorld());
         String oldMultimoduleProjectProperty = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
+        var currentThread = Thread.currentThread();
+        var contextClassLoader = currentThread.getContextClassLoader();
         try {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, rootModuleDirectory.toURI().toString());
             var exitCode = cli.doMain(request.getArgs().toArray(String[]::new),
@@ -181,6 +183,9 @@ public class MavenSessionExecutor {
                 throwBuildException(errorMessageBase, outStream, null);
             }
         } finally {
+            // MavenCli sets its container realm as context class loader and never restores it: the calling mojo
+            // would then run with a class loader that does not see its own dependencies (e.g. the JAXB runtime)
+            currentThread.setContextClassLoader(contextClassLoader);
             // restore the basedir property
             if (oldMultimoduleProjectProperty == null) {
                 System.clearProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
