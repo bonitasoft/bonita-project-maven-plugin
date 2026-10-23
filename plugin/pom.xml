@@ -38,12 +38,26 @@
     <bonita-ui-designer-artifact-builder.version>1.0.10</bonita-ui-designer-artifact-builder.version>
     <file-management.version>3.1.0</file-management.version>
     <bonita2bar.version>9.0.10</bonita2bar.version>
+    <!-- Must stay aligned with the version required by jackson-dataformat-yaml -->
+    <snakeyaml.version>2.5</snakeyaml.version>
     <!-- Test -->
     <groovy.version>3.0.23</groovy.version>
     <byte-buddy.version>1.15.10</byte-buddy.version>
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${snakeyaml.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.bonitasoft.engine</groupId>
         <artifactId>bonita-artifacts-model-dependencies</artifactId>
